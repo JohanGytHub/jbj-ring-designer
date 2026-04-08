@@ -97,7 +97,7 @@ input,select{font-family:inherit;color:inherit}
 #abovePreview{padding:0 0 100px}
 
 /* Ring Preview */
-.ring-preview-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;text-align:center}
+.ring-preview-wrap{position:relative;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;text-align:center}
 .ring-preview-wrap h3{font-family:var(--font-display);font-weight:400;font-size:1rem;color:var(--text-dim);margin-bottom:16px;letter-spacing:.05em}
 .ring-svg-container{display:flex;justify-content:center;align-items:center;min-height:240px}
 .ring-svg-container svg,.ring-svg-container canvas{max-width:100%}
@@ -107,6 +107,11 @@ input,select{font-family:inherit;color:inherit}
 .ring-reset-wrap{margin-top:10px;text-align:center}
 .ring-reset-btn{display:inline-flex;align-items:center;gap:5px;background:var(--bg3);color:var(--text-dim);border:1px solid var(--border);border-radius:var(--radius);padding:5px 12px;font-size:.68rem;font-family:var(--font-body);cursor:pointer;transition:all .2s;letter-spacing:.02em}
 .ring-reset-btn:hover{background:var(--bg2);color:var(--text);border-color:var(--gold)}
+.canvas-undo-btn{position:absolute;top:8px;left:8px;z-index:10;background:var(--bg3);color:var(--text-dim);border:1px solid var(--border);border-radius:var(--radius);padding:5px 8px;cursor:pointer;transition:all .2s;display:none;align-items:center;gap:4px;font-size:.68rem;font-family:var(--font-body);letter-spacing:.02em}
+.canvas-undo-btn:hover{background:var(--bg2);color:var(--text);border-color:var(--gold)}
+.canvas-undo-btn svg{width:14px;height:14px}
+.btn-undo{display:inline-flex;align-items:center;gap:4px}
+.btn-undo svg{width:14px;height:14px}
 .ring-reset-hint{font-size:.6rem;color:var(--text-muted);margin-top:4px}
 #iconSun{display:none}
 #ringResetWrap{display:none}
@@ -455,6 +460,7 @@ input,select{font-family:inherit;color:inherit}
     <!-- Left: Preview -->
     <div class="preview-col">
       <div class="ring-preview-wrap">
+        <button class="canvas-undo-btn" id="canvasUndoBtn" onclick="undoLastInlay()" title="Undo last inlay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Undo</button>
         <h3>Your Ring</h3>
         <div class="ring-svg-container" id="ringPreview"></div>
         <div class="ring-specs" id="ringSpecs"></div>
@@ -1463,6 +1469,7 @@ function renderPanel(){
     case 'finish': renderFinishPanel(col); break;
     case 'summary': renderSummaryPanel(col); break;
   }
+  updateCanvasUndoBtn();
 }
 
 // ── STEP 1: RING SIZE ──
@@ -1706,6 +1713,46 @@ function consolidateStrips(){
   }
 }
 
+function undoLastInlay(){
+  if(state.strips.length===0) return;
+  // Remove strips from the end: skip trailing base metal edges, then remove one inlay
+  // (and any auto-pinstripe that preceded it)
+  let removed=false;
+  while(state.strips.length>0){
+    const last=state.strips[state.strips.length-1];
+    if(isMetal(last.material)){
+      // Base metal edge/pinstripe — remove it
+      state.strips.pop();
+      // If we already removed an inlay, stop here
+      if(removed) break;
+    } else {
+      // Inlay — remove it and mark done
+      state.strips.pop();
+      removed=true;
+      // Check if previous strip is now a base metal auto-pinstripe to also remove
+      if(state.strips.length>0 && isMetal(state.strips[state.strips.length-1].material)){
+        state.strips.pop();
+      }
+      break;
+    }
+  }
+  state.selectedStrip=-1;
+  consolidateStrips();
+  const col=$('#controlsCol');
+  if(col) renderComposePanel(col);
+  renderRing();
+  updatePrice();
+  updateCanvasUndoBtn();
+}
+
+function updateCanvasUndoBtn(){
+  const btn=document.getElementById('canvasUndoBtn');
+  if(!btn) return;
+  const onComposeStep=STEPS[state.step]&&STEPS[state.step].id==='compose';
+  const hasInlays=state.strips.some(s=>!isMetal(s.material));
+  btn.style.display=(onComposeStep&&hasInlays)?'inline-flex':'none';
+}
+
 function renderComposePanel(col){
   consolidateStrips();
   col.innerHTML='';
@@ -1768,6 +1815,10 @@ function renderComposePanel(col){
       renderRing();
       updatePrice();
     }},['Clear All']));
+    const undoSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
+    const undoBtn=h('button',{class:'btn btn-outline btn-sm btn-undo',onClick:()=>undoLastInlay()});
+    undoBtn.innerHTML=undoSvg+' Undo';
+    actions.appendChild(undoBtn);
   }
   col.appendChild(actions);
   
@@ -2116,6 +2167,7 @@ function renderComposePanel(col){
   });
   
   col.appendChild(navButtons(true, true));
+  updateCanvasUndoBtn();
 }
 
 function validateStrips(){
