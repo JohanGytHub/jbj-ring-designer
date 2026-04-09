@@ -121,7 +121,7 @@ input,select{font-family:inherit;color:inherit}
 #profileName{font-size:.72rem;color:var(--text-dim);margin-top:4px;font-weight:500}
 
 /* Price display */
-.price-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 20px;margin-top:16px;display:flex;justify-content:space-between;align-items:center}
+.price-bar{display:none}
 .price-bar .label{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted)}
 .price-bar .amount{font-family:var(--font-display);font-size:1.6rem;font-weight:400;color:var(--gold)}
 .price-bar .note{font-size:.65rem;color:var(--text-muted);margin-top:2px}
@@ -303,7 +303,6 @@ input,select{font-family:inherit;color:inherit}
   .ring-svg-container{min-height:180px}
   .ring-preview-wrap{padding:16px}
   .ring-preview-wrap h3{font-size:.85rem;margin-bottom:10px}
-  .price-bar{padding:12px 16px}
   
   /* Modal full width on tablet */
   .modal{max-width:100%;border-radius:var(--radius-lg)}
@@ -336,9 +335,7 @@ input,select{font-family:inherit;color:inherit}
   .strip-legend{gap:4px;margin-top:6px}
   .strip-legend-item{font-size:.58rem}
   
-  /* Hide price bar in flow, show sticky one */
-  .price-bar{display:none}
-  .price-bar-mobile{display:flex}
+  /* Price bar handled by sticky bar on all screens */
   
   /* Panel typography */
   .panel-title{font-size:1.1rem}
@@ -1470,6 +1467,9 @@ function renderPanel(){
     case 'summary': renderSummaryPanel(col); break;
   }
   updateCanvasUndoBtn();
+  // Show/hide sticky price bar (hidden on step 1)
+  const priceBarM=document.getElementById('priceBarMobile');
+  if(priceBarM) priceBarM.style.display=isSize?'none':'flex';
 }
 
 // ── STEP 1: RING SIZE ──
