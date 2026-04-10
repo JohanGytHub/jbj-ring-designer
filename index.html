@@ -163,7 +163,7 @@ input,select{font-family:inherit;color:inherit}
 .mat-card.selected .name{color:var(--gold)}
 
 /* Width & Profile selectors */
-.width-control{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.width-control{display:flex;align-items:center;gap:10px;margin-bottom:6px}
 .width-control input[type=range]{flex:1;accent-color:var(--gold);height:4px}
 .width-val{font-family:var(--font-display);font-size:1.4rem;color:var(--gold);min-width:60px;text-align:center}
 
@@ -288,6 +288,10 @@ input,select{font-family:inherit;color:inherit}
 .validation-msg.error{background:var(--val-error-bg);border:1px solid var(--val-error-border);color:var(--val-error-text)}
 .validation-msg.warn{background:var(--val-warn-bg);border:1px solid var(--val-warn-border);color:var(--val-warn-text)}
 .validation-msg.info{background:var(--val-info-bg);border:1px solid var(--val-info-border);color:var(--val-info-text)}
+/* Rule violation toast */
+.rule-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:10000;background:#5c1a1a;color:#ffd6d6;padding:12px 20px;border-radius:8px;border:1px solid #8b2a2a;font-size:.82rem;line-height:1.4;max-width:420px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.4);animation:toastIn .3s ease,toastOut .4s ease 3s forwards;pointer-events:none;font-family:'DM Sans',sans-serif}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes toastOut{from{opacity:1}to{opacity:0}}
 
 /* ── MOBILE ── */
 @media(max-width:840px){
@@ -385,9 +389,7 @@ input,select{font-family:inherit;color:inherit}
   .composer-actions{gap:6px}
   
   /* Width control — stack on mobile */
-  .width-control{flex-wrap:wrap;gap:10px}
-  .width-control input[type=range]{flex:1 1 100%;order:2}
-  .width-control span:first-child{order:1}
+  .width-control{gap:8px}
   .width-control span:nth-child(3){order:3}
   
   /* Nav buttons full width */
@@ -457,7 +459,7 @@ input,select{font-family:inherit;color:inherit}
     <!-- Left: Preview -->
     <div class="preview-col">
       <div class="ring-preview-wrap">
-        <button class="canvas-undo-btn" id="canvasUndoBtn" onclick="undoLastInlay()" title="Undo last inlay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Undo</button>
+        <button class="canvas-undo-btn" id="canvasUndoBtn" onclick="undoAction()" title="Undo last action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Undo</button>
         <h3>Your Ring</h3>
         <div class="ring-svg-container" id="ringPreview"></div>
         <div class="ring-specs" id="ringSpecs"></div>
@@ -577,7 +579,7 @@ const state = {
   baseMetal: null,
   ringWidth: 8,
   profile: 'Flat',
-  wantsInlays: null, // null=not yet chosen, true/false after Step 3
+  wantsInlays: true, // null=not yet chosen, true/false after Step 3
   strips: [],
   selectedStrip: -1,
   sleeve: null,
@@ -588,6 +590,24 @@ const state = {
   spotPrices: {Gold:4640, Platinum:1980, Silver:72}, // defaults updated April 2026, live prices fetched on load
   spotsLoaded: false
 };
+
+// ── UNDO STACK ──
+const undoStack=[];
+const UNDO_MAX=30;
+function pushUndo(){
+  undoStack.push({strips:state.strips.map(s=>({...s})),selectedStrip:state.selectedStrip});
+  if(undoStack.length>UNDO_MAX) undoStack.shift();
+}
+function undoAction(){
+  if(undoStack.length===0) return;
+  const prev=undoStack.pop();
+  state.strips=prev.strips;
+  state.selectedStrip=prev.selectedStrip;
+  const col=$('#controlsCol');
+  if(col) renderComposePanel(col);
+  renderRing();
+  updatePrice();
+}
 
 // ── 3D RING VIEW STATE ──
 const ringView = {
@@ -759,6 +779,20 @@ function calcPrice(){
         const psCost=calcPinstripePrice(strip.material, strip.width, state.ringSize, 1, true);
         total+=psCost;
         breakdown.push({label:`${strip.material} (${strip.width}mm)`, price:psCost});
+      } else if(DATA.p[strip.material] && DATA.p[strip.material].inlay_by_width){
+        // Width-based inlay pricing (e.g. Zirconium, Damascus, Stainless)
+        const tbl=DATA.p[strip.material].inlay_by_width;
+        let cost=0;
+        for(let i=0;i<tbl.length;i++){
+          if(strip.width<=tbl[i][0]||i===tbl.length-1){cost=tbl[i][1];break;}
+          if(strip.width>tbl[i][0]&&strip.width<=tbl[i+1][0]){
+            const frac=(strip.width-tbl[i][0])/(tbl[i+1][0]-tbl[i][0]);
+            cost=tbl[i][1]+frac*(tbl[i+1][1]-tbl[i][1]);break;
+          }
+        }
+        cost=Math.round(cost*100)/100;
+        total+=cost;
+        breakdown.push({label:`${strip.material} (${strip.width}mm)`, price:cost});
       } else if(DATA.p[strip.material] && DATA.p[strip.material].per_mm_inlay){
         // Per-mm inlay pricing (e.g. Metal Mokume)
         const cost=DATA.p[strip.material].per_mm_inlay*strip.width;
@@ -1435,6 +1469,7 @@ function goToStep(idx){
     const usedWidth=state.strips.reduce((s,st)=>s+st.width,0);
     const remaining=state.ringWidth-usedWidth;
     if(remaining>0.01){
+      pushUndo();
       state.strips.push({material:state.baseMetal,width:parseFloat(remaining.toFixed(2))});
       consolidateStrips();
     }
@@ -1594,8 +1629,9 @@ function renderWidthPanel(col){
   
   // Width slider + manual input
   const wc=h('div',{class:'width-control'});
+  const wLabel=h('span',{style:{fontSize:'.85rem',color:'var(--text-dim)',fontFamily:'var(--font-display)',marginRight:'8px',flexShrink:'0'}},['Ring Width']);
   const wInput=h('input',{type:'number',min:'2',max:'14',step:'0.5',value:String(state.ringWidth),
-    style:{width:'70px',padding:'8px',background:'var(--input-bg)',border:'1px solid var(--border)',borderRadius:'var(--radius)',textAlign:'center',fontSize:'.95rem',color:'var(--gold)',fontFamily:'var(--font-display)',fontWeight:'500',outline:'none'},
+    style:{width:'60px',padding:'6px',background:'var(--input-bg)',border:'1px solid var(--border)',borderRadius:'var(--radius)',textAlign:'center',fontSize:'.9rem',color:'var(--gold)',fontFamily:'var(--font-display)',fontWeight:'500',outline:'none'},
     onChange:(e)=>{
       let v=parseFloat(e.target.value);
       if(isNaN(v)||v<2)v=2;if(v>14)v=14;
@@ -1603,7 +1639,7 @@ function renderWidthPanel(col){
       state.ringWidth=v;
       e.target.value=v;
       slider.value=v;
-      state.strips=[];
+      state.strips=[];undoStack.length=0;
       state.selectedStrip=-1;
       renderRing();
       updatePrice();
@@ -1613,18 +1649,40 @@ function renderWidthPanel(col){
     onInput:(e)=>{
       state.ringWidth=parseFloat(e.target.value);
       wInput.value=state.ringWidth;
-      state.strips=[];
+      state.strips=[];undoStack.length=0;
       state.selectedStrip=-1;
       renderRing();
       updatePrice();
     }
   });
+  wc.appendChild(wLabel);
   wc.appendChild(h('span',{style:{fontSize:'.75rem',color:'var(--text-muted)'}},['2mm']));
   wc.appendChild(slider);
   wc.appendChild(h('span',{style:{fontSize:'.75rem',color:'var(--text-muted)'}},['14mm']));
   wc.appendChild(wInput);
   wc.appendChild(h('span',{style:{fontSize:'.75rem',color:'var(--text-muted)'}},['mm']));
   col.appendChild(wc);
+  
+  // ── Quick width presets ──
+  const presets=[{label:'Very Narrow',w:4},{label:'Narrower Average',w:6},{label:'Wider Average',w:8},{label:'Very Wide',w:10}];
+  const presetWrap=h('div',{style:{display:'inline-grid',gridAutoFlow:'column',gridAutoColumns:'1fr',gap:'6px',margin:'2px 0 0'}});
+  presets.forEach(p=>{
+    const isActive=state.ringWidth===p.w;
+    presetWrap.appendChild(h('button',{
+      style:{padding:'8px 4px',borderRadius:'var(--radius)',border:isActive?'2px solid var(--gold)':'1px solid var(--border)',
+        background:isActive?'var(--bg3)':'var(--bg2)',color:isActive?'var(--gold)':'var(--text-muted)',
+        fontFamily:'var(--font-display)',fontSize:'.72rem',fontWeight:isActive?'500':'400',cursor:'pointer',transition:'var(--transition)',textAlign:'center',lineHeight:'1.3',whiteSpace:'nowrap'},
+      onClick:()=>{
+        state.ringWidth=p.w;
+        if(state.strips.length>0){pushUndo();state.strips=[];undoStack.length=0;}
+        state.selectedStrip=-1;
+        renderWidthPanel(col);
+        renderRing();
+        updatePrice();
+      }
+    },[p.label+' ('+p.w+'mm)']));
+  });
+  col.appendChild(presetWrap);
   
   // ── Inlay toggle ──
   col.appendChild(h('h3',{style:{fontFamily:'var(--font-display)',fontWeight:'400',fontSize:'1rem',color:'var(--text-dim)',margin:'24px 0 6px'}},['Custom Inlays']));
@@ -1641,9 +1699,9 @@ function renderWidthPanel(col){
         const changed=state.wantsInlays!==val;
         state.wantsInlays=val;
         // If switching away from inlays, clear strips and allow any profile
-        if(!val){state.strips=[];state.selectedStrip=-1;}
+        if(!val){state.strips=[];state.selectedStrip=-1;undoStack.length=0;}
         // If switching to inlays and current profile isn't inlay-compatible, reset to Flat
-        if(val&&!INLAY_PROFILES.includes(state.profile)){state.profile='Flat';state.strips=[];state.selectedStrip=-1;}
+        if(val&&!INLAY_PROFILES.includes(state.profile)){state.profile='Flat';state.strips=[];state.selectedStrip=-1;undoStack.length=0;}
         renderWidthPanel(col);
         renderRing();
         updatePrice();
@@ -1713,44 +1771,11 @@ function consolidateStrips(){
   }
 }
 
-function undoLastInlay(){
-  if(state.strips.length===0) return;
-  // Remove strips from the end: skip trailing base metal edges, then remove one inlay
-  // (and any auto-pinstripe that preceded it)
-  let removed=false;
-  while(state.strips.length>0){
-    const last=state.strips[state.strips.length-1];
-    if(isMetal(last.material)){
-      // Base metal edge/pinstripe — remove it
-      state.strips.pop();
-      // If we already removed an inlay, stop here
-      if(removed) break;
-    } else {
-      // Inlay — remove it and mark done
-      state.strips.pop();
-      removed=true;
-      // Check if previous strip is now a base metal auto-pinstripe to also remove
-      if(state.strips.length>0 && isMetal(state.strips[state.strips.length-1].material)){
-        state.strips.pop();
-      }
-      break;
-    }
-  }
-  state.selectedStrip=-1;
-  consolidateStrips();
-  const col=$('#controlsCol');
-  if(col) renderComposePanel(col);
-  renderRing();
-  updatePrice();
-  updateCanvasUndoBtn();
-}
-
 function updateCanvasUndoBtn(){
   const btn=document.getElementById('canvasUndoBtn');
   if(!btn) return;
   const onComposeStep=STEPS[state.step]&&STEPS[state.step].id==='compose';
-  const hasInlays=state.strips.some(s=>!isMetal(s.material));
-  btn.style.display=(onComposeStep&&hasInlays)?'inline-flex':'none';
+  btn.style.display=(onComposeStep&&undoStack.length>0)?'inline-flex':'none';
 }
 
 function renderComposePanel(col){
@@ -1809,14 +1834,17 @@ function renderComposePanel(col){
   // Clear all
   if(state.strips.length>0){
     actions.appendChild(h('button',{class:'btn btn-outline btn-sm',onClick:()=>{
+      pushUndo();
       state.strips=[];
       state.selectedStrip=-1;
       renderComposePanel(col);
       renderRing();
       updatePrice();
     }},['Clear All']));
+  }
+  if(undoStack.length>0){
     const undoSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
-    const undoBtn=h('button',{class:'btn btn-outline btn-sm btn-undo',onClick:()=>undoLastInlay()});
+    const undoBtn=h('button',{class:'btn btn-outline btn-sm btn-undo',onClick:()=>undoAction()});
     undoBtn.innerHTML=undoSvg+' Undo';
     actions.appendChild(undoBtn);
   }
@@ -1865,6 +1893,7 @@ function renderComposePanel(col){
       h('div',{class:'s-width',style:txtDimCol?{color:txtDimCol}:{}},[s.width+'mm']),
       h('button',{class:'s-remove',onClick:(e)=>{
         e.stopPropagation();
+        pushUndo();
         state.strips.splice(i,1);
         state.selectedStrip=-1;
         renderComposePanel(col);
@@ -1923,6 +1952,7 @@ function renderComposePanel(col){
       const dropBefore=e.clientX<midX;
       
       // Remove the dragged strip
+      const savedStrips=state.strips.map(s=>({...s}));
       const moved=state.strips.splice(dragSrcIdx,1)[0];
       
       // Find the new index of the target (after removal shifted indices)
@@ -1933,6 +1963,17 @@ function renderComposePanel(col){
       const newIdx=dropBefore?targetIdx:targetIdx+1;
       state.strips.splice(newIdx,0,moved);
       
+      // Validate the proposed arrangement
+      const ruleErr=validateProposedStrips(state.strips);
+      if(ruleErr){
+        state.strips=savedStrips;
+        showRuleToast(ruleErr);
+        dragSrcIdx=null;
+        $$('.strip-block',composer).forEach(b=>b.classList.remove('drag-over-left','drag-over-right'));
+        return;
+      }
+      undoStack.push({strips:savedStrips,selectedStrip:state.selectedStrip});
+
       dragSrcIdx=null;
       state.selectedStrip=-1;
       renderComposePanel(col);
@@ -2021,10 +2062,20 @@ function renderComposePanel(col){
             const midX=rect.left+rect.width/2;
             const dropBefore=touch.clientX<midX;
             
+            const savedStrips=state.strips.map(ss=>({...ss}));
             const moved=state.strips.splice(dragSrcIdx,1)[0];
             let newTargetIdx=targetIdx>dragSrcIdx?targetIdx-1:targetIdx;
             const newIdx=dropBefore?newTargetIdx:newTargetIdx+1;
             state.strips.splice(newIdx,0,moved);
+            
+            // Validate the proposed arrangement
+            const ruleErr=validateProposedStrips(state.strips);
+            if(ruleErr){
+              state.strips=savedStrips;
+              showRuleToast(ruleErr);
+            } else {
+              undoStack.push({strips:savedStrips,selectedStrip:state.selectedStrip});
+            }
           }
         }
         
@@ -2083,15 +2134,21 @@ function renderComposePanel(col){
     const controls=h('div',{class:'strip-arrows'});
     
     if(canSlideLeft){
-      controls.appendChild(h('button',{class:'strip-arrow',title:'Slide left 0.25mm',onClick:()=>{
-        const moveAmt=Math.min(step,leftNeighbor.width);
+      // When creating a new metal strip on right, need at least bmMinW
+      const slideNeedsNewRight=!rightIsMetal;
+      const effectiveStep=slideNeedsNewRight?Math.max(step,bmMinW):step;
+      const canAfford=leftNeighbor.width>=effectiveStep||(leftNeighbor.width>=step&&!slideNeedsNewRight);
+      if(canAfford) controls.appendChild(h('button',{class:'strip-arrow',title:'Slide left',onClick:()=>{
+        const savedStrips=state.strips.map(ss=>({...ss}));
+        const savedSel=state.selectedStrip;
+        const moveAmt=slideNeedsNewRight?Math.min(effectiveStep,leftNeighbor.width):Math.min(step,leftNeighbor.width);
         leftNeighbor.width=parseFloat((leftNeighbor.width-moveAmt).toFixed(2));
         
         // Grow or create metal on right side
         if(rightIsMetal){
           rightNeighbor.width=parseFloat((rightNeighbor.width+moveAmt).toFixed(2));
         } else {
-          // Insert new metal strip after the inlay
+          // Insert new metal strip after the inlay at minimum width
           state.strips.splice(si+1,0,{material:state.baseMetal,width:moveAmt});
         }
         
@@ -2100,6 +2157,16 @@ function renderComposePanel(col){
           state.strips.splice(si-1,1);
           state.selectedStrip=si-1; // index shifted
         }
+        
+        // Validate
+        const ruleErr=validateProposedStrips(state.strips);
+        if(ruleErr){
+          state.strips=savedStrips;
+          state.selectedStrip=savedSel;
+          showRuleToast(ruleErr);
+          return;
+        }
+        undoStack.push({strips:savedStrips,selectedStrip:savedSel});
         
         renderComposePanel(col);
         renderRing();
@@ -2112,17 +2179,23 @@ function renderComposePanel(col){
     }},['Edit']));
     
     if(canSlideRight){
-      controls.appendChild(h('button',{class:'strip-arrow',title:'Slide right 0.25mm',onClick:()=>{
+      // When creating a new metal strip on left, need at least bmMinW
+      const slideNeedsNewLeft=!leftIsMetal;
+      const slideEffStep=slideNeedsNewLeft?Math.max(step,bmMinW):step;
+      const canAffordRight=rightIsMetal?(rightNeighbor.width>=step):remaining>=slideEffStep;
+      if(canAffordRight) controls.appendChild(h('button',{class:'strip-arrow',title:'Slide right',onClick:()=>{
+        const savedStrips=state.strips.map(ss=>({...ss}));
+        const savedSel=state.selectedStrip;
         if(rightIsMetal&&rightNeighbor){
           // Slide right by shrinking right metal neighbor
-          const moveAmt=Math.min(step,rightNeighbor.width);
+          const moveAmt=slideNeedsNewLeft?Math.min(slideEffStep,rightNeighbor.width):Math.min(step,rightNeighbor.width);
           rightNeighbor.width=parseFloat((rightNeighbor.width-moveAmt).toFixed(2));
           
           // Grow or create metal on left side
           if(leftIsMetal){
             leftNeighbor.width=parseFloat((leftNeighbor.width+moveAmt).toFixed(2));
           } else {
-            // Insert new metal strip before the inlay
+            // Insert new metal strip before the inlay at minimum width
             state.strips.splice(si,0,{material:state.baseMetal,width:moveAmt});
             state.selectedStrip=si+1; // index shifted
           }
@@ -2135,7 +2208,7 @@ function renderComposePanel(col){
           }
         } else {
           // Slide right into remaining unfilled space (base metal plane)
-          const moveAmt=Math.min(step,remaining);
+          const moveAmt=slideNeedsNewLeft?Math.min(slideEffStep,remaining):Math.min(step,remaining);
           if(leftIsMetal){
             leftNeighbor.width=parseFloat((leftNeighbor.width+moveAmt).toFixed(2));
           } else {
@@ -2143,6 +2216,16 @@ function renderComposePanel(col){
             state.selectedStrip=si+1;
           }
         }
+        
+        // Validate
+        const ruleErr=validateProposedStrips(state.strips);
+        if(ruleErr){
+          state.strips=savedStrips;
+          state.selectedStrip=savedSel;
+          showRuleToast(ruleErr);
+          return;
+        }
+        undoStack.push({strips:savedStrips,selectedStrip:savedSel});
         
         renderComposePanel(col);
         renderRing();
@@ -2182,22 +2265,47 @@ function validateStrips(){
     errors.push({type:'info',msg:`${(state.ringWidth-usedWidth).toFixed(2)}mm remaining — this will be filled with a ${state.baseMetal} edge when you continue.`});
   }
   
-  // Check adjacency rules
+  // Check adjacency rules for all pairs
   for(let i=0;i<state.strips.length-1;i++){
     const a=state.strips[i];
     const b=state.strips[i+1];
     if(a.material==='(choose)'||b.material==='(choose)')continue;
-    
-    const aData=DATA.m[a.material];
-    const bData=DATA.m[b.material];
-    if(!aData||!bData)continue;
-    
-    // Wood next to solid lapidary
-    if(aData.g==='Woods' && bData.g==='Lapidary' && bData.s==='Solid'){
-      errors.push({type:'error',msg:`"${a.material}" (wood) cannot go directly next to "${b.material}" (solid lapidary). Add a metal pinstripe between them.`});
+    const err=checkPairAdjacency(a.material,b.material);
+    if(err) errors.push({type:'error',msg:err});
+  }
+  
+  // "Must have metal edges" rule — check each qualifying inlay has metal on both sides
+  for(let i=0;i<state.strips.length;i++){
+    const s=state.strips[i];
+    if(s.material==='(choose)'||isMetal(s.material))continue;
+    if(!needsMetalEdges(s.material))continue;
+    const leftOk=i>0 && isMetal(state.strips[i-1].material);
+    const rightOk=i<state.strips.length-1 && isMetal(state.strips[i+1].material);
+    // Right side is OK if there's remaining width (auto-closes with base metal on Continue)
+    const rightEdgeOk=rightOk||(i===state.strips.length-1 && usedWidth<state.ringWidth);
+    if(!leftOk){
+      errors.push({type:'error',msg:`"${s.material}" must have a metal edge or pinstripe on its left side.`});
     }
-    if(bData.g==='Woods' && aData.g==='Lapidary' && aData.s==='Solid'){
-      errors.push({type:'error',msg:`"${b.material}" (wood) cannot go directly next to "${a.material}" (solid lapidary). Add a metal pinstripe between them.`});
+    if(!rightEdgeOk){
+      errors.push({type:'error',msg:`"${s.material}" must have a metal edge or pinstripe on its right side.`});
+    }
+  }
+  
+  // Faceted Gibeon Meteorite: must have metal edges on both sides
+  for(let i=0;i<state.strips.length;i++){
+    const s=state.strips[i];
+    if(s.material!=='Faceted Gibeon Meteorite')continue;
+    const leftOk=i>0 && isMetal(state.strips[i-1].material);
+    const rightOk=i<state.strips.length-1 && isMetal(state.strips[i+1].material);
+    const rightEdgeOk=rightOk||(i===state.strips.length-1 && usedWidth<state.ringWidth);
+    if(!leftOk) errors.push({type:'error',msg:`"Faceted Gibeon Meteorite" requires metal edges — missing on left side.`});
+    if(!rightEdgeOk) errors.push({type:'error',msg:`"Faceted Gibeon Meteorite" requires metal edges — missing on right side.`});
+  }
+  
+  // Whale Bone: no inlays into Black Ceramic base
+  for(const s of state.strips){
+    if(s.material==='Whale Bone' && state.baseMetal==='Black Ceramic'){
+      errors.push({type:'error',msg:`"Whale Bone" cannot be inlaid into a Black Ceramic ring.`});
     }
   }
   
@@ -2218,6 +2326,148 @@ function validateStrips(){
   }
   
   return errors;
+}
+
+// ── ADJACENCY RULE HELPERS ──
+// Groups that MUST have metal edges or metal pinstripes on both sides
+const NEEDS_METAL_EDGES_GROUPS=new Set([
+  'Mother of Pearl','Petals','Sand','Stardust','Strings'
+]);
+
+function needsMetalEdges(matName){
+  const d=DATA.m[matName];
+  if(!d)return false;
+  if(NEEDS_METAL_EDGES_GROUPS.has(d.g))return true;
+  if(matName==='Faceted Gibeon Meteorite')return true;
+  return false;
+}
+
+function isCoatedGroup(matName){
+  const d=DATA.m[matName];
+  return d && d.g==='Enamel';
+}
+
+function isSwarf(matName){
+  const d=DATA.m[matName];
+  return d && d.s==='Liquid';
+}
+
+function isSolidLapidary(matName){
+  const d=DATA.m[matName];
+  return d && (d.g==='Lapidary'||d.g==='Dinosaur Bone') && d.s==='Solid';
+}
+
+// Check if two adjacent non-metal materials violate a rule.
+// Returns error message string or null if OK.
+function checkPairAdjacency(matA,matB){
+  if(isMetal(matA)||isMetal(matB))return null;
+  const dA=DATA.m[matA], dB=DATA.m[matB];
+  if(!dA||!dB)return null;
+  
+  // Wood ≠ solid lapidary (crushed/liquid lapidary is OK)
+  if(dA.g==='Woods' && isSolidLapidary(matB))
+    return `"${matA}" (wood) cannot be next to "${matB}" (solid stone). Use crushed stone or add a metal pinstripe.`;
+  if(dB.g==='Woods' && isSolidLapidary(matA))
+    return `"${matB}" (wood) cannot be next to "${matA}" (solid stone). Use crushed stone or add a metal pinstripe.`;
+  
+  // Mokume Composite ≠ coated (Enamel) without metal between
+  if(dA.g==='Mokume Composite' && isCoatedGroup(matB))
+    return `"${matA}" (Mokume) must have metal between it and "${matB}" (coated material).`;
+  if(dB.g==='Mokume Composite' && isCoatedGroup(matA))
+    return `"${matB}" (Mokume) must have metal between it and "${matA}" (coated material).`;
+  
+  // Solid Lapidary ≠ coated (Enamel)
+  if(isSolidLapidary(matA) && isCoatedGroup(matB))
+    return `"${matA}" (solid stone) cannot be next to "${matB}" (coated). Add a metal pinstripe.`;
+  if(isSolidLapidary(matB) && isCoatedGroup(matA))
+    return `"${matB}" (solid stone) cannot be next to "${matA}" (coated). Add a metal pinstripe.`;
+  
+  // Carbon Fiber ≠ swarf/coated
+  if(dA.g==='Carbon Fiber' && (isSwarf(matB)||isCoatedGroup(matB)))
+    return `"${matA}" cannot be next to "${matB}". Add a metal pinstripe.`;
+  if(dB.g==='Carbon Fiber' && (isSwarf(matA)||isCoatedGroup(matA)))
+    return `"${matB}" cannot be next to "${matA}". Add a metal pinstripe.`;
+  
+  // Vinyl ≠ crushed (Liquid subtype)
+  if(dA.g==='Vinyl' && isSwarf(matB))
+    return `"${matA}" cannot be next to "${matB}" (crushed material). Add a metal pinstripe.`;
+  if(dB.g==='Vinyl' && isSwarf(matA))
+    return `"${matB}" cannot be next to "${matA}" (crushed material). Add a metal pinstripe.`;
+  
+  // Feather/Fur ≠ swarf or solid coated
+  if((matA==='Feather'||matA==='Fur') && (isSwarf(matB)||isCoatedGroup(matB)))
+    return `"${matA}" cannot be next to "${matB}". Add a metal pinstripe.`;
+  if((matB==='Feather'||matB==='Fur') && (isSwarf(matA)||isCoatedGroup(matA)))
+    return `"${matB}" cannot be next to "${matA}". Add a metal pinstripe.`;
+  
+  // Whale Bone ≠ wood (unless whale bone is crushed — but WB in our data is Liquid/crushed only, so solid wood is the concern)
+  if(matA==='Whale Bone' && dB.g==='Woods' && dB.s==='Solid')
+    return `"Whale Bone" cannot be next to "${matB}" (solid wood). Add a metal pinstripe.`;
+  if(matB==='Whale Bone' && dA.g==='Woods' && dA.s==='Solid')
+    return `"Whale Bone" cannot be next to "${matA}" (solid wood). Add a metal pinstripe.`;
+  
+  // "Must have metal edges" groups: if two such materials are adjacent (both non-metal), that's a violation
+  if(needsMetalEdges(matA) && !isMetal(matB))
+    return `"${matA}" must have metal on each side — cannot be directly next to "${matB}".`;
+  if(needsMetalEdges(matB) && !isMetal(matA))
+    return `"${matB}" must have metal on each side — cannot be directly next to "${matA}".`;
+  
+  return null;
+}
+
+// Validate a proposed strip arrangement. Returns first error message or null.
+function validateProposedStrips(strips){
+  for(let i=0;i<strips.length-1;i++){
+    const a=strips[i], b=strips[i+1];
+    if(a.material==='(choose)'||b.material==='(choose)')continue;
+    const err=checkPairAdjacency(a.material,b.material);
+    if(err) return err;
+  }
+  // Check metal-edges requirements
+  for(let i=0;i<strips.length;i++){
+    const s=strips[i];
+    if(s.material==='(choose)'||isMetal(s.material))continue;
+    if(!needsMetalEdges(s.material))continue;
+    const leftOk=i>0 && isMetal(strips[i-1].material);
+    const rightOk=i<strips.length-1 && isMetal(strips[i+1].material);
+    const usedW=strips.reduce((sum,st)=>sum+st.width,0);
+    const rightEdgeOk=rightOk||(i===strips.length-1 && usedW<state.ringWidth);
+    if(!leftOk) return `"${s.material}" must have metal on its left side.`;
+    if(!rightEdgeOk) return `"${s.material}" must have metal on its right side.`;
+  }
+  // Whale Bone cannot be inlaid into Black Ceramic
+  for(const s of strips){
+    if(s.material==='Whale Bone' && state.baseMetal==='Black Ceramic')
+      return `"Whale Bone" cannot be inlaid into a Black Ceramic ring.`;
+  }
+  // Min width check
+  for(const s of strips){
+    if(s.material==='(choose)')continue;
+    const mat=DATA.m[s.material];
+    if(!mat)continue;
+    let minW=0;
+    if(isMetal(s.material)){
+      minW=mat.mi.edge_same_sleeve||0.25;
+    } else {
+      minW=mat.mi.solid_inlay||mat.mi.inlay_swarf||0.5;
+    }
+    if(s.width<minW && minW>0 && s.width>0){
+      return `"${s.material}" requires minimum width of ${minW}mm (currently ${s.width}mm).`;
+    }
+  }
+  return null;
+}
+
+// Toast notification for blocked actions
+function showRuleToast(msg){
+  // Remove any existing toast
+  const old=document.querySelector('.rule-toast');
+  if(old) old.remove();
+  const toast=document.createElement('div');
+  toast.className='rule-toast';
+  toast.textContent='⚠ '+msg;
+  document.body.appendChild(toast);
+  setTimeout(()=>{if(toast.parentNode)toast.remove();},3500);
 }
 
 // ── ADD STRIP MODAL ──
@@ -2343,6 +2593,7 @@ function openAddStripModal(){
       h('button',{class:'btn btn-gold',disabled:!selectedMat||stripWidth<=0,onClick:()=>{
         if(!selectedMat||stripWidth<=0)return;
         
+        const savedStrips=state.strips.map(ss=>({...ss}));
         let pos=insertIdx;
         
         // Auto-insert base metal edge/pinstripe if adding an inlay AND there's room
@@ -2354,6 +2605,16 @@ function openAddStripModal(){
         
         // Insert the strip at position
         state.strips.splice(pos,0,{material:selectedMat,width:stripWidth});
+        
+        // Validate the proposed arrangement
+        const ruleErr=validateProposedStrips(state.strips);
+        if(ruleErr){
+          state.strips=savedStrips;
+          showRuleToast(ruleErr);
+          return;
+        }
+        undoStack.push({strips:savedStrips,selectedStrip:state.selectedStrip});
+        
         state.selectedStrip=-1;
         overlay.classList.remove('open');
         const col=$('#controlsCol');
@@ -2454,6 +2715,7 @@ function openEditStripModal(idx){
       h('button',{class:'btn btn-outline',onClick:()=>overlay.classList.remove('open')},['Cancel']),
       h('button',{class:'btn btn-gold',disabled:!selectedMat||stripWidth<=0,onClick:()=>{
         if(!selectedMat||stripWidth<=0)return;
+        const savedStrips=state.strips.map(ss=>({...ss}));
         const origStrip=state.strips[idx];
         const origWasMetal=isMetal(origStrip.material);
         const newIsInlay=!isMetal(selectedMat);
@@ -2468,6 +2730,15 @@ function openEditStripModal(idx){
         } else {
           state.strips[idx]={material:selectedMat,width:stripWidth};
         }
+        
+        // Validate the proposed arrangement
+        const ruleErr=validateProposedStrips(state.strips);
+        if(ruleErr){
+          state.strips=savedStrips;
+          showRuleToast(ruleErr);
+          return;
+        }
+        undoStack.push({strips:savedStrips,selectedStrip:state.selectedStrip});
         
         state.selectedStrip=-1;
         overlay.classList.remove('open');
@@ -2769,22 +3040,33 @@ function patchPricingData(){
   if(!DATA||!DATA.p)return;
   // Titanium base prices
   const ti={fixed_price:84,sleeve:124.6,sleeve_with_inlay:181,partials:76,split:181,shaped:276,full_ring:124.6};
-  // Damascus, Zirconium, Black Ceramic = Ti × 1.5
+  // Black Ceramic: preserve existing fields, fill missing with Ti×1.5
   const ti150={};
   for(const k in ti) ti150[k]=Math.round(ti[k]*1.5*100)/100;
-  ['Damascus','Zirconium'].forEach(m=>{DATA.p[m]=Object.assign({},ti150);});
-  // Black Ceramic: preserve existing fields, fill missing with Ti×1.5
   if(!DATA.p['Black Ceramic']) DATA.p['Black Ceramic']={};
   const bc=DATA.p['Black Ceramic'];
   for(const k in ti150){if(!bc[k])bc[k]=ti150[k];}
-  // Stainless = Ti
-  DATA.p['Stainless']=Object.assign({},ti);
+  // Damascus: per-mm base=$173.75 (from $695/4mm size 10), inlay by width (+$20 labor)
+  if(!DATA.p['Damascus']) DATA.p['Damascus']={};
+  DATA.p['Damascus'].per_mm_base=173.75;
+  DATA.p['Damascus'].per_mm_sleeve=173.75;
+  DATA.p['Damascus'].inlay_by_width=[[1,28.85],[2,33.45],[3,38.05],[4,42.65],[5,47.25],[6,51.85],[7,56.45],[8,61.05],[9,65.65],[10,70.25]];
+  // Zirconium: per-mm base=$52.57 (from $368/7mm size 10), inlay by width (+$20 labor)
+  if(!DATA.p['Zirconium']) DATA.p['Zirconium']={};
+  DATA.p['Zirconium'].per_mm_base=52.57;
+  DATA.p['Zirconium'].per_mm_sleeve=52.57;
+  DATA.p['Zirconium'].inlay_by_width=[[1,24.95],[2,25.66],[3,26.36],[4,27.07],[5,27.77],[6,28.48],[7,29.18],[8,29.88],[9,30.59],[10,31.29]];
+  // Stainless: per-mm base=$49.75 (from $199/4mm size 10), inlay by width (+$20 labor)
+  if(!DATA.p['Stainless']) DATA.p['Stainless']={};
+  DATA.p['Stainless'].per_mm_base=49.75;
+  DATA.p['Stainless'].per_mm_sleeve=49.75;
+  DATA.p['Stainless'].inlay_by_width=[[1,24.54],[2,24.83],[3,25.12],[4,25.42],[5,25.71],[6,26.00],[7,26.29],[8,26.58],[9,26.87],[10,27.17]];
   // Metal Mokume: per-mm pricing handled in calcPrice/getInlayPrice
   if(!DATA.p['Metal Mokume']) DATA.p['Metal Mokume']={};
   DATA.p['Metal Mokume'].per_mm_base=150;
   DATA.p['Metal Mokume'].per_mm_inlay=75;
   DATA.p['Metal Mokume'].per_mm_sleeve=100;
-  console.log('Patched pricing: Damascus, Zirconium, Black Ceramic (Ti×1.5), Stainless (=Ti), Metal Mokume (per-mm: base=$150, inlay=$75, sleeve=$100)');
+  console.log('Patched pricing: Damascus($173.75/mm), Zirconium($52.57/mm), Stainless($49.75/mm), Black Ceramic(Ti×1.5), Mokume(per-mm), inlays+$20 labor');
 }
 
 async function init(){
