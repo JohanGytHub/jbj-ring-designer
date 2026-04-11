@@ -978,6 +978,8 @@ async function fetchSpotPrices(){
       if(d.silver) state.spotPrices.Silver=d.silver;
       if(d.gold||d.platinum||d.silver){
         state.spotsLoaded=true;
+        console.log('%c✅ Spot prices loaded from: CF Worker (jbj-spot-prices)','color:#4a7c59;font-weight:bold');
+        console.log('   Source API: '+(d.source||'unknown')+' | Gold: $'+state.spotPrices.Gold+'/oz | Platinum: $'+state.spotPrices.Platinum+'/oz | Silver: $'+state.spotPrices.Silver+'/oz');
         updatePrice();
         return;
       }
@@ -997,13 +999,16 @@ async function fetchSpotPrices(){
     if(s.price) state.spotPrices.Silver=s.price;
     if(g.price||p.price||s.price){
       state.spotsLoaded=true;
+      console.log('%c✅ Spot prices loaded from: gold-api.com (fallback)','color:#4a7c59;font-weight:bold');
+      console.log('   Gold: $'+state.spotPrices.Gold+'/oz | Platinum: $'+state.spotPrices.Platinum+'/oz | Silver: $'+state.spotPrices.Silver+'/oz');
       updatePrice();
       return;
     }
   }catch(e){console.warn('gold-api.com fallback failed:',e);}
   
-  // If all fail, use defaults from state.spotPrices (line 601)
-  console.log('Using default spot prices:', state.spotPrices);
+  // If all fail, use defaults
+  console.log('%c⚠️ Spot prices: USING HARDCODED DEFAULTS (both API sources failed)','color:#c0392b;font-weight:bold');
+  console.log('   Default Gold: $'+state.spotPrices.Gold+'/oz | Platinum: $'+state.spotPrices.Platinum+'/oz | Silver: $'+state.spotPrices.Silver+'/oz');
 }
 
 // ── 3D RING RENDERER (Canvas) ──
@@ -3325,15 +3330,6 @@ const EMBEDDED_DATA = {"m":{"Antler":{"g":"Antler","s":"Flex","mi":{"solid_inlay
 
 // Start
 document.addEventListener('DOMContentLoaded', init);
-</script>
-<script>
-// Iframe auto-height messaging for Shopify embed
-function postHeight(){
-  window.parent.postMessage({type:'ring-designer-height',height:document.body.scrollHeight},'*');
-}
-window.addEventListener('load',postHeight);
-window.addEventListener('resize',postHeight);
-new MutationObserver(postHeight).observe(document.body,{childList:true,subtree:true,attributes:true});
 </script>
 </body>
 </html>
