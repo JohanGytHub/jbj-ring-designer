@@ -968,7 +968,23 @@ function getInlayPrice(materialName, widthMm){
 
 // ── FETCH LIVE SPOT PRICES ──
 async function fetchSpotPrices(){
-  // Primary: gold-api.com (free, unlimited, CORS enabled — no Worker needed)
+  // Primary: Cloudflare Worker proxy (server-to-server, no browser CORS/iframe restrictions)
+  try{
+    const res=await fetch('https://jbj-spot-prices.johan-475.workers.dev/');
+    if(res.ok){
+      const d=await res.json();
+      if(d.gold) state.spotPrices.Gold=d.gold;
+      if(d.platinum) state.spotPrices.Platinum=d.platinum;
+      if(d.silver) state.spotPrices.Silver=d.silver;
+      if(d.gold||d.platinum||d.silver){
+        state.spotsLoaded=true;
+        updatePrice();
+        return;
+      }
+    }
+  }catch(e){console.warn('CF spot worker failed:',e);}
+
+  // Fallback: gold-api.com direct (may be blocked in iframe contexts)
   try{
     const [gRes,pRes,sRes]=await Promise.all([
       fetch('https://api.gold-api.com/price/XAU'),
@@ -984,23 +1000,9 @@ async function fetchSpotPrices(){
       updatePrice();
       return;
     }
-  }catch(e){}
-
-  // Fallback: Cloudflare Worker proxy (metals.dev, cached 24h)
-  try{
-    const res=await fetch('https://jbj-spot-prices.johan-475.workers.dev/');
-    if(res.ok){
-      const d=await res.json();
-      if(d.gold) state.spotPrices.Gold=d.gold;
-      if(d.platinum) state.spotPrices.Platinum=d.platinum;
-      if(d.silver) state.spotPrices.Silver=d.silver;
-      state.spotsLoaded=true;
-      updatePrice();
-      return;
-    }
-  }catch(e){}
+  }catch(e){console.warn('gold-api.com fallback failed:',e);}
   
-  // If all fail, use defaults from state.spotPrices (line 576)
+  // If all fail, use defaults from state.spotPrices (line 601)
   console.log('Using default spot prices:', state.spotPrices);
 }
 
