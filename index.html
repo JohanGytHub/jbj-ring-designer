@@ -3323,5 +3323,21 @@ const EMBEDDED_DATA = {"m":{"Antler":{"g":"Antler","s":"Flex","mi":{"solid_inlay
 // Start
 document.addEventListener('DOMContentLoaded', init);
 </script>
+<script>
+  // Send height to parent Shopify iframe
+  (function() {
+    function postHeight() {
+      if (window.parent !== window) {
+        window.parent.postMessage({
+          type: 'ring-designer-height',
+          height: document.body.scrollHeight
+        }, '*');
+      }
+    }
+    window.addEventListener('load', postHeight);
+    window.addEventListener('resize', postHeight);
+    new MutationObserver(postHeight).observe(document.body, {childList:true, subtree:true});
+  })();
+</script>
 </body>
 </html>
