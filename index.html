@@ -1276,12 +1276,19 @@ function renderRing(){
   
   const cx=dispW/2, cy=dispH/2;
   
-  // Ring geometry in pixels
-  const majorR=Math.min(dispW*0.36, 145);         // ring center radius (larger)
-  const ringWPx=state.ringWidth*12;                // face width in px (2mm=24px, 14mm=168px)
-  const thick=majorR*0.22;                         // wall thickness in px
-  const outerR=majorR+thick/2;
-  const innerR=majorR-thick/2;
+  // Ring geometry — real proportions (diameter scales with size, width with width)
+  const rSz=state.ringSize||10;
+  const innerDiam=rSz*0.8128+11.63;               // mm inner diameter from sizing formula
+  const wallT=2.1;                                 // mm wall thickness (ring_thickness_mm)
+  const outerDiam=innerDiam+2*wallT;               // mm outer diameter
+  // Fixed px/mm scale: size 10 ring fills canvas, other sizes proportional
+  const refOuter=10*0.8128+11.63+2*2.1;            // 23.956mm (size 10 outer diam)
+  const pxMm=Math.min(dispW*0.36,155)/(refOuter/2);// ~12.94 px per mm
+  const outerR=(outerDiam/2)*pxMm;
+  const innerR=(innerDiam/2)*pxMm;
+  const majorR=(outerR+innerR)/2;
+  const thick=outerR-innerR;                       // wallT * pxMm
+  const ringWPx=state.ringWidth*pxMm;              // face width in px
   
   // Camera — remap elevation so 0° = face-on (ring upright as a circle)
   // and increasing elevation tilts the ring forward for 3D perspective
