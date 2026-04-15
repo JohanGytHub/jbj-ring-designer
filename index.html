@@ -3368,25 +3368,28 @@ function patchPricingData(){
 }
 
 async function init(){
-  // Load data
+  let _pricingFromKV=false;
+  // Try loading pricing from Cloudflare KV (via spot-prices worker)
   try{
-    // Try loading from external file first (for Shopify deployment)
-    const extRes=await fetch('jbj-ring-data.json');
-    if(extRes.ok){
-      const raw=await extRes.json();
-      DATA=raw;
-      console.log('Loaded external data');
+    const kvRes=await fetch('https://jbj-spot-prices.johan-475.workers.dev/pricing');
+    if(kvRes.ok){
+      const kv=await kvRes.json();
+      if(kv.base_prices&&kv.material_groups){
+        // Start with embedded material definitions + colors, overlay KV pricing
+        DATA=Object.assign({},_ED_BASE);
+        DATA.p=kv.base_prices;DATA.pm=kv.width_prices||{};DATA.mp=kv.meteorite_prices||[];DATA.mk=kv.mokume_prices||[];DATA.f=kv.formula_constants||{};
+        if(kv.misc_costs)DATA.misc_costs=kv.misc_costs;
+        _pricingFromKV=true;
+        console.log('%c✅ Pricing loaded from: CF Worker (KV) — v'+(kv._version||'?'),'color:#2ecc71;font-weight:bold');
+      }
     }
-  }catch(e){}
-  
+  }catch(e){console.log('KV pricing fetch failed, using embedded:',e.message);}
   if(!DATA){
-    // Use embedded data
     DATA=EMBEDDED_DATA;
-    console.log('Using embedded data');
+    console.log('%c⚠️ Using embedded pricing data (KV unavailable)','color:#f39c12;font-weight:bold');
   }
-  
-  // Patch missing pricing data
-  patchPricingData();
+  // Only patch if using embedded data (KV data already has all patches baked in)
+  if(!_pricingFromKV) patchPricingData();
   
   // Load design from URL if present
   loadDesignFromURL();
