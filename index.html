@@ -604,6 +604,12 @@ const state = {
 };
 
 const QUOTE_WORKER_URL = 'https://jbj-ring-quote.johan-475.workers.dev/';
+// Unicode-safe base64 helpers (btoa/atob crash on non-Latin-1 chars like accented names or emoji)
+function utoa(str){return btoa(unescape(encodeURIComponent(str)));}
+function atou(b64){return decodeURIComponent(escape(atob(b64)));}
+// Debounce helper for slider input (reduces DOM thrashing on slow devices)
+let _dbTimer=null;
+function debounceSlider(fn,ms){return function(){clearTimeout(_dbTimer);_dbTimer=setTimeout(fn,ms||50);};}
 const _staffMode = new URLSearchParams(window.location.search).has('staff');
 if(_staffMode) document.body.classList.add('staff-mode');
 
@@ -730,9 +736,7 @@ function getAllGroups(){
 }
 
 // ── PRICING ENGINE ──
-// TODO: Server-verified price hash — on quote submission, generate an HMAC hash of all prices
-// (spot prices, inlay prices, total) server-side via Cloudflare Worker, and include it in the
-// submitted quote. When reviewing quotes, verify the hash to detect any client-side price tampering.
+// HMAC price hash implemented in ring-quote-worker.js (requires PRICE_HMAC_SECRET env var)
 function calcPrice(){
   if(!DATA||!state.baseMetal||!state.ringSize)return null;
   let total=0;
@@ -1025,10 +1029,11 @@ async function fetchSpotPrices(){
     const res=await fetch('https://jbj-spot-prices.johan-475.workers.dev/');
     if(res.ok){
       const d=await res.json();
-      if(d.gold) state.spotPrices.Gold=d.gold;
-      if(d.platinum) state.spotPrices.Platinum=d.platinum;
-      if(d.silver) state.spotPrices.Silver=d.silver;
       if(d.gold||d.platinum||d.silver){
+        // Validate spot prices are in reasonable range before accepting
+        if(d.gold>500&&d.gold<15000) state.spotPrices.Gold=d.gold;
+        if(d.platinum>300&&d.platinum<5000) state.spotPrices.Platinum=d.platinum;
+        if(d.silver>10&&d.silver<200) state.spotPrices.Silver=d.silver;
         state.spotsLoaded=true;
         console.log('%c✅ Spot prices loaded from: CF Worker (jbj-spot-prices)','color:#4a7c59;font-weight:bold');
         console.log('   Source API: '+(d.source||'unknown')+' | Gold: $'+state.spotPrices.Gold+'/oz | Platinum: $'+state.spotPrices.Platinum+'/oz | Silver: $'+state.spotPrices.Silver+'/oz');
@@ -1046,10 +1051,10 @@ async function fetchSpotPrices(){
       fetch('https://api.gold-api.com/price/XAG')
     ]);
     const [g,p,s]=[await gRes.json(),await pRes.json(),await sRes.json()];
-    if(g.price) state.spotPrices.Gold=g.price;
-    if(p.price) state.spotPrices.Platinum=p.price;
-    if(s.price) state.spotPrices.Silver=s.price;
     if(g.price||p.price||s.price){
+      if(g.price>500&&g.price<15000) state.spotPrices.Gold=g.price;
+      if(p.price>300&&p.price<5000) state.spotPrices.Platinum=p.price;
+      if(s.price>10&&s.price<200) state.spotPrices.Silver=s.price;
       state.spotsLoaded=true;
       console.log('%c✅ Spot prices loaded from: gold-api.com (fallback)','color:#4a7c59;font-weight:bold');
       console.log('   Gold: $'+state.spotPrices.Gold+'/oz | Platinum: $'+state.spotPrices.Platinum+'/oz | Silver: $'+state.spotPrices.Silver+'/oz');
@@ -1602,6 +1607,7 @@ function _exitIntentHandler(e){
 }
 
 function showExitEmailModal(onDone){
+  if(state._quoteSubmitted) return; // Prevent duplicate submission
   const isValid=(e)=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
   const overlay=document.createElement('div');
   overlay.className='exit-overlay';
@@ -1628,7 +1634,7 @@ function showExitEmailModal(onDone){
     // Fire the quote to the worker
     const result=calcPrice();
     const config={bm:state.baseMetal,w:state.ringWidth,p:state.profile,st:state.strips,sl:state.sleeve,f:state.finish,sz:state.ringSize,eng:state.engraving,wi:state.wantsInlays};
-    const shareUrl=window.location.origin+window.location.pathname+'?design='+btoa(JSON.stringify(config));
+    const shareUrl=window.location.origin+window.location.pathname+'?design='+utoa(JSON.stringify(config));
     try{
       await fetch(QUOTE_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
         email:state.email,notes:state.notes,baseMetal:state.baseMetal,ringSize:state.ringSize,ringWidth:state.ringWidth,
@@ -1821,8 +1827,7 @@ function renderWidthPanel(col){
       wInput.value=state.ringWidth;
       state.strips=[];undoStack.length=0;
       state.selectedStrip=-1;
-      renderRing();
-      updatePrice();
+      debounceSlider(()=>{renderRing();updatePrice();},50)();
     }
   });
   wc.appendChild(wLabel);
@@ -1978,9 +1983,8 @@ function renderComposePanel(col){
       let v=parseFloat(e.target.value);
       if(v<minW)v=minW;
       state.ringWidth=v;
-      renderComposePanel(col);
-      renderRing();
-      updatePrice();
+      wInput.value=v;
+      debounceSlider(()=>{renderComposePanel(col);renderRing();updatePrice();},50)();
     }
   });
   wc.appendChild(wLabel);
@@ -3192,7 +3196,7 @@ function renderSummaryPanel(col){
         st:state.strips,sl:state.sleeve,f:state.finish,
         sz:state.ringSize,eng:state.engraving,wi:state.wantsInlays
       };
-      const shareUrl=window.location.origin+window.location.pathname+'?design='+btoa(JSON.stringify(config));
+      const shareUrl=window.location.origin+window.location.pathname+'?design='+utoa(JSON.stringify(config));
       
       const payload={
         email:state.email,
@@ -3248,7 +3252,7 @@ function renderSummaryPanel(col){
   // Share link
   const shareSection=h('div',{style:{marginTop:'16px',textAlign:'center'}});
   shareSection.appendChild(h('button',{class:'btn btn-outline',onClick:()=>{
-    const config=btoa(JSON.stringify({
+    const config=utoa(JSON.stringify({
       bm:state.baseMetal,w:state.ringWidth,p:state.profile,
       st:state.strips,sl:state.sleeve,f:state.finish,
       sz:state.ringSize,eng:state.engraving,wi:state.wantsInlays
@@ -3297,7 +3301,7 @@ function loadDesignFromURL(){
   const design=params.get('design');
   if(!design)return;
   try{
-    const config=JSON.parse(atob(design));
+    const config=JSON.parse(atou(design));
     if(config.bm) state.baseMetal=config.bm;
     if(config.w) state.ringWidth=config.w;
     if(config.p) state.profile=config.p;
@@ -3347,6 +3351,19 @@ function patchPricingData(){
   DATA.p['Metal Mokume'].per_mm_base=150;
   DATA.p['Metal Mokume'].per_mm_inlay=75;
   DATA.p['Metal Mokume'].per_mm_sleeve=100;
+  // Jade variants: catalog has "Jade - Black" / "Jade - Green" but pricing only has "Jade"
+  if(DATA.p['Jade']&&!DATA.p['Jade - Black']){DATA.p['Jade - Black']=Object.assign({},DATA.p['Jade']);}
+  if(DATA.p['Jade']&&!DATA.p['Jade - Green']){DATA.p['Jade - Green']=Object.assign({},DATA.p['Jade']);}
+  if(DATA.pm){
+    if(DATA.pm['Jade']&&!DATA.pm['Jade - Black']){DATA.pm['Jade - Black']=DATA.pm['Jade'].map(e=>[...e]);}
+    if(DATA.pm['Jade']&&!DATA.pm['Jade - Green']){DATA.pm['Jade - Green']=DATA.pm['Jade'].map(e=>[...e]);}
+    // Stones 9.75mm price anomaly fix ($622.1 should be $677.1)
+    if(DATA.pm['Stones']){DATA.pm['Stones'].forEach(e=>{if(e[0]===9.75&&e[1]===622.1)e[1]=677.1;});}
+    // Sugilite: ensure width entries are sorted ascending by mm
+    if(DATA.pm['Sugilite']){DATA.pm['Sugilite'].sort((a,b)=>a[0]-b[0]);}
+    // Turquoise 4.25mm: $409.25 should be $409.2 (consistency fix)
+    if(DATA.pm['Turquoise']){DATA.pm['Turquoise'].forEach(e=>{if(e[0]===4.25&&e[1]===409.25)e[1]=409.2;});}
+  }
   console.log('Patched pricing: Damascus($580 flat), Zirconium($(0x34*0x64+0x39)/0x64/mm), Stainless($(0x31*0x64+0x4B)/0x64/mm), Black Ceramic(Ti×1.5), Mokume(per-mm)');
 }
 
