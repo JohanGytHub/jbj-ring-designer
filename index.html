@@ -599,7 +599,7 @@ const state = {
   engraving: '',
   email: '',
   notes: '',
-  spotPrices: {Gold:4640, Platinum:1980, Silver:72}, // defaults updated April 2026, live prices fetched on load
+  spotPrices: null, // no hardcoded fallback — populated by fetchSpotPrices() on load; state.spotsLoaded gates the Submit button until real prices arrive
   spotsLoaded: false
 };
 
@@ -739,6 +739,7 @@ function getAllGroups(){
 // HMAC price hash implemented in ring-quote-worker.js (requires PRICE_HMAC_SECRET env var)
 function calcPrice(){
   if(!DATA||!state.baseMetal||!state.ringSize)return null;
+  try{
   let total=0;
   const breakdown=[];
 
@@ -746,23 +747,27 @@ function calcPrice(){
   const slv=state.sleeve||bm;
   const hasInlays=state.strips.some(s=>!isMetal(s.material));
   const hasNonMetalInlays=state.strips.some(s=>!isMetal(s.material)&&!isMetalGroup(s.material));
-  // misc() reads misc_costs from jbj-pricing.json (via DATA.misc_costs). Fallback only if KV is unreachable AND embedded data lacks misc_costs.
-  const misc=(k,dflt)=>(DATA.misc_costs&&DATA.misc_costs[k]!=null?DATA.misc_costs[k]:dflt);
+  // misc() reads misc_costs from jbj-pricing.json (via DATA.misc_costs). NO hardcoded fallback —
+  // if a misc cost is missing, calcPrice() fails loudly (caught below, returns null → UI shows "—" instead of a guessed price).
+  const misc=(k)=>{
+    if(DATA.misc_costs&&DATA.misc_costs[k]!=null) return DATA.misc_costs[k];
+    throw new Error('Missing misc_costs.'+k+' in pricing data');
+  };
   
   // 1. Base metal cost (always included, as if sleeve = base metal)
   if(isPrecious(bm)){
     const pCost=calcPreciousMetalCost(bm, state.ringWidth, state.ringSize, hasInlays);
     total+=pCost;
     breakdown.push({label:`${bm} (Base Metal)`, price:pCost});
-    total+=misc('precious_base_metal',278);
-    breakdown.push({label:`Precious Base Metal Misc`, price:misc('precious_base_metal',278)});
+    total+=misc('precious_base_metal');
+    breakdown.push({label:`Precious Base Metal Misc`, price:misc('precious_base_metal')});
   } else if(DATA.p[bm] && DATA.p[bm].per_mm_base){
     // Per-mm pricing (e.g. Metal Mokume)
     const cost=DATA.p[bm].per_mm_base*state.ringWidth;
     total+=cost;
     breakdown.push({label:`${bm} (Base Metal, ${state.ringWidth}mm)`, price:cost});
-    total+=misc('non_precious_base_metal',199);
-    breakdown.push({label:`Base Metal Misc`, price:misc('non_precious_base_metal',199)});
+    total+=misc('non_precious_base_metal');
+    breakdown.push({label:`Base Metal Misc`, price:misc('non_precious_base_metal')});
   } else {
     const pData=DATA.p[bm];
     if(pData){
@@ -773,8 +778,8 @@ function calcPrice(){
       else if(pData.fixed_price) cost=pData.fixed_price;
       total+=cost;
       breakdown.push({label:`${bm} (Base Metal)`, price:cost});
-      total+=misc('non_precious_base_metal',199);
-      breakdown.push({label:`Base Metal Misc`, price:misc('non_precious_base_metal',199)});
+      total+=misc('non_precious_base_metal');
+      breakdown.push({label:`Base Metal Misc`, price:misc('non_precious_base_metal')});
     }
   }
   
@@ -784,14 +789,14 @@ function calcPrice(){
       const sCost=calcPreciousSleeveCost(slv, state.ringWidth, state.ringSize);
       total+=sCost;
       breakdown.push({label:`${slv} (Sleeve)`, price:sCost});
-      total+=misc('precious_sleeve',199);
-      breakdown.push({label:`Precious Sleeve Metal Misc`, price:misc('precious_sleeve',199)});
+      total+=misc('precious_sleeve');
+      breakdown.push({label:`Precious Sleeve Metal Misc`, price:misc('precious_sleeve')});
     } else if(DATA.p[slv] && DATA.p[slv].per_mm_sleeve){
       const cost=DATA.p[slv].per_mm_sleeve*state.ringWidth;
       total+=cost;
       breakdown.push({label:`${slv} (Sleeve, ${state.ringWidth}mm)`, price:cost});
-      total+=misc('non_precious_sleeve',149);
-      breakdown.push({label:`Sleeve Metal Misc`, price:misc('non_precious_sleeve',149)});
+      total+=misc('non_precious_sleeve');
+      breakdown.push({label:`Sleeve Metal Misc`, price:misc('non_precious_sleeve')});
     } else {
       const sData=DATA.p[slv];
       if(sData){
@@ -801,8 +806,8 @@ function calcPrice(){
         else if(sData.fixed_price) cost=sData.fixed_price;
         total+=cost;
         breakdown.push({label:`${slv} (Sleeve)`, price:cost});
-        total+=misc('non_precious_sleeve',149);
-        breakdown.push({label:`Sleeve Metal Misc`, price:misc('non_precious_sleeve',149)});
+        total+=misc('non_precious_sleeve');
+        breakdown.push({label:`Sleeve Metal Misc`, price:misc('non_precious_sleeve')});
       }
     }
   }
@@ -869,15 +874,19 @@ function calcPrice(){
   if(hasInlays){
     const hasPreciousInlay=state.strips.some(s=>!isMetal(s.material)&&isPrecious(s.material));
     if(hasPreciousInlay){
-      total+=misc('precious_inlay',149);
-      breakdown.push({label:`Precious Inlay Metal Misc`, price:misc('precious_inlay',149)});
+      total+=misc('precious_inlay');
+      breakdown.push({label:`Precious Inlay Metal Misc`, price:misc('precious_inlay')});
     } else {
-      total+=misc('non_precious_inlay',129);
-      breakdown.push({label:`Inlay Metal Misc`, price:misc('non_precious_inlay',129)});
+      total+=misc('non_precious_inlay');
+      breakdown.push({label:`Inlay Metal Misc`, price:misc('non_precious_inlay')});
     }
   }
 
   return{total, breakdown};
+  }catch(e){
+    console.error('%c❌ calcPrice() failed: '+e.message,'color:#c0392b;font-weight:bold');
+    return null;
+  }
 }
 
 function calcPreciousMetalCost(metalName, ringWidthMm, ringSize, hasInlays){
