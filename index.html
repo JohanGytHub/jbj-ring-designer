@@ -2377,14 +2377,21 @@ function renderComposePanel(col){
     composer.appendChild(block);
   });
   
-  // Show remaining space as a ghost block
+  // Show remaining space filled with the base metal (it auto-closes with a base metal edge on Continue)
   if(state.strips.length>0 && remaining>0.01){
     const ghostPx=Math.max(28, remaining*30);
+    const bmColor=getColor(state.baseMetal);
+    const bmLight=bmColor.startsWith('#')&&isLightColor(bmColor);
+    const bmTxt=bmLight?'rgba(0,0,0,.85)':'rgba(255,255,255,.92)';
+    const bmTxtDim=bmLight?'rgba(0,0,0,.55)':'rgba(255,255,255,.68)';
     composer.appendChild(h('div',{
-      style:{width:ghostPx+'px',minWidth:ghostPx+'px',border:'1.5px dashed var(--border-light)',borderRadius:'3px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',opacity:'0.6',cursor:'pointer'},
+      title:'Remaining width \u2014 filled with '+state.baseMetal+'. Click to add an inlay here.',
+      style:{width:ghostPx+'px',minWidth:ghostPx+'px',background:bmColor,border:'1.5px dashed '+bmTxtDim,borderRadius:'5px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',opacity:'0.9',cursor:'pointer',padding:'4px 2px',boxShadow:'var(--shadow-sm)'},
       onClick:()=>{state.selectedStrip=-1;openAddStripModal();}
     },[
-      h('div',{style:{fontSize:'.55rem',color:'var(--text-muted)',textAlign:'center',lineHeight:'1.2'}},
+      h('div',{style:{fontSize:'.52rem',color:bmTxt,writingMode:'vertical-rl',textOrientation:'mixed',lineHeight:'1',maxHeight:'50px',overflow:'hidden'}},
+        [state.baseMetal.length>12?state.baseMetal.slice(0,10)+'\u2026':state.baseMetal]),
+      h('div',{style:{fontSize:'.57rem',color:bmTxtDim,marginTop:'2px'}},
         [remaining.toFixed(1)+'mm']),
     ]));
   }
