@@ -1202,14 +1202,14 @@ function shadeMetal(hex,b,s){
 // Phase 2 — specular character per finish (sharpness + strength of the glint)
 function finishSpec(f){
   switch(f){
-    case 'Polished':return{pow:28,str:1.3};
-    case 'Brushed':return{pow:8,str:0.7};
-    case 'Matte':return{pow:5,str:0.38};
-    case 'Sandblasted':return{pow:4,str:0.24};
-    case 'Frost':return{pow:4,str:0.28};
-    case 'Deep Frost':return{pow:4,str:0.2};
-    case 'Hammer':return{pow:14,str:0.95};
-    default:return{pow:18,str:1.0};
+    case 'Polished':return{pow:30,str:0.95};
+    case 'Brushed':return{pow:8,str:0.55};
+    case 'Matte':return{pow:5,str:0.3};
+    case 'Sandblasted':return{pow:4,str:0.2};
+    case 'Frost':return{pow:4,str:0.22};
+    case 'Deep Frost':return{pow:4,str:0.16};
+    case 'Hammer':return{pow:14,str:0.75};
+    default:return{pow:22,str:0.72};
   }
 }
 
