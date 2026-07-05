@@ -209,6 +209,11 @@ input,select{font-family:inherit;color:inherit}
 .mat-card .name{font-size:.78rem;line-height:1.35;color:var(--text-dim);font-weight:500}
 .mat-card.selected .name{color:var(--text);font-weight:600}
 .mat-card.selected::after{content:'✓';position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;background:var(--gold-grad);color:var(--done-dot-text);font-size:.62rem;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);animation:badgePop .35s cubic-bezier(.34,1.56,.64,1)}
+.mat-card .staff-price{margin-left:auto;font-size:.7rem;font-weight:600;color:var(--gold);white-space:nowrap;padding-left:6px;flex-shrink:0}
+.staff-item-prices{margin:10px 0 14px;padding:10px 12px;border:1px dashed var(--gold);border-radius:var(--radius);background:var(--bg2)}
+.staff-item-prices .sip-title{font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.staff-item-prices .sip-row{display:flex;justify-content:space-between;gap:10px;font-size:.74rem;color:var(--text-dim);padding:2px 0}
+.staff-item-prices .sip-row .p{color:var(--text);font-weight:600;white-space:nowrap}
 
 /* Width & Profile selectors */
 .width-control{display:flex;align-items:center;gap:12px;margin-bottom:6px}
@@ -994,6 +999,66 @@ function calcPrice(){
     console.error('%c❌ calcPrice() failed: '+e.message,'color:#c0392b;font-weight:bold');
     return null;
   }
+}
+
+// ── STAFF MODE: per-item price helpers (display only; mirror calcPrice logic, NO hardcoded fallbacks — unknown = null → '—') ──
+function staffFmtPrice(v){
+  if(v==null||isNaN(v))return '—';
+  if(v===0)return 'included';
+  return '$'+v.toFixed(2);
+}
+function staffBaseMetalPrice(name,widthMm){
+  if(!DATA||!DATA.p||!name)return null;
+  const w=widthMm||state.ringWidth||8;
+  try{
+    const hasInlays=state.strips.some(st=>!isMetal(st.material));
+    const hasNonMetalInlays=state.strips.some(st=>!isMetal(st.material)&&!isMetalGroup(st.material));
+    if(isPrecious(name)){
+      if(!state.ringSize)return null;
+      return calcPreciousMetalCost(name,w,state.ringSize,hasInlays);
+    }
+    const pd=DATA.p[name];
+    if(!pd)return null;
+    if(pd.per_mm_base)return pd.per_mm_base*w;
+    if(hasNonMetalInlays&&pd.sleeve_with_inlay)return pd.sleeve_with_inlay;
+    if(pd.sleeve)return pd.sleeve;
+    if(pd.full_ring)return pd.full_ring;
+    if(pd.fixed_price)return pd.fixed_price;
+    return null;
+  }catch(e){return null;}
+}
+function staffStripPrice(material,width){
+  if(!DATA||!DATA.p||!material||material==='(choose)')return null;
+  try{
+    const bm=state.baseMetal,slv=state.sleeve||bm;
+    if(isMetal(material)){
+      if(material===bm||material===slv)return 0;
+      if(isPrecious(material)){
+        if(!state.ringSize)return null;
+        return calcPinstripePrice(material,width,state.ringSize,1,false);
+      }
+      const pd=DATA.p[material];
+      return(pd&&pd.partials!=null)?pd.partials:null;
+    }
+    if(isMetalGroup(material)){
+      if(isPrecious(material)){
+        if(!state.ringSize)return null;
+        return calcPinstripePrice(material,width,state.ringSize,1,true);
+      }
+      const pd=DATA.p[material];
+      if(pd&&pd.inlay_by_width){
+        const tbl=pd.inlay_by_width;let cost=0;
+        for(let i=0;i<tbl.length;i++){
+          if(width<=tbl[i][0]||i===tbl.length-1){cost=tbl[i][1];break;}
+          if(width>tbl[i][0]&&width<=tbl[i+1][0]){const frac=(width-tbl[i][0])/(tbl[i+1][0]-tbl[i][0]);cost=tbl[i][1]+frac*(tbl[i+1][1]-tbl[i][1]);break;}
+        }
+        return Math.round(cost*100)/100;
+      }
+      if(pd&&pd.per_mm_inlay)return pd.per_mm_inlay*width;
+      return(pd&&pd.partials!=null)?pd.partials:null;
+    }
+    return getInlayPrice(material,width);
+  }catch(e){return null;}
 }
 
 function calcPreciousMetalCost(metalName, ringWidthMm, ringSize, hasInlays){
@@ -2132,6 +2197,11 @@ function renderMetalPanel(col){
         matSwatch(name),
         h('div',{class:'name'},[name])
       ]);
+      if(_staffMode){
+        const _sp=staffBaseMetalPrice(name,state.ringWidth);
+        card.appendChild(h('div',{class:'staff-price'},[staffFmtPrice(_sp)]));
+        card.title=name+' as base metal @ '+state.ringWidth+'mm: '+staffFmtPrice(_sp);
+      }
       grid.appendChild(card);
     });
   }
@@ -2172,6 +2242,7 @@ function renderWidthPanel(col){
       state.selectedStrip=-1;
       renderRing();
       updatePrice();
+      if(_staffMode&&window._staffWidthPriceRefresh)window._staffWidthPriceRefresh();
     }
   });
   const slider=h('input',{type:'range',min:'2',max:'14',step:'0.5',value:String(state.ringWidth),
@@ -2180,6 +2251,7 @@ function renderWidthPanel(col){
       wInput.value=state.ringWidth;
       state.strips=[];undoStack.length=0;
       state.selectedStrip=-1;
+      if(_staffMode&&window._staffWidthPriceRefresh)window._staffWidthPriceRefresh();
       debounceSlider(()=>{renderRing();updatePrice();},50)();
     }
   });
@@ -2190,6 +2262,19 @@ function renderWidthPanel(col){
   wc.appendChild(wInput);
   wc.appendChild(h('span',{style:{fontSize:'.75rem',color:'var(--text-muted)'}},['mm']));
   col.appendChild(wc);
+  
+  if(_staffMode){
+    const sipW=h('div',{class:'staff-item-prices'},[h('div',{class:'sip-title'},['Staff: Base Metal Price'])]);
+    const sipLbl=h('span',{});
+    const sipVal=h('span',{class:'p'});
+    sipW.appendChild(h('div',{class:'sip-row'},[sipLbl,sipVal]));
+    window._staffWidthPriceRefresh=()=>{
+      sipLbl.textContent=(state.baseMetal||'—')+' @ '+state.ringWidth+'mm';
+      sipVal.textContent=staffFmtPrice(staffBaseMetalPrice(state.baseMetal,state.ringWidth));
+    };
+    window._staffWidthPriceRefresh();
+    col.appendChild(sipW);
+  }
   
   // ── Quick width presets ──
   const presets=[{label:'Very Narrow',w:4},{label:'Narrower Average',w:6},{label:'Wider Average',w:8},{label:'Very Wide',w:10}];
@@ -2383,6 +2468,18 @@ function renderComposePanel(col){
     ' of '+state.ringWidth+'mm'
   ]));
   
+  if(_staffMode){
+    const sip=h('div',{class:'staff-item-prices'});
+    sip.appendChild(h('div',{class:'sip-title'},['Staff: Item Prices']));
+    const _bmp=staffBaseMetalPrice(state.baseMetal,state.ringWidth);
+    sip.appendChild(h('div',{class:'sip-row'},[h('span',{},[(state.baseMetal||'—')+' (Base Metal, '+state.ringWidth+'mm)']),h('span',{class:'p'},[staffFmtPrice(_bmp)])]));
+    state.strips.forEach((st,ix)=>{
+      if(st.material==='(choose)')return;
+      sip.appendChild(h('div',{class:'sip-row'},[h('span',{},['Strip '+(ix+1)+': '+st.material+' ('+st.width+'mm)']),h('span',{class:'p'},[staffFmtPrice(staffStripPrice(st.material,st.width))])]));
+    });
+    col.appendChild(sip);
+  }
+  
   // Visual strip bar with drag-and-drop
   const composer=h('div',{class:'composer-strips'});
   // Click empty area of composer to deselect
@@ -2428,6 +2525,8 @@ function renderComposePanel(col){
         updatePrice();
       }},['×'])
     ]);
+    
+    if(_staffMode&&s.material!=='(choose)')block.title=s.material+' '+s.width+'mm: '+staffFmtPrice(staffStripPrice(s.material,s.width));
     
     // Drag events
     block.addEventListener('dragstart',(e)=>{
@@ -3132,6 +3231,7 @@ function openAddStripModal(){
         matSwatch(name),
         h('div',{class:'name'},[name+(tooWide?' (min '+matMin+'mm)':'')])
       ]);
+      if(_staffMode&&!tooWide)card.title=name+' @ '+stripWidth+'mm: '+staffFmtPrice(staffStripPrice(name,stripWidth));
       grid.appendChild(card);
     });
     modal.appendChild(grid);
@@ -3258,6 +3358,7 @@ function openEditStripModal(idx){
         matSwatch(name),
         h('div',{class:'name'},[name+(tooNarrow?' (min '+matMin+'mm)':'')])
       ]);
+      if(_staffMode&&!tooNarrow)card.title=name+' @ '+stripWidth+'mm: '+staffFmtPrice(staffStripPrice(name,stripWidth));
       grid.appendChild(card);
     });
     modal.appendChild(grid);
