@@ -1093,6 +1093,64 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
   #nbStepNext.nb-wide{max-width:48vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #nbStepNext.nb-wait{opacity:.55}
 }
+/* ===== NEW BUILDER (2026-11-11, Johan): READY-MADE LAYOUTS =====
+   Cards at the top of the Inlays screen. The list comes from the pricing settings (builder_config.ready_layouts).
+   Layout only. */
+.nb-layouts{margin:0 0 16px;border:1px solid var(--border);border-radius:14px;background:var(--bg2);padding:10px 12px}
+.nb-layouts > summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;font-size:15px;font-weight:600;color:var(--text);-webkit-tap-highlight-color:transparent}
+.nb-layouts > summary::-webkit-details-marker{display:none}
+.nb-layouts > summary::after{content:"+";font-size:20px;line-height:1;color:var(--text-muted);font-weight:400}
+.nb-layouts[open] > summary::after{content:"\2212"}
+.nb-layouts .nb-lay-note{font-size:13px;line-height:1.4;color:var(--text-muted);margin:0 0 10px}
+.nb-layouts .nb-lay-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media(min-width:900px){ .nb-layouts .nb-lay-grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
+.nb-lay-card{display:flex;flex-direction:column;gap:6px;min-height:92px;padding:8px;border:1px solid var(--border);border-radius:12px;background:var(--bg);color:var(--text);font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.nb-lay-card:hover,.nb-lay-card:focus-visible{border-color:var(--gold)}
+.nb-lay-card.selected{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+.nb-lay-bar{display:flex;width:100%;height:40px;border-radius:8px;overflow:hidden;background:#b9bcc4;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.nb-lay-bar i{display:block;height:100%;box-shadow:inset 1px 0 0 rgba(0,0,0,.28)}
+.nb-lay-bar i:first-child{box-shadow:none}
+.nb-lay-name{font-size:13px;line-height:1.3;font-weight:600}
+.nb-lay-more{margin-top:8px;width:100%;min-height:44px;border:1px dashed var(--border);border-radius:12px;background:transparent;color:var(--text);font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.nb-layouts .nb-lay-plain{font-size:13px;line-height:1.4;color:var(--text-muted);margin:10px 0 2px}
+/* ===== NEW BUILDER (2026-11-11, Johan): TAP TARGETS AND TEXT SIZE ON PHONES =====
+   Acceptance: every tap target at least 44 x 44 px, no text under 12 px (hand-over section 5.4). Phones only.
+   Layout only - no control is removed; the small "x" on each strip in the band picture is replaced by a
+   "Remove" button in that strip's row (same action). */
+@media(max-width:767.98px){
+  /* metal / sleeve / material lists */
+  .mat-group-btn{min-height:44px !important;font-size:12px !important}
+  .mat-group-btn .mat-group-name{font-size:12.5px !important}
+  .mat-group-btn .mat-group-sub{font-size:12px !important}
+  .swatch-zoom-btn{width:44px !important;height:44px !important;right:-20px !important;bottom:-20px !important;border:0 !important;box-shadow:none !important;border-radius:50% !important;font-size:12px !important;line-height:44px !important;
+    background:radial-gradient(circle at center,var(--bg2,#fff) 0 9.5px,var(--swatch-border,#c9cddb) 9.5px 10.5px,transparent 11px) !important}
+  /* ring width slider and number box */
+  .width-control input[type=range],#controlsCol input[type=range],.acc-body input[type=range]{box-sizing:content-box !important;height:6px !important;padding:19px 0 !important;background-clip:content-box !important;min-width:44px}
+  .width-control input[type=number]{min-height:44px !important;min-width:62px}
+  /* ring sizes */
+  .size-btn{height:44px !important;min-height:44px !important;font-size:13px !important}
+  .size-btn.quarter{font-size:12px !important}
+  /* inlay rows: two lines per strip - name (tap to change) + Remove, then move and width */
+  .v2-strip-row{display:flex !important;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:8px 10px !important}
+  .v2-strip-row > .v2-row-dot{order:1;flex:0 0 auto}
+  .v2-strip-row > .v2-row-name{order:2;flex:1 1 calc(100% - 130px);min-width:44px !important;min-height:44px !important;text-align:left;display:flex !important;flex-direction:column;justify-content:center;align-items:flex-start;font-size:14px !important;white-space:normal;overflow-wrap:anywhere}
+  .v2-strip-row > .nb-row-remove{order:3;flex:0 0 auto}
+  .v2-strip-row > .v2-row-group{order:4;flex:0 0 auto;display:inline-flex;align-items:center;gap:6px}
+  .v2-strip-row > .v2-row-group ~ .v2-row-group{order:5;margin-left:auto}
+  .v2-strip-row .v2-row-min{font-size:12px !important}
+  .v2-row-btn{min-width:44px !important;min-height:44px !important;width:44px !important;height:44px !important;font-size:16px !important}
+  .v2-row-w{font-size:13px !important}
+  .nb-row-remove{min-width:44px;min-height:44px;padding:0 10px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--danger,#c0392b);font:inherit;font-size:13px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  /* dialogs and text links */
+  .v2-modal-x{min-width:44px !important;min-height:44px !important;width:44px !important;height:44px !important;top:6px !important;right:6px !important}
+  .acc-body p a,.acc-body div > a,#addStripModal a{display:inline-block;padding:15px 0;margin:-15px 0;min-width:44px}
+  .acc-body button{min-height:44px}
+  /* the band picture: the tiny labels and the tiny "x" give way to the rows underneath */
+  .composer-strips .strip-block .s-remove{display:none !important}
+  .composer-strips .s-name,.composer-strips .s-width,.composer-strips > div:not(.strip-block) > div{visibility:hidden !important}
+  .composer-strips .v2-grip{font-size:12px !important}
+  .composer-strips .strip-block{min-width:28px}
+}
 </style>
 </head>
 <body>
@@ -7885,6 +7943,216 @@ const PROFILE_IMAGES = {"Flat":"iVBORw0KGgoAAAANSUhEUgAAAMgAAAA5CAYAAABzlmQiAAAD
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
   window.__V2_THREESTEPS__={ applyOrder:applyOrder, grouped:grouped, reordered:reordered };
+})();
+/* ===== NEW BUILDER (2026-11-11, Johan): READY-MADE LAYOUTS =====
+   Cards at the top of the Inlays screen: "Start from a popular design". One tap fills the inlay layout for the
+   base metal and ring width already chosen; after that the customer edits it like any other layout.
+   - The list (names, materials, widths as drawn on a ring of designed_for_width mm) is a pricing setting:
+     builder_config.ready_layouts. No setting = no cards.
+   - A card is shown only when the engine's OWN rules accept that layout for the current metal, width and
+     profile (stripRuleBlock, validateProposedStrips, the material minimum / maximum widths). Nothing is forced.
+   - No price here. The engine and its rules are untouched; applying a layout goes through the engine's undo. */
+(function(){
+  function builder(){ try{ return (typeof BUILDER!=='undefined'&&BUILDER)?BUILDER:null; }catch(e){ return null; } }
+  function st(){ try{ return (typeof state!=='undefined'&&state)?state:null; }catch(e){ return null; } }
+  function data(){ try{ return (typeof DATA!=='undefined'&&DATA&&DATA.m)?DATA:null; }catch(e){ return null; } }
+  function cfg(){
+    var b=builder(), c=b&&b.ready_layouts;
+    if(!c||typeof c!=='object'||!Array.isArray(c.layouts)||!(Number(c.designed_for_width)>0)) return null;
+    return c;
+  }
+  function el(tag,cls,text){ var e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
+  function snap(value,step,mode){ var n=value/step; n=(mode==='floor')?Math.floor(n+1e-9):(mode==='ceil')?Math.ceil(n-1e-9):Math.round(n); return Math.round(n*step*1000)/1000; }
+  function isPrecut(){ var b=builder(), s=st(); try{ var blanks=b.rules&&b.rules.precut_blanks&&s.baseMetal?b.rules.precut_blanks[s.baseMetal]:null; return !!(blanks&&blanks.length); }catch(e){ return false; } }
+  function minFor(name,isBase){
+    var d=data(), b=builder(), mat=d.m[name]; if(!mat) return null;
+    try{ if(isBase&&typeof getBaseMetalMinWidth==='function') return getBaseMetalMinWidth(); }catch(e){}
+    try{ if(typeof isMetal==='function'&&isMetal(name)&&typeof metalStripMin==='function') return metalStripMin(name); }catch(e){}
+    var mi=mat.mi||{};
+    return mi.solid_inlay||mi.inlay_swarf||b.material_default_min_width||b.strip_width.min;
+  }
+  function maxFor(name){ var b=builder(); var m=b.rules&&b.rules.max_width_materials; return (m&&Number(m[name])>0)?Number(m[name]):Infinity; }
+
+  // The layout for the ring as it is now, or null when it cannot be made (then the card is not shown).
+  function compute(layout){
+    var c=cfg(), b=builder(), s=st(), d=data();
+    if(!c||!b||!s||!d||!layout||!Array.isArray(layout.strips)||layout.strips.length<3) return null;
+    if(!s.baseMetal||!d.m[s.baseMetal]||!(Number(s.ringWidth)>0)||isPrecut()) return null;
+    if(Array.isArray(b.inlay_profiles)&&s.profile&&b.inlay_profiles.indexOf(s.profile)<0) return null;
+    var step=b.strip_width.step, W=Number(s.ringWidth), ref=Number(c.designed_for_width), n=layout.strips.length;
+    var parts=[];
+    for(var i=0;i<n;i++){
+      var raw=layout.strips[i]; if(!raw||typeof raw.material!=='string'||!(Number(raw.width)>0)) return null;
+      var isBase=(raw.material==='base'), name=isBase?s.baseMetal:raw.material;
+      if(!d.m[name]) return null;                                   // hidden or unknown material
+      if(!isBase&&name===s.baseMetal) return null;                  // would melt into the base metal
+      parts.push({ material:name, ref:Number(raw.width), base:isBase, fixed:!!raw.fixed, edge:(isBase&&(i===0||i===n-1)), width:0 });
+    }
+    if(!parts[0].edge||!parts[n-1].edge) return null;               // every layout has a base-metal edge on both sides
+    for(var k=0;k<n;k++){ if(!parts[k].base){ try{ if(typeof stripRuleBlock==='function'&&stripRuleBlock(parts[k].material)) return null; }catch(e){ return null; } } }
+    var fixedSum=0, flexRef=0, edgeRef=0;
+    parts.forEach(function(p){ if(p.edge) edgeRef+=p.ref; else if(p.fixed) fixedSum+=p.ref; else flexRef+=p.ref; });
+    var room=W-fixedSum; if(!(room>0)||!(ref-fixedSum>0)) return null;
+    var factor=room/(ref-fixedSum);
+    var inner=parts.filter(function(p){ return !p.edge&&!p.fixed; });
+    parts.forEach(function(p){ if(p.fixed&&!p.edge) p.width=p.ref; });
+    inner.forEach(function(p){ p.width=Math.min(snap(p.ref*factor,step,'floor'),snap(maxFor(p.material),step,'floor')); });
+    var edgeMin=minFor(s.baseMetal,true); if(edgeMin==null) return null;
+    function innerSum(){ return inner.reduce(function(a,p){ return a+p.width; },0); }
+    function edgeTotal(){ return Math.round((W-fixedSum-innerSum())*1000)/1000; }
+    // every inlay at least as wide as its material allows
+    for(var q=0;q<inner.length;q++){ var mn=snap(minFor(inner[q].material,false),step,'ceil'); if(inner[q].width<mn) inner[q].width=mn; if(inner[q].width>maxFor(inner[q].material)) return null; }
+    // both edges at least as wide as the base metal allows: take width back from the widest inlay
+    var guard=0;
+    while(edgeTotal()<2*edgeMin-1e-9&&guard++<200){
+      var widest=null; inner.forEach(function(p){ var mn=snap(minFor(p.material,false),step,'ceil'); if(p.width-step>=mn-1e-9&&(!widest||p.width>widest.width)) widest=p; });
+      if(!widest) return null;
+      widest.width=Math.round((widest.width-step)*1000)/1000;
+    }
+    var total=edgeTotal(); if(total<2*edgeMin-1e-9) return null;
+    var left=snap(total/2,step,'floor'), right=Math.round((total-left)*1000)/1000;
+    if(left<edgeMin-1e-9||right<edgeMin-1e-9) return null;
+    parts[0].width=left; parts[n-1].width=right;
+    var strips=parts.map(function(p){ return { material:p.material, width:p.width }; });
+    var sum=strips.reduce(function(a,x){ return a+x.width; },0);
+    if(Math.abs(sum-W)>1e-6||strips.some(function(x){ return !(x.width>0); })) return null;
+    for(var f=0;f<n;f++){ if(parts[f].fixed&&!parts[f].edge){ var fm=minFor(parts[f].material,parts[f].base); if(fm!=null&&parts[f].width<fm-1e-9) return null; } }
+    try{ if(typeof validateProposedStrips==='function'&&validateProposedStrips(strips)) return null; }catch(e){ return null; }
+    return strips;
+  }
+  function available(){ var c=cfg(); if(!c) return []; var out=[]; c.layouts.forEach(function(l,i){ var strips=compute(l); if(strips) out.push({ index:i, name:String(l.name||''), strips:strips }); }); return out; }
+  function sameStrips(a,b){ if(!a||!b||a.length!==b.length) return false; for(var i=0;i<a.length;i++){ if(a[i].material!==b[i].material||Math.abs(a[i].width-b[i].width)>1e-6) return false; } return true; }
+  function apply(index){
+    var c=cfg(), s=st(); if(!c||!s) return false;
+    var strips=compute(c.layouts[index]); if(!strips) return false;
+    try{ if(typeof pushUndo==='function') pushUndo(); }catch(e){}
+    s.strips=strips.map(function(x){ return { material:x.material, width:x.width }; });
+    s.selectedStrip=-1; s.wantsInlays=true;
+    s._touched=s._touched||{}; s._touched.compose=true;
+    moreOpen=false;
+    try{ window.__V2_ROUTER__.rerenderSection('compose'); }catch(e){}
+    try{ if(typeof renderRing==='function') renderRing(); }catch(e){}
+    try{ if(typeof updatePrice==='function') updatePrice(); }catch(e){}
+    schedule();
+    return true;
+  }
+
+  // ---- the cards ----
+  // How one band of the little drawing looks - the same sources the ring drawing uses: the metal's own texture,
+  // the material's texture file, the metal's shade colours, else the material colour.
+  function look(name){
+    try{
+      if(typeof METAL_TEXTURES!=='undefined'&&METAL_TEXTURES[name]) return 'center / cover url(data:image/jpeg;base64,'+METAL_TEXTURES[name]+')';
+      if(typeof TEXTURE_MATERIALS!=='undefined'&&TEXTURE_MATERIALS.has(name)&&typeof swatchSlug==='function') return 'center / cover url(swatches-tex/'+swatchSlug(name)+'.jpg)';
+      var rp=(typeof METAL_SHADE_RAMPS!=='undefined')?METAL_SHADE_RAMPS[name]:null;
+      if(rp&&rp.length>=4){ var c=function(v){ return 'rgb('+v[0]+','+v[1]+','+v[2]+')'; }; return 'linear-gradient(180deg,'+c(rp[1])+' 0%,'+c(rp[3])+' 38%,'+c(rp[2])+' 58%,'+c(rp[0])+' 100%)'; }
+      if(typeof getColor==='function'){ var hex=getColor(name); if(hex) return String(hex); }
+    }catch(e){}
+    return '';
+  }
+  var moreOpen=false, userToggled=null;
+  function paint(){
+    var host=document.getElementById('acc-body-compose'); if(!host) return;
+    var c=cfg(), s=st(), old=host.querySelector('.nb-layouts');
+    var list=(c&&s)?available():[];
+    if(!list.length){ if(old) old.remove(); return; }
+    var hasInlays=Array.isArray(s.strips)&&s.strips.some(function(x){ return x&&x.material!==s.baseMetal; });
+    var current=-1; list.forEach(function(item){ if(sameStrips(item.strips,s.strips)) current=item.index; });
+    var open=(userToggled!=null)?userToggled:!hasInlays;
+    var first=Math.max(1,Number(c.show_first)||6), showAll=moreOpen||list.length<=first;
+    var sig=[s.baseMetal,s.ringWidth,s.profile,list.map(function(i){ return i.index+':'+i.strips.map(function(x){ return x.width; }).join('/'); }).join(','),current,open?1:0,showAll?1:0,hasInlays?1:0].join('|');
+    var anchor=host.querySelector('.width-control')||null;
+    if(old&&old.getAttribute('data-sig')===sig&&old.parentNode){ return; }
+    var box=el('details','nb-layouts'); box.setAttribute('data-sig',sig); if(open) box.open=true;
+    var sum=el('summary',null,hasInlays?'Popular designs':String(c.title||'Start from a popular design'));
+    box.appendChild(sum);
+    box.addEventListener('toggle',function(){ userToggled=box.open; });
+    if(c.note) box.appendChild(el('p','nb-lay-note',String(c.note)));
+    var grid=el('div','nb-lay-grid');
+    (showAll?list:list.slice(0,first)).forEach(function(item){
+      var card=el('button','nb-lay-card'+(item.index===current?' selected':'')); card.type='button';
+      card.setAttribute('data-nb-layout',String(item.index)); card.setAttribute('aria-pressed',item.index===current?'true':'false');
+      var bar=el('span','nb-lay-bar'); bar.setAttribute('aria-hidden','true');
+      item.strips.forEach(function(x){ var seg=document.createElement('i'); seg.style.flex=String(x.width)+' 1 0'; var bg=look(x.material); if(bg) seg.style.background=bg; bar.appendChild(seg); });
+      card.appendChild(bar); card.appendChild(el('span','nb-lay-name',item.name));
+      card.addEventListener('click',function(){ userToggled=null; apply(item.index); });
+      grid.appendChild(card);
+    });
+    box.appendChild(grid);
+    if(!showAll){
+      var more=el('button','nb-lay-more','More designs ('+(list.length-first)+')'); more.type='button';
+      more.addEventListener('click',function(){ moreOpen=true; schedule(); });
+      box.appendChild(more);
+    }
+    if(!hasInlays) box.appendChild(el('p','nb-lay-plain','Or build your own below - or keep the band plain and continue.'));
+    if(old) old.remove();
+    var parent=anchor?anchor.parentNode:host.firstElementChild||host;
+    if(anchor) parent.insertBefore(box,anchor); else parent.appendChild(box);
+  }
+  var queued=false;
+  function schedule(){ if(queued) return; queued=true; setTimeout(function(){ queued=false; try{ paint(); }catch(e){ if(window.console) console.error('ready layouts:',e); } },40); }
+  function start(){
+    var host=document.getElementById('acc-body-compose'); if(!host) return;
+    try{ new MutationObserver(schedule).observe(host,{ childList:true, subtree:true }); }catch(e){}
+    schedule();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+  window.__V2_LAYOUTS__={ available:available, compute:function(i){ var c=cfg(); return c?compute(c.layouts[i]):null; }, apply:apply, paint:paint };
+})();
+/* ===== NEW BUILDER (2026-11-11, Johan): TAP TARGETS AND TEXT SIZE ON PHONES =====
+   1. Every strip row on the Inlays screen gets a "Remove" button (44 px). It presses that strip's own small "x"
+      in the band picture, which is hidden on phones - same action, same rules, same undo.
+   2. A safety net for text: on phones any text in the builder that would show under 12 px is raised to 12 px.
+   Phones only (under 768 px). Nothing here knows about prices or rules. */
+(function(){
+  var phone=window.matchMedia?window.matchMedia('(max-width:767.98px)'):null;
+  function isPhone(){ return !!(phone&&phone.matches); }
+  function addRemoveButtons(){
+    var host=document.getElementById('acc-body-compose'); if(!host) return;
+    var blocks=host.querySelectorAll('.composer-strips > .strip-block'), rows=host.querySelectorAll('.v2-strip-rows > .v2-strip-row:not(.v2-row-ghost)');
+    for(var i=0;i<rows.length;i++){
+      var row=rows[i], own=blocks[i]?blocks[i].querySelector('.s-remove'):null, have=row.querySelector('.nb-row-remove');
+      if(!isPhone()||!own){ if(have) have.remove(); continue; }
+      if(have) continue;
+      var b=document.createElement('button'); b.type='button'; b.className='nb-row-remove'; b.textContent='Remove';
+      var nm=row.querySelector('.v2-row-name'); b.setAttribute('aria-label','Remove '+(nm?String(nm.firstChild&&nm.firstChild.nodeValue||nm.textContent||'').trim():'this strip'));
+      (function(index){ b.addEventListener('click',function(ev){
+        ev.stopPropagation();
+        var list=document.querySelectorAll('#acc-body-compose .composer-strips > .strip-block'); var x=list[index]?list[index].querySelector('.s-remove'):null; if(x) x.click();
+      }); })(i);
+      row.appendChild(b);
+    }
+  }
+  var SCOPES=['.acc-panel.open .acc-body','.v2-preview','#nbStepBar','#nbStepList','#addStripModal','.rule-toast','#v2-price'];
+  function raiseSmallText(){
+    if(!isPhone()) return;
+    for(var s=0;s<SCOPES.length;s++){
+      var roots=document.querySelectorAll(SCOPES[s]);
+      for(var r=0;r<roots.length;r++){
+        var root=roots[r]; if(!root.offsetParent&&getComputedStyle(root).position!=='fixed') continue;
+        var all=root.querySelectorAll('*');
+        for(var i=0;i<all.length;i++){
+          var e=all[i]; if(e.__nbText||!e.firstChild) continue;
+          var hasText=false; for(var c=e.firstChild;c;c=c.nextSibling){ if(c.nodeType===3&&c.nodeValue.trim()){ hasText=true; break; } }
+          if(!hasText) continue;
+          var cs=getComputedStyle(e); if(cs.visibility==='hidden'||cs.display==='none') continue;
+          var size=parseFloat(cs.fontSize);
+          if(size>0&&size<12){ e.style.setProperty('font-size','12px','important'); }
+          e.__nbText=true;
+        }
+      }
+    }
+  }
+  function run(){ try{ addRemoveButtons(); raiseSmallText(); }catch(e){ if(window.console) console.error('touch:',e); } }
+  var queued=false;
+  function schedule(){ if(queued) return; queued=true; setTimeout(function(){ queued=false; run(); },120); }
+  function start(){
+    try{ new MutationObserver(schedule).observe(document.body,{ childList:true, subtree:true }); }catch(e){}
+    if(phone&&phone.addEventListener) phone.addEventListener('change',schedule);
+    schedule();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+  window.__V2_TOUCH__={ run:run };
 })();
 </script>
 </body>
