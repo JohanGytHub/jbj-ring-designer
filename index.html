@@ -7619,15 +7619,52 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     function edgeTotal(){ return Math.round((W-fixedSum-innerSum())*1000)/1000; }
     // every inlay at least as wide as its material allows
     for(var q=0;q<inner.length;q++){ var mn=snap(minFor(inner[q].material,false),step,'ceil'); if(inner[q].width<mn) inner[q].width=mn; if(inner[q].width>maxFor(inner[q].material)) return null; }
-    // both edges at least as wide as the base metal allows: take width back from the widest inlay
-    var guard=0;
-    while(edgeTotal()<2*edgeMin-1e-9&&guard++<200){
-      var widest=null; inner.forEach(function(p){ var mn=snap(minFor(p.material,false),step,'ceil'); if(p.width-step>=mn-1e-9&&(!widest||p.width>widest.width)) widest=p; });
-      if(!widest) return null;
-      widest.width=Math.round((widest.width-step)*1000)/1000;
+    // BALANCED LAYOUT (2026-11-11, Johan) - START: "offer a balanced inlay layout automatically so the customer does not
+    // start with a lopsided layout". A layout whose widths are written as a mirror image (all of them are) always comes
+    // out as one: both edges equal, the inlays left and right of the centre equal - also when they are two different
+    // materials (the pair takes the width both allow). Width only moves in mirrored pairs, or in the centre strip.
+    function r3(x){ return Math.round(x*1000)/1000; }
+    function low(p){ var m=minFor(p.material,p.base); return snap(m==null?step:m,step,'ceil'); }
+    function edgesNow(){ var used=0; parts.forEach(function(p){ if(!p.edge) used+=p.width; }); return r3(W-used); }
+    var mirror=parts.every(function(p,ix){ var o=parts[n-1-ix]; return p.base===o.base&&p.ref===o.ref&&p.fixed===o.fixed; });
+    function pairLow(pr){ return Math.max(low(pr[0]),low(pr[1])); }
+    var left, right, total, guard=0;
+    if(mirror){
+      var mid=(n%2===1)?parts[(n-1)/2]:null, pairs=[];
+      for(var a=1;a<n-1-a;a++) pairs.push([parts[a],parts[n-1-a]]);
+      for(var b2=0;b2<pairs.length;b2++){
+        var pr0=pairs[b2], pw=Math.min(pr0[0].width,pr0[1].width); if(!pr0[0].fixed&&pw<pairLow(pr0)) pw=pairLow(pr0);
+        if(pw>Math.min(maxFor(pr0[0].material),maxFor(pr0[1].material))+1e-9) return null;
+        pr0[0].width=pr0[1].width=pw;
+      }
+      // room for both edges: the widest inlay gives width back - a pair on both sides at once, the centre strip alone
+      while(edgesNow()<2*edgeMin-1e-9&&guard++<200){
+        var best=null;
+        if(mid&&!mid.fixed&&mid.width-step>=low(mid)-1e-9) best={ w:mid.width, mid:true };
+        pairs.forEach(function(pr){ if(!pr[0].fixed&&pr[0].width-step>=pairLow(pr)-1e-9&&(!best||pr[0].width>best.w)) best={ w:pr[0].width, pair:pr }; });
+        if(!best) return null;
+        if(best.mid) mid.width=r3(mid.width-step); else { best.pair[0].width=r3(best.pair[0].width-step); best.pair[1].width=best.pair[0].width; }
+      }
+      // equal edges need an even number of steps: the centre strip gives one step, or takes one
+      if(Math.round(edgesNow()/step)%2!==0){
+        if(!mid) return null;
+        if(mid.width-step>=low(mid)-1e-9) mid.width=r3(mid.width-step);
+        else if(mid.width+step<=maxFor(mid.material)+1e-9&&edgesNow()-step>=2*edgeMin-1e-9) mid.width=r3(mid.width+step);
+        else return null;
+      }
+      total=edgesNow(); if(total<2*edgeMin-1e-9||Math.round(total/step)%2!==0) return null;
+      left=right=r3(total/2);
+    } else {
+      // a layout that is written off-centre on purpose keeps the first rule: width comes back from the widest inlay
+      while(edgeTotal()<2*edgeMin-1e-9&&guard++<200){
+        var widest=null; inner.forEach(function(p){ var mn=snap(minFor(p.material,false),step,'ceil'); if(p.width-step>=mn-1e-9&&(!widest||p.width>widest.width)) widest=p; });
+        if(!widest) return null;
+        widest.width=Math.round((widest.width-step)*1000)/1000;
+      }
+      total=edgeTotal(); if(total<2*edgeMin-1e-9) return null;
+      left=snap(total/2,step,'floor'); right=Math.round((total-left)*1000)/1000;
     }
-    var total=edgeTotal(); if(total<2*edgeMin-1e-9) return null;
-    var left=snap(total/2,step,'floor'), right=Math.round((total-left)*1000)/1000;
+    // BALANCED LAYOUT (2026-11-11, Johan) - END
     if(left<edgeMin-1e-9||right<edgeMin-1e-9) return null;
     parts[0].width=left; parts[n-1].width=right;
     var strips=parts.map(function(p){ return { material:p.material, width:p.width }; });
