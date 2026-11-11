@@ -1030,6 +1030,31 @@ input[type="text"],input[type="email"],input[type="number"],input[type="search"]
   #nbStepNext[hidden]{display:none}
 }
 @media(min-width:768px){ #nbStepBar,#nbStepScrim{display:none !important} }
+/* ===== NEW BUILDER (2026-11-11, Johan): LAST STEP AS A RECEIPT (phones) =====
+   The Summary's long tables are folded behind "Show all details"; a short receipt with Edit links comes first;
+   optional parts (engraving, note, price point) are folded; one line under the form says what happens next.
+   Layout only: the fields, their checks and what is sent are the engine's own, unchanged. */
+.nb-receipt{border:1px solid var(--border);border-radius:14px;background:var(--bg2);margin:10px 0 12px;overflow:hidden}
+.nb-receipt-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px;padding:4px 4px 4px 14px;min-height:52px;border-top:1px solid var(--border)}
+.nb-receipt-row:first-child{border-top:0}
+.nb-receipt-row .nb-k{display:block;font-size:12px;line-height:1.3;color:var(--text-muted);letter-spacing:.02em}
+.nb-receipt-row .nb-t{display:block;font-size:15px;line-height:1.35;font-weight:600;color:var(--text);overflow-wrap:anywhere}
+.nb-edit{min-width:60px;min-height:44px;border:0;background:transparent;color:var(--gold);font:inherit;font-size:14px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
+details.nb-details{border:1px solid var(--border);border-radius:12px;margin:0 0 12px;background:transparent}
+details.nb-details>summary{list-style:none;min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;font-size:15px;font-weight:600;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent}
+details.nb-details>summary::-webkit-details-marker{display:none}
+details.nb-details>summary::after{content:'+';font-size:20px;font-weight:400;color:var(--text-muted)}
+details.nb-details[open]>summary::after{content:'\2212'}
+details.nb-details>.nb-inner{padding:2px 14px 12px}
+details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
+.nb-next{font-size:13px;line-height:1.45;color:var(--text-muted);text-align:center;margin:12px 0 10px}
+@media(max-width:767px){
+  #acc-body-summary .panel-desc{display:none}
+  #acc-body-summary .email-form{margin-top:4px}
+  /* first + last name side by side (browsers without :has keep them stacked) */
+  #acc-body-summary .email-form > div:has(> .form-row #quoteFirstName){display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+  #acc-body-summary #quoteSubmitBtn{min-height:52px !important;font-size:16px !important}
+}
 </style>
 </head>
 <body>
@@ -7364,6 +7389,81 @@ const PROFILE_IMAGES = {"Flat":"iVBORw0KGgoAAAANSUhEUgAAAMgAAAA5CAYAAABzlmQiAAAD
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
   window.__V2_STEPBAR__={ refresh:refresh };
+})();
+/* ===== NEW BUILDER (2026-11-11, Johan): LAST STEP AS A RECEIPT (phones) =====
+   Runs after the engine has drawn the Summary. It only MOVES the engine's own elements (so their checks, values
+   and what is sent stay exactly as they are) and adds: a short receipt with Edit links, fold-away blocks, and one
+   line saying what happens next. Phones only (under 768px). Re-applied each time the Summary is drawn again. */
+(function(){
+  var MQ=window.matchMedia?window.matchMedia('(max-width:767px)'):null;
+  function phone(){ return !MQ||MQ.matches; }
+  function el(tag,cls,text){ var e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
+  function sectionByTitle(h,title){ var s=h.querySelectorAll('.summary-section'); for(var i=0;i<s.length;i++){ var t=s[i].querySelector('h4'); if(t&&String(t.textContent||'').trim().indexOf(title)===0) return s[i]; } return null; }
+  function rows(section){ var out=[]; if(!section) return out; var r=section.querySelectorAll('.summary-row'); for(var i=0;i<r.length;i++){ var l=r[i].querySelector('.label'), v=r[i].querySelector('.value'); out.push({ label:l?String(l.textContent||'').trim():'', value:v?String(v.textContent||'').trim():'' }); } return out; }
+  function valueOf(list,label){ for(var i=0;i<list.length;i++){ if(list[i].label===label) return list[i].value; } return ''; }
+  function fold(title,cls,open){ var d=el('details','nb-details'+(cls?' '+cls:'')); if(open) d.open=true; d.appendChild(el('summary','',title)); var inner=el('div','nb-inner'); d.appendChild(inner); d._inner=inner; return d; }
+  function receiptRow(kicker,text,sec){
+    var row=el('div','nb-receipt-row'); var txt=el('div',''); txt.appendChild(el('span','nb-k',kicker)); txt.appendChild(el('span','nb-t',text)); row.appendChild(txt);
+    var b=el('button','nb-edit','Edit'); b.type='button'; b.setAttribute('aria-label','Edit '+kicker.toLowerCase()); b.setAttribute('data-nb-edit',sec);
+    b.addEventListener('click',function(){ try{ window.__V2_ROUTER__.openSection(sec); }catch(e){} });
+    row.appendChild(b); return row;
+  }
+  function apply(){
+    var h=document.getElementById('acc-body-summary');
+    if(!h||!phone()||h.querySelector('.nb-receipt')) return;
+    var cfg=sectionByTitle(h,'Configuration'); if(!cfg) return;
+    var band=sectionByTitle(h,'Band Composition');
+    var c=rows(cfg), b=rows(band);
+    var base=valueOf(c,'Base Metal');
+    // 1. receipt
+    var rec=el('div','nb-receipt');
+    rec.appendChild(receiptRow('Your band',[base,valueOf(c,'Ring Width'),valueOf(c,'Profile'),valueOf(c,'Finish')].filter(Boolean).join(' · '),'metal'));
+    var inl=[]; for(var i=0;i<b.length;i++){ var m=/^Strip\s+\d+:\s*(.+)$/.exec(b[i].label); if(m&&m[1]!==base) inl.push(m[1]+' '+b[i].value); }
+    rec.appendChild(receiptRow(inl.length===1?'1 inlay':(inl.length>1?inl.length+' inlays':'Inlays'),inl.length?inl.join(', '):'None - plain band','compose'));
+    var sl=valueOf(c,'Sleeve'); rec.appendChild(receiptRow('Sleeve',sl||'None','sleeve'));
+    rec.appendChild(receiptRow('Ring size',valueOf(c,'Ring Size')||'Not chosen yet','size'));
+    cfg.parentNode.insertBefore(rec,cfg);
+    // 2. the long tables fold away
+    var all=fold('Show all details','nb-all',false); rec.parentNode.insertBefore(all,rec.nextSibling);
+    all._inner.appendChild(cfg); if(band) all._inner.appendChild(band);
+    for(var k=0;k<h.children.length;k++){ var kid=h.children[k]; if(kid.tagName==='P'&&/Not seeing what/.test(kid.textContent||'')){ all._inner.appendChild(kid); break; } }
+    // 3. engraving is optional: folded unless something is already typed
+    var eng=sectionByTitle(h,'Inside Laser Engraving'), font=h.querySelector('.eng-font-wrap');
+    if(eng){
+      var hasEng=false; try{ hasEng=!!(state&&state.engraving); }catch(e){}
+      var fe=fold('Add inside engraving (optional)','nb-eng',hasEng); eng.parentNode.insertBefore(fe,font&&font.parentNode===eng.parentNode?font:eng);
+      if(font&&font.parentNode===fe.parentNode) fe._inner.appendChild(font);
+      fe._inner.appendChild(eng);
+    }
+    // 4. note + price point are optional: folded unless already used
+    var form=h.querySelector('.email-form');
+    if(form){
+      var ta=form.querySelector('textarea'), notes=ta?ta.closest('.form-row'):null, budget=form.querySelector('#quoteBudgetBox');
+      var used=false; try{ used=!!(ta&&ta.value)||!!(budget&&budget.querySelector('input:checked')); }catch(e){}
+      var first=notes||budget;
+      if(first&&first.parentNode===form){
+        var fo=fold('Add a note or a price point (optional)','nb-opt',used); form.insertBefore(fo,first);
+        if(notes&&notes.parentNode===form) fo._inner.appendChild(notes);
+        if(budget&&budget.parentNode===form) fo._inner.appendChild(budget);
+      }
+      // 5. what happens next, right at the button
+      var btn=form.querySelector('#quoteSubmitBtn');
+      if(btn&&!form.querySelector('.nb-next')){
+        var days=null; try{ days=(typeof BUSINESS!=='undefined'&&BUSINESS)?Number(BUSINESS.quote_turnaround_business_days):null; }catch(e){}
+        var line='We reply '+((days&&days>0)?('within '+days+' business day'+(days===1?'':'s')):'by email')+' with your exact price. No payment now.';
+        btn.parentNode.insertBefore(el('p','nb-next',line),btn);
+      }
+    }
+  }
+  var queued=false;
+  function schedule(){ if(queued) return; queued=true; setTimeout(function(){ queued=false; try{ apply(); }catch(e){ if(window.console) console.error('quote step layout:',e); } },30); }
+  function start(){
+    var h=document.getElementById('acc-body-summary'); if(!h) return;
+    try{ new MutationObserver(schedule).observe(h,{ childList:true, subtree:true }); }catch(e){}
+    schedule();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+  window.__V2_QUOTESTEP__={ apply:apply };
 })();
 </script>
 </body>
