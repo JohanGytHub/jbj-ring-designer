@@ -1078,6 +1078,21 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
 .nb-range .nb-group.selected{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);background:linear-gradient(135deg,var(--gold-wash),transparent 70%),var(--bg2)}
 .nb-range.nb-nudge{border-color:#c0392b;box-shadow:0 0 0 1px #c0392b}
 .nb-range.nb-nudge .nb-groups .nb-k{color:#c0392b;font-weight:700}
+/* ===== NEW BUILDER (2026-11-11, Johan): THREE STEPS =====
+   The tools are grouped into the steps named in the pricing settings (builder_config.steps[].group):
+   Your band / Make it yours / Get my quote. Layout only. Without groups in the settings nothing here applies. */
+.acc-panel[data-nb-first="1"] .nav-buttons .btn-prev{visibility:hidden}
+.nb-size-nudge{outline:2px solid #c0392b;outline-offset:2px;border-radius:14px}
+#acc-body-size .nb-hide{display:none !important}
+@media(max-width:767.98px){
+  #nbStepMid .nb-step-dots.nb-groups i{width:22px;height:6px;border-radius:3px;position:relative;overflow:hidden}
+  #nbStepMid .nb-step-dots.nb-groups i.on{width:34px;background:var(--border,#c9cddb)}
+  #nbStepMid .nb-step-dots.nb-groups i.on b{position:absolute;left:0;top:0;bottom:0;background:var(--gold,#5b63ff);border-radius:3px;display:block}
+  #nbStepList .nb-g{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold,#5b63ff);padding:8px 12px 2px}
+  #nbStepList .nb-g:first-child{padding-top:2px}
+  #nbStepNext.nb-wide{max-width:48vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #nbStepNext.nb-wait{opacity:.55}
+}
 </style>
 </head>
 <body>
@@ -7353,6 +7368,13 @@ const PROFILE_IMAGES = {"Flat":"iVBORw0KGgoAAAANSUhEUgAAAMgAAAA5CAYAAABzlmQiAAAD
   function tabs(){ return Array.prototype.slice.call(document.querySelectorAll('#studio-tool-rail .tool-tab[data-sec]')); }
   function activeIndex(list){ for(var i=0;i<list.length;i++){ if(list[i].classList.contains('active')||list[i].getAttribute('aria-selected')==='true') return i; } return -1; }
   function label(tab){ var l=tab&&tab.querySelector('.tool-label'); return l?String(l.textContent||'').trim():''; }
+  // THREE STEPS (2026-11-11, Johan) - START: when the tools carry a step name (data-nb-group, set from the pricing settings by
+  // the three-steps part) the bar counts the STEPS (1 of 3), not the tools. Without step names: as before.
+  function groupOf(tab){ return (tab&&tab.getAttribute('data-nb-group'))||''; }
+  function shown(){ return tabs().filter(function(t){ return !t.hidden; }); }
+  function grouped(){ return tabs().some(function(t){ return !!groupOf(t); }); }
+  function groupNames(list){ var out=[]; list.forEach(function(t){ var g=groupOf(t); if(g&&out.indexOf(g)<0) out.push(g); }); return out; }
+  // THREE STEPS (2026-11-11, Johan) - END
   var bar, back, mid, name, dots, next, scrim, listEl;
   function panelOf(tab){ var id=tab&&tab.getAttribute('aria-controls'); return id?document.getElementById(id):null; }
   function panelBtn(tab,cls){ var p=panelOf(tab); return p?p.querySelector('.nav-buttons .'+cls):null; }
@@ -7375,8 +7397,11 @@ const PROFILE_IMAGES = {"Flat":"iVBORw0KGgoAAAANSUhEUgAAAMgAAAA5CAYAAABzlmQiAAAD
     scrim.addEventListener('click',closeList);
   }
   function openList(){
-    var list=tabs(), i=activeIndex(list); listEl.textContent='';
+    var list=grouped()?shown():tabs(), i=activeIndex(list), lastGroup=null; listEl.textContent='';   // THREE STEPS (2026-11-11, Johan)
     list.forEach(function(t,k){
+      var g=groupOf(t);   // THREE STEPS (2026-11-11, Johan): a heading where a new step begins
+      if(g&&g!==lastGroup){ var hd=document.createElement('div'); hd.className='nb-g'; hd.textContent=(groupNames(list).indexOf(g)+1)+'. '+g; listEl.appendChild(hd); }
+      lastGroup=g;
       var b=document.createElement('button'); b.type='button'; b.setAttribute('role','menuitem'); if(k===i) b.className='on';
       var n=document.createElement('span'); n.className='nb-n'; n.textContent=(k<9?'0':'')+(k+1);
       var l=document.createElement('span'); l.className='nb-l'; l.textContent=label(t);
@@ -7390,13 +7415,37 @@ const PROFILE_IMAGES = {"Flat":"iVBORw0KGgoAAAANSUhEUgAAAMgAAAA5CAYAAABzlmQiAAAD
   function closeList(){ document.body.classList.remove('nb-steps-open'); }
   function go(delta){
     closeList();
-    var list=tabs(), i=activeIndex(list); if(i<0) i=0;
+    var list=grouped()?shown():tabs(), i=activeIndex(list); if(i<0) i=0;   // THREE STEPS (2026-11-11, Johan)
     var own=panelBtn(list[i], delta>0?'btn-next':'btn-prev');
     if(own){ own.click(); return; }
     var t=list[i+delta]; if(t) t.click();
   }
   function refresh(){
     if(!bar) return;
+    // THREE STEPS (2026-11-11, Johan) - START
+    if(grouped()){
+      var vis=shown(), a=activeIndex(vis); if(a<0) a=0;
+      var names=groupNames(vis), g=groupOf(vis[a]), gi=Math.max(0,names.indexOf(g));
+      var inGroup=vis.filter(function(t){ return groupOf(t)===g; }), pos=inGroup.indexOf(vis[a])+1;
+      name.textContent=g;   // the three bars underneath show "step 1 of 3"; the full wording is in the aria-label
+      mid.setAttribute('aria-label','Step '+(gi+1)+' of '+names.length+': '+g+', '+label(vis[a])+'. Show all steps');
+      dots.className='nb-step-dots nb-groups';
+      if(dots.childNodes.length!==names.length||!dots.firstChild||dots.firstChild.tagName!=='I'){ dots.textContent=''; for(var q=0;q<names.length;q++) dots.appendChild(document.createElement('i')); }
+      for(var e=0;e<names.length;e++){
+        var dot=dots.childNodes[e]; dot.className=(e===gi)?'on':(e<gi?'done':''); dot.textContent='';
+        if(e===gi){ var fill=document.createElement('b'); fill.style.width=Math.round(100*pos/Math.max(1,inGroup.length))+'%'; dot.appendChild(fill); }
+      }
+      back.disabled=(a<=0);
+      if(a>=vis.length-1){ next.hidden=true; next.textContent=''; next.classList.remove('nb-wide'); }
+      else{
+        var ng=groupOf(vis[a+1]), newStep=(ng!==g);
+        next.hidden=false; next.textContent=(newStep?ng:'Next')+' \u2192'; next.classList.toggle('nb-wide',newStep);
+        next.setAttribute('aria-label','Next: '+label(vis[a+1]));
+      }
+      return;
+    }
+    dots.className='nb-step-dots'; next.classList.remove('nb-wide');
+    // THREE STEPS (2026-11-11, Johan) - END
     var list=tabs(), i=activeIndex(list); if(i<0) i=0;
     name.textContent=(i+1)+' of '+list.length+' · '+label(list[i]);
     if(dots.childNodes.length!==list.length){ dots.textContent=''; for(var k=0;k<list.length;k++) dots.appendChild(document.createElement('i')); }
@@ -7408,7 +7457,7 @@ const PROFILE_IMAGES = {"Flat":"iVBORw0KGgoAAAANSUhEUgAAAMgAAAA5CAYAAABzlmQiAAAD
   function start(){
     if(!document.getElementById('studio-tool-rail')) return;
     build(); refresh();
-    try{ new MutationObserver(refresh).observe(document.getElementById('studio-tool-rail'),{ attributes:true, subtree:true, attributeFilter:['class','aria-selected'] }); }catch(e){}
+    try{ new MutationObserver(refresh).observe(document.getElementById('studio-tool-rail'),{ attributes:true, subtree:true, attributeFilter:['class','aria-selected','hidden','data-nb-group'] }); }catch(e){}
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
   window.__V2_STEPBAR__={ refresh:refresh };
@@ -7693,6 +7742,149 @@ const PROFILE_IMAGES = {"Flat":"iVBORw0KGgoAAAANSUhEUgAAAMgAAAA5CAYAAABzlmQiAAAD
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
   window.__V2_SIZE__={ state:NB, chooseUnknown:chooseUnknown, chooseGroup:chooseGroup, paint:paint };
+})();
+/* ===== NEW BUILDER (2026-11-11, Johan): THREE STEPS =====
+   The order of the tools and the step each tool belongs to come from the pricing settings
+   (builder_config.steps - the list order, and "group" on each entry). The engine and the router already walk
+   that list for Back / Continue. This part makes the page follow it too:
+     - the tool list and the panels are put in the list's order and renumbered,
+     - the page opens on the first tool of the list (the engine's boot opens Ring Size),
+     - the Ring Size screen gets a Back button and its own heading when it is no longer first (the welcome text
+       belonged to a first screen),
+     - the last screen waits for a ring size: opening it without one leads to the Ring Size screen,
+     - the "choose a Base Metal first" message loses its old section number.
+   With the live step list (Ring Size first, no groups) every function here does nothing. */
+(function(){
+  function steps(){ try{ return (typeof STEPS!=='undefined'&&STEPS&&STEPS.length)?STEPS:null; }catch(e){ return null; } }
+  function st(){ try{ return (typeof state!=='undefined'&&state)?state:null; }catch(e){ return null; } }
+  function grouped(){ var s=steps(); return !!(s&&s.some(function(x){ return x&&typeof x.group==='string'&&x.group; })); }
+  function reordered(){ var s=steps(); return !!(s&&s[0]&&s[0].id!=='size'); }
+  function two(n){ return (n<10?'0':'')+n; }
+
+  function applyOrder(){
+    var s=steps(); if(!s||(!grouped()&&!reordered())) return;
+    var rail=document.getElementById('studio-tool-rail'), stack=document.getElementById('v2-acc-stack'), price=document.getElementById('v2-price');
+    var lastGroup=null;
+    s.forEach(function(step,i){
+      var tab=rail?rail.querySelector('.tool-tab[data-sec="'+step.id+'"]'):null;
+      if(tab){
+        if(rail.children[i]!==tab) rail.insertBefore(tab,rail.children[i]||null);
+        var idx=tab.querySelector('.tool-index'); if(idx&&idx.textContent!==two(i+1)) idx.textContent=two(i+1);
+        var g=(typeof step.group==='string'&&step.group)?step.group:null;
+        if(g&&g!==lastGroup) tab.setAttribute('data-nb-group-start',g); else tab.removeAttribute('data-nb-group-start');
+        if(g) tab.setAttribute('data-nb-group',g); else tab.removeAttribute('data-nb-group');
+        lastGroup=g;
+      }
+      var panel=document.getElementById('acc-panel-'+step.id);
+      if(panel&&stack){
+        var panels=stack.querySelectorAll(':scope > .acc-panel');
+        if(panels[i]!==panel) stack.insertBefore(panel,panels[i]||price||null);
+        var num=panel.querySelector('.acc-num'); if(num&&num.textContent!==String(i+1)) num.textContent=String(i+1);
+        if(i===0) panel.setAttribute('data-nb-first','1'); else panel.removeAttribute('data-nb-first');
+      }
+    });
+  }
+
+  // Ring Size is no longer the first screen: give it a Back button and a heading that does not say "Start by".
+  function fixSizePanel(){
+    if(!reordered()) return;
+    var host=document.getElementById('acc-body-size'); if(!host) return;
+    var title=host.querySelector('h2.panel-title'); if(title&&String(title.textContent||'').trim()==='Design Your Custom Ring') title.textContent='Your Ring Size';
+    var kids=host.children;
+    for(var i=0;i<kids.length;i++){
+      var k=kids[i], text=String(k.textContent||'');
+      if((k.tagName==='P'&&/^Build a one-of-a-kind ring/.test(text))||(k.tagName==='H3'&&/^Start by selecting your ring size/i.test(text))){ if(!k.classList.contains('nb-hide')) k.classList.add('nb-hide'); }
+    }
+    var nav=host.querySelector('.nav-buttons');
+    if(nav&&!nav.querySelector('.btn-prev')){
+      var b=document.createElement('button'); b.type='button'; b.className='btn-nav btn-prev'; b.textContent='← Back';
+      b.addEventListener('click',function(){ var s=st(); try{ window.goToStep(((s&&s.step)||0)-1); }catch(e){} });
+      var first=nav.firstElementChild;
+      if(first&&first.tagName==='DIV'&&!first.className&&!first.childNodes.length) nav.replaceChild(b,first); else nav.insertBefore(b,nav.firstChild);
+    }
+  }
+
+  // "Please choose a Base Metal first (Section 2) ..." - the section number is no longer true.
+  function wrapToast(){
+    if(typeof window.showRuleToast!=='function'||window.showRuleToast.__nbThreeSteps) return;
+    var original=window.showRuleToast;
+    var wrapped=function(message){
+      var args=Array.prototype.slice.call(arguments);
+      if(reordered()&&typeof message==='string') args[0]=message.replace('Please choose a Base Metal first (Section 2) before making changes here.','Please choose a Base Metal first.');
+      return original.apply(this,args);
+    };
+    wrapped.__nbThreeSteps=true; window.showRuleToast=wrapped;
+  }
+
+  // The last screen needs a ring size (the price depends on it). Opening it without one leads to Ring Size.
+  function sizeMissing(){ var s=st(); return !!(reordered()&&s&&s.ringSize==null); }
+  function askForSize(){
+    var unknown=false; try{ unknown=!!(typeof BUILDER!=='undefined'&&BUILDER&&BUILDER.unknown_size&&BUILDER.unknown_size.label); }catch(e){}
+    try{ window.__V2_ROUTER__.openSection('size'); }catch(e){}
+    try{ if(window.showRuleToast) window.showRuleToast(unknown?'One more thing: tap your ring size - or "'+BUILDER.unknown_size.label+'" if you are not sure.':'One more thing: please tap your ring size.'); }catch(e){}
+    setTimeout(function(){
+      var host=document.getElementById('acc-body-size'); if(!host) return;
+      var target=host.querySelector('.nb-size-unknown')||host.querySelector('.size-grid');
+      if(target){ target.classList.add('nb-size-nudge'); try{ target.scrollIntoView({ block:'center', behavior:'smooth' }); }catch(e){} setTimeout(function(){ target.classList.remove('nb-size-nudge'); },2600); }
+    },80);
+  }
+  document.addEventListener('click',function(ev){
+    var t=ev.target&&ev.target.closest?ev.target.closest('.tool-tab[data-sec="summary"], .acc-head[data-sec="summary"]'):null;
+    if(t&&sizeMissing()){ ev.preventDefault(); ev.stopImmediatePropagation(); askForSize(); }
+  },true);
+  function wrapGoToStep(){
+    if(typeof window.goToStep!=='function'||window.goToStep.__nbThreeSteps) return;
+    var original=window.goToStep;
+    var wrapped=function(idx){
+      var s=steps();
+      if(s&&s[idx]&&s[idx].id==='summary'&&sizeMissing()){ askForSize(); return; }
+      return original.apply(this,arguments);
+    };
+    wrapped.__nbThreeSteps=true; window.goToStep=wrapped;
+  }
+  // phone bar: the Next button looks "not yet" on the Ring Size screen until a size is chosen
+  // a message that has been answered (metal chosen / size chosen) does not stay on the next screens
+  function clearAnsweredToast(){
+    var s=st(), toast=document.querySelector('.rule-toast'); if(!s||!toast||!reordered()) return;
+    var text=String(toast.textContent||'');
+    if((s.baseMetal&&text.indexOf('Please choose a Base Metal first.')>=0)||(s.ringSize!=null&&text.indexOf('tap your ring size')>=0)) toast.remove();
+  }
+  function paintNext(){
+    clearAnsweredToast();
+    var next=document.getElementById('nbStepNext'), s=st(); if(!next||!s) return;
+    next.classList.toggle('nb-wait',!!(reordered()&&s._openSection==='size'&&s.ringSize==null));
+  }
+  // a summary opened by another route (a design link without a size): say "not chosen yet", never "null"
+  function fixSummarySize(){
+    if(!sizeMissing()) return;
+    var h=document.getElementById('acc-body-summary'); if(!h) return;
+    var rows=h.querySelectorAll('.summary-row');
+    for(var i=0;i<rows.length;i++){ var l=rows[i].querySelector('.label'), v=rows[i].querySelector('.value'); if(l&&v&&String(l.textContent||'').trim()==='Ring Size'&&String(v.textContent||'').trim()==='null') v.textContent='Not chosen yet'; }
+    var edit=h.querySelector('.nb-edit[data-nb-edit="size"]'), text=edit&&edit.parentNode?edit.parentNode.querySelector('.nb-t'):null;
+    if(text&&String(text.textContent||'').trim()==='null') text.textContent='Not chosen yet';
+  }
+
+  var booted=false, tries=0;
+  function boot(){
+    var s=steps(), stt=st();
+    if(!s||!stt||!window.__V2_ROUTER__||!stt._openSection){ if(++tries<600) setTimeout(boot,50); return; }
+    if(booted) return; booted=true;
+    applyOrder(); wrapToast(); wrapGoToStep(); fixSizePanel();
+    try{ new MutationObserver(function(){ fixSizePanel(); paintNext(); }).observe(document.getElementById('acc-body-size'),{ childList:true, subtree:true }); }catch(e){}
+    try{ new MutationObserver(fixSummarySize).observe(document.getElementById('acc-body-summary'),{ childList:true, subtree:true, characterData:true }); }catch(e){}
+    try{ new MutationObserver(paintNext).observe(document.getElementById('studio-tool-rail'),{ attributes:true, subtree:true, attributeFilter:['class','aria-selected'] }); }catch(e){}
+    // the engine's boot opened Ring Size; with a new first tool, open that one instead
+    if(reordered()&&stt._openSection==='size'){
+      if(stt._touched) delete stt._touched.size;
+      stt._skipNextStudioScroll=true;
+      try{ window.__V2_ROUTER__.openSection(s[0].id); }catch(e){}
+      try{ window.scrollTo(0,0); }catch(e){}
+    }
+    if(window.__V2_STEPBAR__&&window.__V2_STEPBAR__.refresh) try{ window.__V2_STEPBAR__.refresh(); }catch(e){}
+    paintNext();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
+  window.__V2_THREESTEPS__={ applyOrder:applyOrder, grouped:grouped, reordered:reordered };
 })();
 </script>
 </body>
