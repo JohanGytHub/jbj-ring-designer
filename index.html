@@ -1151,6 +1151,110 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
   .composer-strips .v2-grip{font-size:12px !important}
   .composer-strips .strip-block{min-width:28px}
 }
+/* ===== NEW BUILDER (2026-11-11, Johan): PC LAYOUT =====
+   From 768 px wide, only while the page body carries the class "nb-pc" (set by router part 369d when the pricing settings have the
+   step names). Layout only: no control is removed, no price, rule or payload is touched.
+   Step header at the top of the right column - Back / step / Next bar at its bottom - short receipt on the last
+   screen - no text under 12 px. */
+.nb-pc-steps{display:none}
+@media(min-width:768px){
+  body.nb-pc .studio-intro{display:none !important}
+  body.nb-pc .tool-rail{display:none !important}
+  body.nb-pc .nav-buttons{display:none !important}
+  body.nb-pc .studio-controls{display:flex;flex-direction:column}
+  body.nb-pc .acc-stack{flex:1 0 auto;padding:26px 36px 44px !important;min-height:0}
+  body.nb-pc .acc-panel{scroll-margin-top:150px !important}
+  /* 1. step header */
+  body.nb-pc .nb-pc-steps{display:block;position:sticky;top:0;z-index:45;padding:14px 30px 0;border-bottom:1px solid var(--border);background:var(--glass);-webkit-backdrop-filter:blur(22px) saturate(1.3);backdrop-filter:blur(22px) saturate(1.3)}
+  .nb-pc-row1{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px}
+  .nb-pc-step{display:flex;align-items:center;gap:10px;min-width:0;min-height:52px;padding:7px 12px;border:1px solid var(--border);border-radius:14px;background:transparent;color:var(--text-muted);font:inherit;text-align:left;cursor:pointer;transition:border-color .2s ease,background .2s ease,color .2s ease}
+  .nb-pc-step:hover{color:var(--text);background:var(--bg2)}
+  .nb-pc-step.on{cursor:default;color:var(--text);border-color:var(--gold);background:linear-gradient(145deg,var(--gold-wash),transparent 70%),var(--bg2);box-shadow:0 0 0 1px var(--gold)}
+  .nb-pc-n{flex:0 0 28px;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border-light);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text-dim);background:var(--bg2)}
+  .nb-pc-step.on .nb-pc-n{border-color:transparent;background:var(--gold-grad);color:#fff}
+  .nb-pc-step.done .nb-pc-n{border-color:transparent;background:#1fa98b;color:#fff}
+  .nb-pc-t{display:flex;flex-direction:column;min-width:0}
+  .nb-pc-k{font-size:12px;line-height:1.2;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
+  .nb-pc-g{font-size:15px;line-height:1.25;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nb-pc-row2{display:flex;gap:2px;margin-top:10px;overflow:hidden}
+  .nb-pc-tool{flex:0 1 auto;min-width:0;min-height:50px;padding:6px 16px 9px;border:0;border-bottom:3px solid transparent;border-radius:10px 10px 0 0;background:transparent;color:var(--text-muted);font:inherit;text-align:left;cursor:pointer}
+  .nb-pc-tool:hover{color:var(--text);background:var(--bg2)}
+  .nb-pc-tool.on{color:var(--text);border-bottom-color:var(--gold);background:var(--bg2)}
+  .nb-pc-tool.off{opacity:.5}
+  .nb-pc-l{display:block;font-size:14px;line-height:1.3;font-weight:700;white-space:nowrap}
+  .nb-pc-l::after{content:'';display:inline-block;width:7px;height:7px;margin-left:7px;border-radius:50%;vertical-align:middle;background:transparent}
+  .nb-pc-tool.filled .nb-pc-l::after{background:#1fa98b}
+  .nb-pc-v{display:block;font-size:12px;line-height:1.3;color:var(--gold);max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* a narrow right column (small windows): the step names stay whole */
+  @container studio (max-width:540px){
+    body.nb-pc .nb-pc-steps{padding:12px 16px 0}
+    .nb-pc-row1{gap:6px}
+    .nb-pc-step{gap:7px;padding:6px 8px}
+    .nb-pc-n{flex-basis:24px;width:24px;height:24px;font-size:12px}
+    .nb-pc-k{display:none}
+    .nb-pc-g{font-size:13px;line-height:1.2;white-space:normal;overflow:visible}
+    .nb-pc-tool{padding:6px 9px 8px}
+    .nb-pc-l{font-size:13px}
+    .nb-pc-l::after{margin-left:5px}
+    .nb-pc-v{max-width:108px}
+    body.nb-pc .acc-stack{padding:22px 20px 40px !important}
+    body.nb-pc #nbStepBar{padding:10px 16px;gap:8px}
+    body.nb-pc #nbStepBack{min-width:88px;padding:0 12px}
+    body.nb-pc #nbStepNext{min-width:128px;padding:0 14px;font-size:15px}
+    body.nb-pc #nbStepMid .nb-step-dots i{width:22px}
+    body.nb-pc #nbStepMid .nb-step-dots i.on{width:36px}
+    /* strip rows on two lines, as on phones: the name stays whole */
+    body.nb-pc .v2-strip-row{display:flex !important;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:8px 10px !important}
+    body.nb-pc .v2-strip-row > .v2-row-dot{order:1;flex:0 0 auto}
+    body.nb-pc .v2-strip-row > .v2-row-name{order:2;flex:1 1 calc(100% - 130px);min-width:44px;text-align:left;white-space:normal;overflow-wrap:anywhere}
+    body.nb-pc .v2-strip-row > .nb-row-remove{order:3;flex:0 0 auto;margin-left:0}
+    body.nb-pc .v2-strip-row > .v2-row-group{order:4;flex:0 0 auto;display:inline-flex;align-items:center;gap:6px}
+    body.nb-pc .v2-strip-row > .v2-row-group ~ .v2-row-group{order:5;margin-left:auto}
+  }
+  /* 2. Back - step - Next, at the bottom of the right column */
+  body.nb-pc #nbStepBar{display:grid !important;position:sticky;bottom:0;z-index:46;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;margin-top:auto;padding:12px 30px;background:var(--glass);border-top:1px solid var(--border);-webkit-backdrop-filter:blur(22px) saturate(1.3);backdrop-filter:blur(22px) saturate(1.3);box-shadow:0 -8px 24px rgba(20,24,40,.08)}
+  body.nb-pc #nbStepBar button{font:inherit;cursor:pointer}
+  body.nb-pc #nbStepBack{height:48px;min-width:104px;padding:0 18px;border-radius:12px;border:1px solid var(--border-light);background:var(--bg2);color:var(--text);font-size:15px;font-weight:600;line-height:1}
+  body.nb-pc #nbStepBack::after{content:' Back'}
+  body.nb-pc #nbStepBack[disabled]{opacity:.4;cursor:default}
+  body.nb-pc #nbStepMid{pointer-events:none;border:0;background:transparent;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-width:0;min-height:48px}
+  body.nb-pc #nbStepMid .nb-step-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  body.nb-pc #nbStepMid .nb-step-dots{display:flex;gap:6px}
+  body.nb-pc #nbStepMid .nb-step-dots i{display:block;width:34px;height:6px;border-radius:3px;background:var(--border-light);position:relative;overflow:hidden}
+  body.nb-pc #nbStepMid .nb-step-dots i.done{background:#1fa98b}
+  body.nb-pc #nbStepMid .nb-step-dots i.on{width:56px}
+  body.nb-pc #nbStepMid .nb-step-dots i.on b{position:absolute;left:0;top:0;bottom:0;display:block;border-radius:3px;background:var(--gold)}
+  body.nb-pc #nbStepNext{height:48px;min-width:170px;padding:0 24px;border-radius:12px;border:0;background:var(--gold-grad);color:#fff;font-size:16px;font-weight:700;white-space:nowrap;box-shadow:0 12px 28px rgba(75,88,206,.2)}
+  body.nb-pc #nbStepNext:hover{background:var(--gold-grad-hover)}
+  body.nb-pc #nbStepNext[hidden]{display:block !important;visibility:hidden}
+  #nbStepList,#nbStepScrim{display:none !important}
+  /* 3. last screen: the receipt and a short form (the long tables are behind "Show all details") */
+  body.nb-pc #acc-body-summary .panel-desc{display:none}
+  body.nb-pc #acc-body-summary .email-form > h4{display:none}
+  body.nb-pc #acc-body-summary .nb-receipt,body.nb-pc #acc-body-summary details.nb-details,body.nb-pc #acc-body-summary .email-form,body.nb-pc #acc-body-summary .nb-range{max-width:640px}
+  body.nb-pc #acc-body-summary .email-form{margin-top:6px}
+  body.nb-pc #acc-body-summary .email-form > div:has(> .form-row #quoteFirstName){display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+  body.nb-pc #acc-body-summary #quoteSubmitBtn{min-height:54px !important;width:100%;font-size:16px !important}
+  body.nb-pc #acc-body-summary details.nb-all{margin-top:16px}
+  /* the four receipt rows sit two by two when the column is wide enough - Submit comes up by about 100 px */
+  @container studio (min-width:560px){
+    body.nb-pc #acc-body-summary .nb-receipt{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+    body.nb-pc #acc-body-summary .nb-receipt-row{border-top:0;border-bottom:1px solid var(--border)}
+    body.nb-pc #acc-body-summary .nb-receipt-row:nth-child(odd){border-right:1px solid var(--border)}
+    body.nb-pc #acc-body-summary .nb-receipt-row:nth-last-child(-n+2){border-bottom:0}
+  }
+  body.nb-pc #acc-body-summary input[type="text"],body.nb-pc #acc-body-summary input[type="email"],body.nb-pc #acc-body-summary textarea{font-size:16px !important;min-height:46px}
+  /* 4. strip rows: an own Remove button, as on phones */
+  body.nb-pc .nb-row-remove{min-height:30px;padding:0 10px;margin-left:6px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--danger,#c0392b);font:inherit;font-size:12px;font-weight:600;cursor:pointer}
+  body.nb-pc .nb-row-remove:hover{background:rgba(192,57,43,.08)}
+  /* the brand mark over the ring */
+  body.nb-pc .v2-header .studio-eyebrow{font-size:12px;letter-spacing:.18em}
+  body.nb-pc .v2-header .studio-brand-mark{font-size:12px}
+  /* 5. readable sizes on the tools */
+  body.nb-pc .studio-controls .mat-group-btn{font-size:13px;padding:9px 14px}
+  body.nb-pc .acc-body .panel-desc{font-size:14px}
+  body.nb-pc .studio-controls .mat-card .name{font-size:13px}
+}
 </style>
 </head>
 <body>
@@ -7143,7 +7247,8 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
    line saying what happens next. Phones only (under 768px). Re-applied each time the Summary is drawn again. */
 (function(){
   var MQ=window.matchMedia?window.matchMedia('(max-width:767px)'):null;
-  function phone(){ return !MQ||MQ.matches; }
+  // PC LAYOUT (2026-11-11, Johan): the receipt also applies on a PC while the PC layout is on (router part 369d).
+  function phone(){ if(!MQ||MQ.matches) return true; try{ return !!(window.__V2_PC__&&window.__V2_PC__.on()); }catch(e){ return false; } }
   function el(tag,cls,text){ var e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
   function sectionByTitle(h,title){ var s=h.querySelectorAll('.summary-section'); for(var i=0;i<s.length;i++){ var t=s[i].querySelector('h4'); if(t&&String(t.textContent||'').trim().indexOf(title)===0) return s[i]; } return null; }
   function rows(section){ var out=[]; if(!section) return out; var r=section.querySelectorAll('.summary-row'); for(var i=0;i<r.length;i++){ var l=r[i].querySelector('.label'), v=r[i].querySelector('.value'); out.push({ label:l?String(l.textContent||'').trim():'', value:v?String(v.textContent||'').trim():'' }); } return out; }
@@ -7760,7 +7865,8 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
    Phones only (under 768 px). Nothing here knows about prices or rules. */
 (function(){
   var phone=window.matchMedia?window.matchMedia('(max-width:767.98px)'):null;
-  function isPhone(){ return !!(phone&&phone.matches); }
+  // PC LAYOUT (2026-11-11, Johan): the Remove buttons and the 12 px text rule also apply on a PC while the PC layout is on (router part 369d).
+  function isPhone(){ if(phone&&phone.matches) return true; try{ return !!(window.__V2_PC__&&window.__V2_PC__.on()); }catch(e){ return false; } }
   function addRemoveButtons(){
     var host=document.getElementById('acc-body-compose'); if(!host) return;
     var blocks=host.querySelectorAll('.composer-strips > .strip-block'), rows=host.querySelectorAll('.v2-strip-rows > .v2-strip-row:not(.v2-row-ghost)');
@@ -7864,6 +7970,97 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   function start(){ if(started) return; started=true; setTimeout(next,60); }
   if(document.readyState==='complete') start(); else { window.addEventListener('load',start); setTimeout(start,2500); }
   window.__V2_PICTURES__={ done:done, failed:failed, list:NB_LATE_PICTURES, refresh:function(){ try{ showProfilePicture(); showMaterialPictures(); }catch(e){} } };
+})();
+/* ===== NEW BUILDER (2026-11-11, Johan): PC LAYOUT - "completely build and finish the PC version" =====
+   From 768 px wide, and only when the pricing settings carry the step names (builder_config.steps[].group):
+     1. the seven small tabs give way to a step header: 1 Your band - 2 Make it yours - 3 Get my quote, with the
+        tools of the current step as tabs underneath;
+     2. the Back / step / Next bar of the phone sits at the bottom of the right column (the Back / Continue buttons
+        inside the panels are hidden; the bar presses them, so every rule and message still decides);
+     3. the last screen becomes the short receipt, strip rows get their Remove button, no text under 12 px
+        (the phone parts 367 and 369b ask this part whether the PC layout is on).
+   Everything here presses the page's own tabs and buttons. Nothing knows about prices or rules.
+   Without step names in the settings (today's live pricing) this part does nothing and the PC page is as before. */
+(function(){
+  var MQ=window.matchMedia?window.matchMedia('(min-width:768px)'):null;
+  function wide(){ return !!(MQ&&MQ.matches); }
+  function rail(){ return document.getElementById('studio-tool-rail'); }
+  function tabs(){ var r=rail(); return r?Array.prototype.slice.call(r.querySelectorAll('.tool-tab[data-sec]')).filter(function(t){ return !t.hidden; }):[]; }
+  function groupOf(t){ return (t&&t.getAttribute('data-nb-group'))||''; }
+  function grouped(){ return tabs().some(function(t){ return !!groupOf(t); }); }
+  function isActive(t){ return t.classList.contains('active')||t.getAttribute('aria-selected')==='true'; }
+  function text(t,sel){ var e=t.querySelector(sel); return e?String(e.textContent||'').trim():''; }
+  function el(tag,cls,txt){ var e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
+  var on=false, host=null, row1=null, row2=null, lastKey='';
+  function isOn(){ return on; }
+  function build(){
+    if(host) return;
+    var r=rail(); if(!r||!r.parentNode) return;
+    host=el('nav','nb-pc-steps'); host.id='nbPcSteps'; host.setAttribute('aria-label','Ring design steps');
+    row1=el('div','nb-pc-row1'); row2=el('div','nb-pc-row2'); row2.setAttribute('role','tablist');
+    host.appendChild(row1); host.appendChild(row2);
+    r.parentNode.insertBefore(host,r);
+  }
+  function paint(){
+    if(!host) return;
+    var list=tabs(), names=[]; list.forEach(function(t){ var g=groupOf(t); if(g&&names.indexOf(g)<0) names.push(g); });
+    var cur=null; list.forEach(function(t){ if(isActive(t)) cur=t; }); if(!cur) cur=list[0]; var curGroup=groupOf(cur);
+    var key=names.join('|')+'#'+list.map(function(t){ return [t.getAttribute('data-sec'),groupOf(t),isActive(t)?1:0,t.classList.contains('filled')?1:0,(t.disabled||t.getAttribute('aria-disabled')==='true')?1:0,text(t,'.tool-label'),text(t,'.tool-value')].join('~'); }).join('|');
+    if(key===lastKey) return; lastKey=key;
+    row1.textContent=''; row2.textContent='';
+    var curIndex=names.indexOf(curGroup);
+    names.forEach(function(g,gi){
+      var mine=list.filter(function(t){ return groupOf(t)===g; });
+      // a step is ticked when the customer is past it (the page only lets them pass when it is complete) or every tool in it was used
+      var here=(g===curGroup), done=mine.length>0&&(gi<curIndex||mine.every(function(t){ return t.classList.contains('filled'); }));
+      var b=el('button','nb-pc-step'+(here?' on':'')+(done&&!here?' done':'')); b.type='button';
+      b.setAttribute('aria-label','Step '+(gi+1)+' of '+names.length+': '+g+(done?' (done)':'')); if(here) b.setAttribute('aria-current','step');
+      b.appendChild(el('span','nb-pc-n',(done&&!here)?'✓':String(gi+1)));
+      var t2=el('span','nb-pc-t'); t2.appendChild(el('span','nb-pc-k','Step '+(gi+1))); t2.appendChild(el('span','nb-pc-g',g)); b.appendChild(t2);
+      b.addEventListener('click',function(){ if(here) return; var first=mine[0]; if(first) first.click(); });
+      row1.appendChild(b);
+    });
+    list.filter(function(t){ return groupOf(t)===curGroup; }).forEach(function(t){
+      var off=(t.disabled||t.getAttribute('aria-disabled')==='true');
+      var b=el('button','nb-pc-tool'+(isActive(t)?' on':'')+(t.classList.contains('filled')?' filled':'')+(off?' off':'')); b.type='button'; b.setAttribute('role','tab');
+      b.setAttribute('aria-selected',isActive(t)?'true':'false'); b.setAttribute('data-nb-sec',t.getAttribute('data-sec'));
+      b.appendChild(el('span','nb-pc-l',text(t,'.tool-label'))); var v=text(t,'.tool-value'); b.appendChild(el('span','nb-pc-v',v||' '));
+      b.addEventListener('click',function(){ t.click(); });
+      row2.appendChild(b);
+    });
+  }
+  // the bar is a child of the page body on phones; on PC it sits at the bottom of the right column (it then follows the light / dark theme of that column)
+  function placeBar(){
+    var bar=document.getElementById('nbStepBar'), col=document.querySelector('.studio-controls'); if(!bar||!col) return;
+    if(on){ if(bar.parentNode!==col) col.appendChild(bar); }
+    else if(bar.parentNode!==document.body) document.body.appendChild(bar);
+  }
+  function others(){
+    try{ if(window.__V2_QUOTESTEP__) window.__V2_QUOTESTEP__.apply(); }catch(e){}
+    try{ if(window.__V2_TOUCH__) window.__V2_TOUCH__.run(); }catch(e){}
+    try{ if(window.__V2_STEPBAR__) window.__V2_STEPBAR__.refresh(); }catch(e){}
+  }
+  function update(){
+    var want=wide()&&grouped();
+    if(want!==on){
+      on=want; document.body.classList.toggle('nb-pc',on);
+      if(on) build();
+      placeBar(); lastKey=''; if(on) paint();
+      others();
+      return;
+    }
+    if(on){ placeBar(); paint(); }
+  }
+  var queued=false;
+  function schedule(){ if(queued) return; queued=true; setTimeout(function(){ queued=false; try{ update(); }catch(e){ if(window.console) console.error('pc layout:',e); } },20); }
+  function start(){
+    var r=rail(); if(!r) return;
+    try{ new MutationObserver(schedule).observe(r,{ attributes:true, subtree:true, childList:true, characterData:true, attributeFilter:['class','aria-selected','hidden','disabled','aria-disabled','data-nb-group'] }); }catch(e){}
+    if(MQ&&MQ.addEventListener) MQ.addEventListener('change',schedule);
+    schedule();
+  }
+  window.__V2_PC__={ on:isOn, refresh:update };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
 </script>
 </body>
