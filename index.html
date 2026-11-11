@@ -1255,6 +1255,18 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
   body.nb-pc .acc-body .panel-desc{font-size:14px}
   body.nb-pc .studio-controls .mat-card .name{font-size:13px}
 }
+/* ===== NEW BUILDER (2026-11-11, Johan): STRIP WIDTHS - a number box in every strip row =====
+   Only while the page body carries "nb-easy" (router part 369f; new builder on). The row's width text gives way to
+   a box that looks like the Ring Width box above it, so it reads as "type here". */
+body.nb-easy .v2-strip-row .v2-row-w{display:none !important}
+body.nb-easy .v2-strip-row .nb-w{width:66px;height:36px;padding:0 4px;border:1px solid var(--border-light,#ccd2df);border-radius:10px;background:var(--input-bg,#fff);color:var(--gold,#5362e6);font:inherit;font-size:15px;font-weight:700;text-align:center;-moz-appearance:textfield;appearance:textfield}
+body.nb-easy .v2-strip-row .nb-w::-webkit-outer-spin-button,body.nb-easy .v2-strip-row .nb-w::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+body.nb-easy .v2-strip-row .nb-w:focus{outline:2px solid var(--gold,#5362e6);outline-offset:1px;border-color:transparent}
+body.nb-easy .v2-strip-row .nb-w-u{font-size:12px;color:var(--text-muted,#778095);margin:0 2px 0 -2px}
+body.nb-easy .nb-w-hint{font-size:13px !important;line-height:1.5 !important;color:var(--text-dim,#4e5668) !important;text-align:left !important;margin:10px 2px 0 !important}
+@media(max-width:767.98px){
+  body.nb-easy .v2-strip-row .nb-w{width:64px;height:44px;font-size:16px}
+}
 </style>
 </head>
 <body>
@@ -8060,6 +8072,165 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     schedule();
   }
   window.__V2_PC__={ on:isOn, refresh:update };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+})();
+/* ===== NEW BUILDER (2026-11-11, Johan): "BEFORE YOU GO..." PROMPT - A SWITCH =====
+   Johan 16:11: "Selecting the 'Back' button must not offer a 'Before you go...' popup, allow them to go back.
+   Disable the popup for now, CS might want it back later."
+   The page's own prompt (name + email, "Before you go...") opens in three places while no request was sent and no
+   email is filled in: Back on the last screen, leaving the last screen through a step, and the mouse leaving the
+   page at the top. With the pricing setting  builder_config.leave_prompt.ask_for_email = false  the prompt is
+   skipped and the customer simply goes where they clicked. Setting missing or true = the prompt as before, so
+   customer service can switch it back on in the uploader without a code change.
+   Only the prompt is skipped: nothing about the request, its fields or its checks changes. */
+(function(){
+  function off(){ try{ var c=(typeof BUILDER!=='undefined'&&BUILDER)?BUILDER.leave_prompt:null; return !!c&&c.ask_for_email===false; }catch(e){ return false; } }
+  if(typeof showExitEmailModal!=='function') return;
+  var own=showExitEmailModal;
+  showExitEmailModal=function(onDone){
+    if(!off()) return own.apply(this,arguments);
+    if(typeof onDone==='function') onDone();
+  };
+  window.__V2_LEAVEPROMPT__={ off:off };
+})();
+/* ===== NEW BUILDER (2026-11-11, Johan): STRIP WIDTHS WITHOUT KNOWING THE ORDER =====
+   Johan 16:17 / 16:20: "I want the Meteorite to be 4mm with 1mm Titanium edges. Make it intuitively obvious for the
+   customer how to make the edits." Before, the edges had to be made narrower first; the "+" on the inlay was greyed
+   out and nothing on the screen said why.
+   On the Inlays screen, while the new builder is on (step names in the pricing settings):
+     1. every strip row has a number box: type a width, press Enter or click elsewhere;
+     2. "+" on a strip keeps working when the band is full: an inlay takes the width from the base-metal edges
+        (both equally when they are equal); an edge takes it from the other edge, so the inlay keeps the width
+        the customer gave it (Johan 16:25: 1 / 3.5 / 1.5 must be possible) - and from the widest inlay only when
+        the other edge is at its minimum;
+     3. one plain line under the rows says so.
+   Narrower ("-" or a smaller typed width) frees width exactly as before.
+   Nothing is forced: the material minimum and maximum, the edge minimum and the page's own strip check
+   (validateProposedStrips) decide; when there is no room the customer is told why. No prices here. */
+(function(){
+  function B(){ try{ return (typeof BUILDER!=='undefined')?BUILDER:null; }catch(e){ return null; } }
+  function S(){ try{ return (typeof state!=='undefined')?state:null; }catch(e){ return null; } }
+  function on(){ var b=B(); return !!(b&&Array.isArray(b.steps)&&b.steps.some(function(x){ return x&&x.group; })); }
+  function r3(x){ return Math.round(x*1000)/1000; }
+  function eps(){ var b=B(); return (b&&b.width_epsilon)||0.01; }
+  function unit(){ return B().strip_width.step; }
+  function stepOf(name){ var b=B(), m=(b.rules&&b.rules.width_increment_materials)||{}, v=parseFloat(m[name]); return v>0?v:b.strip_width.step; }
+  function isEdge(i){ var s=S(); return (i===0||i===s.strips.length-1)&&s.strips[i].material===s.baseMetal; }
+  function minOf(i){
+    var b=B(), s=S(), name=s.strips[i].material, floor=b.strip_width.min, m=null;
+    try{
+      if(isEdge(i)&&typeof getBaseMetalMinWidth==='function') m=getBaseMetalMinWidth();
+      else if(typeof isMetal==='function'&&isMetal(name)) m=(typeof metalStripMin==='function')?metalStripMin(name):null;
+      else { var mi=(DATA.m[name]&&DATA.m[name].mi)||{}; m=mi.solid_inlay||mi.inlay_swarf||b.material_default_min_width; }
+    }catch(e){}
+    m=parseFloat(m); return Math.max(isNaN(m)?floor:m,floor);
+  }
+  function maxOf(name){ var b=B(), m=b.rules&&b.rules.max_width_materials, v=m?parseFloat(m[name]):NaN; return v>0?v:Infinity; }
+  function free(strips){ var s=S(), used=0; strips.forEach(function(x){ used+=x.width; }); return r3(Number(s.ringWidth)-used); }
+  // who gives when strip i gets wider, in order of asking: an inlay asks the two base-metal edges;
+  // an edge asks the other edge first, then the inlays
+  function tiers(i){
+    var s=S(), n=s.strips.length, edges=[], inlays=[];
+    if(isEdge(0)&&i!==0) edges.push(0); if(n>1&&isEdge(n-1)&&i!==n-1) edges.push(n-1);
+    if(!isEdge(i)) return [edges];
+    for(var k=0;k<n;k++){ if(k!==i&&s.strips[k].material!==s.baseMetal) inlays.push(k); }
+    return [edges,inlays];
+  }
+  function partners(i){ var t=tiers(i), out=[]; t.forEach(function(x){ out=out.concat(x); }); return out; }
+  // the strips after strip i is set to "want" mm, or { error }.
+  function plan(i,want){
+    var s=S(); if(!s||!s.strips||!s.strips[i]) return { error:'' };
+    var name=s.strips[i].material, st=stepOf(name), cur=s.strips[i].width;
+    want=r3(Math.round(want/st)*st);
+    var mn=minOf(i), mx=maxOf(name);
+    if(want<mn-eps()) return { error:name+' must be at least '+mn+'mm wide.' };
+    if(want>mx+eps()) return { error:name+' can be '+mx+'mm wide at most.' };
+    var strips=s.strips.map(function(x){ return Object.assign({},x); });
+    if(want<=cur+eps()){ strips[i].width=want; return { strips:strips, got:want, changed:Math.abs(want-cur)>eps() }; }
+    var need=r3(want-cur-Math.max(0,free(strips))), ask=tiers(i), guard=0;
+    while(need>eps()&&guard++<400){
+      var best=-1;
+      for(var t=0;t<ask.length&&best<0;t++){ var who=ask[t];
+        for(var k=0;k<who.length;k++){ var j=who[k], sj=stepOf(strips[j].material); if(strips[j].width-sj>=minOf(j)-eps()&&(best<0||strips[j].width>strips[best].width+eps())) best=j; } }
+      if(best<0) break;
+      var give=stepOf(strips[best].material); strips[best].width=r3(strips[best].width-give); need=r3(need-give);
+    }
+    var got=want;
+    if(need>eps()){ got=r3(Math.floor((want-need)/st+1e-9)*st); if(got<=cur+eps()) return { error:noRoom(i) }; }
+    strips[i].width=got;
+    return { strips:strips, got:got, changed:true, capped:got<want-eps() };
+  }
+  function noRoom(i){
+    var s=S(), base=s.baseMetal;
+    if(isEdge(i)) return 'No room left: the other edge and every inlay are at their narrowest. Make the ring wider first.';
+    if(!partners(i).length) return 'No free width left - make another strip narrower or the ring wider first.';
+    return 'No room left: the '+base+' edges are at their narrowest ('+minOf(0)+'mm). Make the ring wider or another strip narrower.';
+  }
+  function say(msg){ try{ if(msg&&typeof showRuleToast==='function') showRuleToast(msg); }catch(e){} }
+  function apply(i,want){
+    var p=plan(i,want); if(p.error!==undefined){ say(p.error); return false; }
+    if(!p.changed) return false;
+    try{ var why=(typeof validateProposedStrips==='function')?validateProposedStrips(p.strips):null; if(why){ say(why); return false; } }catch(e){ return false; }
+    var s=S();
+    try{ if(typeof pushUndo==='function') pushUndo(); }catch(e){}
+    s.strips=p.strips; s.selectedStrip=-1;
+    try{ if(typeof clearEstimate==='function') clearEstimate(); }catch(e){}
+    try{ window.__V2_ROUTER__.rerenderSection('compose'); }catch(e){}
+    try{ if(typeof renderRing==='function') renderRing(); }catch(e){}
+    try{ if(typeof updatePrice==='function') updatePrice(); }catch(e){}
+    if(p.capped) say('Widest possible here: '+p.got+'mm.');
+    return true;
+  }
+  // "+" on a full band: one press. With two equal edges an inlay takes one step from each (the band stays balanced).
+  function plusWant(i){
+    var s=S(), cur=s.strips[i].width, st=stepOf(s.strips[i].material), who=partners(i);
+    if(!isEdge(i)&&who.length===2&&Math.abs(s.strips[who[0]].width-s.strips[who[1]].width)<eps()&&free(s.strips)<eps()){
+      var two=r3(cur+2*unit()); if(Math.abs(Math.round(two/st)*st-two)<eps()&&two<=maxOf(s.strips[i].material)+eps()){ var p=plan(i,two); if(p.error===undefined&&!p.capped) return two; }
+    }
+    return r3(cur+st);
+  }
+  function dress(){
+    var host=document.getElementById('acc-body-compose'); if(!host) return;
+    var active=on(); document.body.classList.toggle('nb-easy',active);
+    if(!active) return;
+    var s=S(); if(!s||!s.strips) return;
+    var rows=host.querySelectorAll('.v2-strip-rows > .v2-strip-row:not(.v2-row-ghost)');
+    for(var i=0;i<rows.length&&i<s.strips.length;i++){ (function(row,i){
+      var label=row.querySelector('.v2-row-w'); if(!label||row.querySelector('.nb-w')) return;
+      var name=s.strips[i].material, box=document.createElement('input');
+      box.type='number'; box.className='nb-w'; box.inputMode='decimal'; box.step=String(stepOf(name)); box.min=String(minOf(i)); box.value=String(parseFloat(s.strips[i].width));
+      box.setAttribute('aria-label','Width of '+name+' in millimetres'); box.title='Type a width, then press Enter';
+      var mm=document.createElement('span'); mm.className='nb-w-u'; mm.textContent='mm';
+      label.parentNode.insertBefore(box,label); label.parentNode.insertBefore(mm,label);
+      var busy=false;
+      function commit(){ if(busy) return; var v=parseFloat(box.value); if(isNaN(v)){ box.value=String(parseFloat(s.strips[i].width)); return; } if(Math.abs(v-s.strips[i].width)<eps()) return; busy=true; if(!apply(i,v)) box.value=String(parseFloat(S().strips[i]?S().strips[i].width:v)); busy=false; }
+      box.addEventListener('focus',function(){ try{ box.select(); }catch(e){} });
+      box.addEventListener('click',function(e){ e.stopPropagation(); });
+      box.addEventListener('keydown',function(e){ e.stopPropagation(); if(e.key==='Enter'){ e.preventDefault(); commit(); } else if(e.key==='Escape'){ box.value=String(parseFloat(s.strips[i].width)); box.blur(); } });
+      box.addEventListener('change',commit);
+      // the page's own "+" is switched off when the band is full; here it borrows instead
+      var btns=row.querySelectorAll('.v2-row-group:last-of-type .v2-row-btn'), plus=label.parentNode.querySelector('.v2-row-btn:last-child');
+      if(plus&&plus.disabled){
+        var p=plan(i,plusWant(i));
+        if(p.error===undefined&&p.changed){
+          plus.disabled=false; plus.setAttribute('data-nb-borrow','1');
+          plus.title=isEdge(i)?'Wider - the width comes from the other edge':'Wider - the width comes from the '+s.baseMetal+' edges';
+          plus.addEventListener('click',function(e){ if(plus.getAttribute('data-nb-borrow')!=='1') return; e.preventDefault(); e.stopImmediatePropagation(); apply(i,plusWant(i)); },true);
+        }
+      }
+    })(rows[i],i); }
+    // one plain line instead of the small hint
+    var ps=host.querySelectorAll('p');
+    for(var k=0;k<ps.length;k++){ if(/Tap a strip to edit/.test(ps[k].textContent||'')){ ps[k].textContent='To change a width, type it in the box or press − / +. A wider inlay takes its width from the '+s.baseMetal+' edges; a wider edge takes it from the other edge. « » move a strip.'; ps[k].classList.add('nb-w-hint'); } }
+  }
+  var queued=false;
+  function schedule(){ if(queued) return; queued=true; setTimeout(function(){ queued=false; try{ dress(); }catch(e){ if(window.console) console.error('easy widths:',e); } },40); }
+  function start(){
+    var host=document.getElementById('acc-body-compose'); if(!host) return;
+    try{ new MutationObserver(schedule).observe(host,{ childList:true, subtree:true }); }catch(e){}
+    schedule();
+  }
+  window.__V2_WIDTHS__={ on:on, plan:plan, apply:apply, plusWant:plusWant };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
 </script>
