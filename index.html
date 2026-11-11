@@ -972,6 +972,64 @@ html.v2-modal-lock body{position:fixed!important;left:0;right:0;width:100%;overf
    An iPhone zooms the whole page when a field under 16px gets focus. Size only - no layout change. */
 .form-row input,.form-row textarea,.engraving-input,.exit-modal input,.mat-search,.eng-font-select,
 input[type="text"],input[type="email"],input[type="number"],input[type="search"],input[type="tel"],textarea,select{font-size:16px !important}
+/* ===== NEW BUILDER (2026-11-11, Johan): PHONE LAYOUT - ring always in view + bottom step bar =====
+   Phones only (under 768px). Layout only: no price, rule or payload is touched.
+   1. The ring preview is pinned to the top of the screen (compact) while the tools scroll under it.
+   2. The sideways-scrolling tool rail is replaced by a fixed bottom bar: Back - step - Next.
+      (The rail itself opens as a list from the middle of the bar, so every tool stays one tap away.) */
+@media(max-width:767px){
+  .v2-header{position:static !important;width:auto !important;height:52px !important;padding:4px 10px !important;display:flex !important;align-items:center;gap:8px}
+  .v2-header .studio-brand-mark{display:none}
+  .v2-header .studio-eyebrow{display:none}
+  .v2-header h1{font-size:15px !important;line-height:1.2 !important;margin:0 !important}
+  .v2-header .v2-theme-btn,.v2-header .v2-exit-btn{min-width:44px !important;min-height:44px !important}
+  .v2-preview{position:sticky !important;top:0 !important;z-index:70 !important;height:34svh !important;min-height:176px !important;max-height:264px !important;padding:8px 10px !important;gap:0 !important;box-shadow:0 6px 18px rgba(0,0,0,.32)}
+  .v2-preview::after{display:none !important}
+  .v2-preview #ringPreview{height:100% !important;min-height:0 !important;width:100% !important}
+  .v2-preview #ringPreview canvas{height:100% !important;width:auto !important;max-width:100% !important;max-height:100% !important;object-fit:contain;filter:drop-shadow(0 14px 12px rgba(0,0,0,.28)) !important}
+  .v2-preview #dragCaption{left:8px !important;bottom:6px !important}
+  .v2-preview #crossSectionHost{right:8px !important;bottom:6px !important;min-width:0 !important;padding:5px 6px !important}
+  .v2-preview #crossSectionHost #profileImg{width:44px !important;max-width:44px !important}
+  .acc-panel{scroll-margin-top:calc(min(max(34svh,176px),264px) + 10px) !important}
+  .v2-preview #dragCaption .reset-image-btn{font-size:0 !important;width:44px;height:44px;padding:0 !important;display:inline-flex;align-items:center;justify-content:center}
+  .v2-preview #dragCaption .reset-image-btn::before{content:'\27F3';font-size:17px;line-height:1}
+  .v2-preview #crossSectionHost .cs-label{display:none !important}
+  .v2-preview #crossSectionHost #profileName{font-size:11px !important}
+  /* the intro text pushed the first control off the first screen */
+  .studio-intro{display:none !important}
+  /* the sideways tool rail and the in-panel Back / Continue row are replaced by the bottom bar (the bar presses them) */
+  .tool-rail{display:none !important}
+  .nav-buttons{display:none !important}
+  /* Width & Profile and Inlays tools were wider than a 360px phone (546px / 383px), which made the whole page zoom out */
+  .width-control{max-width:100% !important;min-width:0 !important;gap:6px !important}
+  .width-control input[type="range"]{min-width:0 !important;flex:1 1 0 !important;width:auto !important}
+  .width-control input[type="number"]{width:62px !important;min-width:0 !important;padding-left:6px !important;padding-right:6px !important}
+  #acc-body-width div[style*="inline-grid"]{display:grid !important;grid-auto-flow:row !important;grid-template-columns:repeat(2,minmax(0,1fr)) !important;width:100% !important}
+  #acc-body-width div[style*="inline-grid"] > button{min-width:0 !important;min-height:44px;white-space:normal !important}
+  #nbStepList{display:none}
+  body.nb-steps-open #nbStepList{display:flex;flex-direction:column;gap:6px;position:fixed;left:10px;right:10px;bottom:calc(74px + env(safe-area-inset-bottom,0px));z-index:95;max-height:calc(100svh - 96px);overflow:auto;padding:8px;border-radius:14px;background:var(--bg2,#fff);box-shadow:0 18px 50px rgba(0,0,0,.45);border:1px solid var(--border,#d8dbe6)}
+  #nbStepList button{font:inherit;min-height:48px;display:grid;grid-template-columns:30px 1fr auto;align-items:center;gap:8px;text-align:left;padding:6px 12px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--text,#1c1f2b);cursor:pointer}
+  #nbStepList button.on{border-color:var(--gold,#5b63ff);background:var(--gold-wash,rgba(91,99,255,.08))}
+  #nbStepList .nb-n{font-size:12px;font-weight:700;color:var(--gold,#5b63ff)}
+  #nbStepList .nb-l{font-size:15px;font-weight:600}
+  #nbStepList .nb-v{font-size:12px;opacity:.75;text-align:right;max-width:44vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #nbStepScrim{display:none}
+  body.nb-steps-open #nbStepScrim{display:block;position:fixed;inset:0;z-index:90;background:rgba(10,12,20,.45)}
+  .v2-app{padding-bottom:calc(78px + env(safe-area-inset-bottom,0px)) !important}
+  #nbStepBar{position:fixed;left:0;right:0;bottom:0;z-index:96;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));background:var(--bg2,#fff);border-top:1px solid var(--border,#d8dbe6);box-shadow:0 -6px 20px rgba(0,0,0,.14)}
+  #nbStepBar button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  #nbStepBack{min-width:48px;height:48px;border-radius:12px;border:1px solid var(--border,#d8dbe6);background:transparent;color:var(--text,#1c1f2b);font-size:20px;line-height:1}
+  #nbStepBack[disabled]{opacity:.35}
+  #nbStepMid{min-height:48px;border:0;background:transparent;color:var(--text,#1c1f2b);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:0 4px;min-width:0}
+  #nbStepMid .nb-step-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  #nbStepMid .nb-step-dots{display:flex;gap:5px}
+  #nbStepMid .nb-step-dots i{width:7px;height:7px;border-radius:50%;background:var(--border,#c9cddb);display:block}
+  #nbStepMid .nb-step-dots i.done{background:var(--text-dim,#7d8499)}
+  #nbStepMid .nb-step-dots i.on{background:var(--gold,#5b63ff);width:18px;border-radius:4px}
+  #nbStepNext{height:48px;min-width:112px;padding:0 16px;border-radius:12px;border:0;background:var(--gold,#5b63ff);color:#fff;font-size:15px;font-weight:700;white-space:nowrap}
+  #nbStepNext[hidden]{display:none}
+}
+@media(min-width:768px){ #nbStepBar,#nbStepScrim{display:none !important} }
 </style>
 </head>
 <body>
@@ -7238,6 +7296,74 @@ const PROFILE_IMAGES = {"Flat":"iVBORw0KGgoAAAANSUhEUgAAAMgAAAA5CAYAAABzlmQiAAAD
   function schedule(){ if(scheduled) return; scheduled=true; setTimeout(function(){ scheduled=false; tidy(); },120); }
   try{ new MutationObserver(schedule).observe(document.documentElement,{ childList:true, subtree:true, characterData:true }); }catch(e){}
   schedule();
+})();
+/* ===== NEW BUILDER (2026-11-11, Johan): PHONE BOTTOM STEP BAR =====
+   Back - current step (tap for the list of all steps) - Next.
+   Back / Next press the panel's own (now hidden) Back / Continue buttons, and the list presses the existing tool
+   tabs - so every existing rule, message and step logic still decides what happens. Phones only (CSS hides it from 768px up). */
+(function(){
+  function tabs(){ return Array.prototype.slice.call(document.querySelectorAll('#studio-tool-rail .tool-tab[data-sec]')); }
+  function activeIndex(list){ for(var i=0;i<list.length;i++){ if(list[i].classList.contains('active')||list[i].getAttribute('aria-selected')==='true') return i; } return -1; }
+  function label(tab){ var l=tab&&tab.querySelector('.tool-label'); return l?String(l.textContent||'').trim():''; }
+  var bar, back, mid, name, dots, next, scrim, listEl;
+  function panelOf(tab){ var id=tab&&tab.getAttribute('aria-controls'); return id?document.getElementById(id):null; }
+  function panelBtn(tab,cls){ var p=panelOf(tab); return p?p.querySelector('.nav-buttons .'+cls):null; }
+  function build(){
+    if(document.getElementById('nbStepBar')) return;
+    scrim=document.createElement('div'); scrim.id='nbStepScrim';
+    listEl=document.createElement('div'); listEl.id='nbStepList'; listEl.setAttribute('role','menu'); listEl.setAttribute('aria-label','All steps');
+    bar=document.createElement('div'); bar.id='nbStepBar'; bar.setAttribute('role','navigation'); bar.setAttribute('aria-label','Ring design steps');
+    back=document.createElement('button'); back.id='nbStepBack'; back.type='button'; back.setAttribute('aria-label','Previous step'); back.textContent='\u2190';
+    mid=document.createElement('button'); mid.id='nbStepMid'; mid.type='button'; mid.setAttribute('aria-label','Show all steps');
+    name=document.createElement('span'); name.className='nb-step-name';
+    dots=document.createElement('span'); dots.className='nb-step-dots';
+    mid.appendChild(name); mid.appendChild(dots);
+    next=document.createElement('button'); next.id='nbStepNext'; next.type='button';
+    bar.appendChild(back); bar.appendChild(mid); bar.appendChild(next);
+    document.body.appendChild(scrim); document.body.appendChild(listEl); document.body.appendChild(bar);
+    back.addEventListener('click',function(){ go(-1); });
+    next.addEventListener('click',function(){ go(1); });
+    mid.addEventListener('click',function(){ if(document.body.classList.contains('nb-steps-open')) closeList(); else openList(); });
+    scrim.addEventListener('click',closeList);
+  }
+  function openList(){
+    var list=tabs(), i=activeIndex(list); listEl.textContent='';
+    list.forEach(function(t,k){
+      var b=document.createElement('button'); b.type='button'; b.setAttribute('role','menuitem'); if(k===i) b.className='on';
+      var n=document.createElement('span'); n.className='nb-n'; n.textContent=(k<9?'0':'')+(k+1);
+      var l=document.createElement('span'); l.className='nb-l'; l.textContent=label(t);
+      var v=document.createElement('span'); v.className='nb-v'; var tv=t.querySelector('.tool-value'); v.textContent=tv?String(tv.textContent||'').trim():'';
+      b.appendChild(n); b.appendChild(l); b.appendChild(v);
+      b.addEventListener('click',function(){ closeList(); t.click(); });
+      listEl.appendChild(b);
+    });
+    document.body.classList.add('nb-steps-open');
+  }
+  function closeList(){ document.body.classList.remove('nb-steps-open'); }
+  function go(delta){
+    closeList();
+    var list=tabs(), i=activeIndex(list); if(i<0) i=0;
+    var own=panelBtn(list[i], delta>0?'btn-next':'btn-prev');
+    if(own){ own.click(); return; }
+    var t=list[i+delta]; if(t) t.click();
+  }
+  function refresh(){
+    if(!bar) return;
+    var list=tabs(), i=activeIndex(list); if(i<0) i=0;
+    name.textContent=(i+1)+' of '+list.length+' · '+label(list[i]);
+    if(dots.childNodes.length!==list.length){ dots.textContent=''; for(var k=0;k<list.length;k++) dots.appendChild(document.createElement('i')); }
+    for(var d=0;d<list.length;d++) dots.childNodes[d].className=(d===i)?'on':(d<i?'done':'');
+    back.disabled=(i<=0);
+    if(i>=list.length-1){ next.hidden=true; next.textContent=''; }
+    else{ next.hidden=false; next.textContent=(i===list.length-2)?'Get my quote →':'Next →'; next.setAttribute('aria-label','Next step: '+label(list[i+1])); }
+  }
+  function start(){
+    if(!document.getElementById('studio-tool-rail')) return;
+    build(); refresh();
+    try{ new MutationObserver(refresh).observe(document.getElementById('studio-tool-rail'),{ attributes:true, subtree:true, attributeFilter:['class','aria-selected'] }); }catch(e){}
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+  window.__V2_STEPBAR__={ refresh:refresh };
 })();
 </script>
 </body>
