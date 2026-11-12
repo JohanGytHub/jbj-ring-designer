@@ -1317,6 +1317,20 @@ body.staff-mode #v2-price.nb-total-empty{display:none !important}
   /* staff with no amount yet: no line (part 369g marks it), the tools keep their usual room at the end */
   body.nb-pc.staff-mode:has(#v2-price.nb-total-empty) .acc-stack{padding-bottom:44px !important}
 }
+/* ===== NEW BUILDER (2026-11-11, Johan 22:26): ONE "ESTIMATED TOTAL" ON THE LAST SCREEN · STAFF PRICE FITS ITS CARD =====
+   1. "The Summary page shows Estimated Total twice, remove the bottom fixed one."
+      While the last screen is open and shows its own Estimated Total, the total line / box at the bottom is not
+      shown (router part 369i marks it). On every other screen it is where it was. Visibility only.
+   2. "fix the staff price being cut off at the right edge."
+      The staff price on a base metal card stood beside the name and stuck out of the card. It now stands under
+      the name, inside the card. Staff only (the element exists for signed-in staff only). Position only.
+   Only while the new builder is on (nb-easy comes with the step names, on PC and on phones). */
+body.nb-easy #v2-price.nb-total-twice{display:none !important}
+@media(min-width:768px){ body.nb-pc:has(#v2-price.nb-total-twice) .acc-stack{padding-bottom:44px !important} }
+body.nb-easy.staff-mode .mat-card:has(> .staff-price){display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:10px;row-gap:1px}
+body.nb-easy.staff-mode .mat-card:has(> .staff-price) > .swatch{grid-row:1 / span 2}
+body.nb-easy.staff-mode .mat-card:has(> .staff-price) > .name{grid-column:2;align-self:end;min-width:0}
+body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;justify-self:start;margin-left:0;padding-left:0;font-size:12px;line-height:1.25;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 </style>
 </head>
 <body>
@@ -7562,7 +7576,8 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
         var main=el('div','nb-range-main');
         main.appendChild(el('span','nb-k','Estimated price range'));
         main.appendChild(el('span','nb-range-v',NB.range?(money(NB.range.low)+' – '+money(NB.range.high)):'Calculating…'));
-        if(!showGroups) main.appendChild(el('span','nb-range-n','Your exact price comes with our reply.'));
+        // RANGE NOTE (2026-11-11, Johan 22:26): was "Your exact price comes with our reply."
+        if(!showGroups) main.appendChild(el('span','nb-range-n','Price may vary depending on the ring size.'));
         box.appendChild(main);
       }
     }
@@ -8353,6 +8368,34 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     schedule();
   }
   window.__V2_STAFFPRICES__={ check:check };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+})();
+/* ===== NEW BUILDER (2026-11-11, Johan 22:26): ONE "ESTIMATED TOTAL" ON THE LAST SCREEN =====
+   "The Summary page shows Estimated Total twice, remove the bottom fixed one."
+   The last screen has its own Estimated Total (in the Price Breakdown). While that screen is open and that total
+   is on the page, this part marks the bottom total (#v2-price) "nb-total-twice"; CSS part 109g hides a marked one.
+   It reads nothing but "is the last screen open, and is its own total shown". No price, no amount.
+   Only while the new builder is on (step names in the pricing settings). */
+(function(){
+  function builderOn(){ var c=document.body.classList; return c.contains('nb-pc')||c.contains('nb-easy'); }
+  function shown(e){ return !!(e&&e.getClientRects().length); }   // not in a closed fold, not display:none
+  function update(){
+    var box=document.getElementById('v2-price'); if(!box) return;
+    var panel=document.getElementById('acc-panel-summary'), own=panel?panel.querySelector('#acc-body-summary .summary-total'):null;
+    var twice=builderOn()&&!!(panel&&panel.classList.contains('open')&&shown(own));
+    if(box.classList.contains('nb-total-twice')!==twice) box.classList.toggle('nb-total-twice',twice);
+  }
+  var queued=false;
+  function schedule(){ if(queued) return; queued=true; setTimeout(function(){ queued=false; try{ update(); }catch(e){ if(window.console) console.error('one total:',e); } },0); }
+  function start(){
+    var panel=document.getElementById('acc-panel-summary'), body=document.getElementById('acc-body-summary');
+    try{ if(panel) new MutationObserver(schedule).observe(panel,{ attributes:true, attributeFilter:['class'] }); }catch(e){}
+    try{ if(body) new MutationObserver(schedule).observe(body,{ childList:true, subtree:true }); }catch(e){}
+    try{ new MutationObserver(schedule).observe(document.body,{ attributes:true, attributeFilter:['class'] }); }catch(e){}
+    document.addEventListener('toggle',schedule,true);   // "Show all details" opened or closed
+    schedule();
+  }
+  window.__V2_ONETOTAL__={ update:update };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
 </script>
