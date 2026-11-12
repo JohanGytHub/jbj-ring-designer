@@ -1286,6 +1286,37 @@ details.nb-all > .nb-inner > #quoteBudgetBox.nb-pp{margin:8px 0 16px !important}
    (router part 369g marks the box; the engine sets display inline, hence !important) */
 body.staff-mode #v2-price.nb-total-empty{display:none !important}
 @media(min-width:768px){ body.nb-pc.staff-mode:has(#v2-price.nb-total-empty) .acc-stack{padding-bottom:44px !important} }
+/* ===== NEW BUILDER (2026-11-11, Johan 21:32): THE "ESTIMATED TOTAL" NO LONGER COVERS A CONTROL (PC) =====
+   Seen on the hosted test page at a 608 px high window: the floating total box lay over the size-group button
+   "13.25 and larger" on the last screen. A floating box always lies over something.
+   From 768 px, while the new builder is on (nb-pc): the box is a slim line across the column, directly above the
+   Back / Next bar - in the flow of the tools, so it has its own room and nothing is underneath it at the end of
+   a screen. Position and shape only: the amount, who sees it and when are the engine's and the server's.
+   Phones (under 768 px) and the page without step names: unchanged. */
+@media(min-width:768px){
+  body.nb-pc:not(.v2-hide-prices) .acc-stack{display:flex !important;flex-direction:column;padding-bottom:12px !important}
+  body.nb-pc:not(.v2-hide-prices) .acc-stack > *{flex:0 0 auto}
+  body.nb-pc .acc-stack > #v2-price{
+    position:sticky !important;right:auto !important;bottom:81px !important;z-index:44;
+    flex-direction:row !important;align-items:center !important;justify-content:space-between;gap:16px;
+    min-width:0;margin:auto 0 0 !important;padding:9px 16px !important;border-radius:12px;
+    box-shadow:0 6px 20px rgba(18,24,40,.10);
+  }
+  body.nb-pc .acc-stack > #v2-price .v2-price-label{font-size:12px;letter-spacing:.12em}
+  body.nb-pc .acc-stack > #v2-price .v2-price-amount{font-size:1.2rem;line-height:1.1}
+  /* a plain band behind the line, as wide as the column and down to the bar: what scrolls past does not show
+     through above, beside or under the line - it reads as part of the bar */
+  body.nb-pc .acc-stack > #v2-price::after{content:'';position:absolute;z-index:-1;top:-8px;bottom:-9px;left:-36px;right:-36px;
+    background:var(--bg);border-top:1px solid var(--border)}
+  /* a little air between the last line of a tool and the total line */
+  body.nb-pc:not(.v2-hide-prices) .acc-stack > section:last-of-type{margin-bottom:24px}
+  /* narrow column (same switch as part 109c): the column has 20 px at the sides */
+  @container studio (max-width:540px){
+    body.nb-pc .acc-stack > #v2-price::after{left:-20px;right:-20px}
+  }
+  /* staff with no amount yet: no line (part 369g marks it), the tools keep their usual room at the end */
+  body.nb-pc.staff-mode:has(#v2-price.nb-total-empty) .acc-stack{padding-bottom:44px !important}
+}
 </style>
 </head>
 <body>
@@ -8284,6 +8315,44 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     schedule();
   }
   window.__V2_TOTALBOX__={ update:update, amount:amount };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+})();
+/* ===== NEW BUILDER (2026-11-11, Johan 21:32): STAFF PRICES ON THE BASE METAL CARDS FOLLOW THE DESIGN =====
+   Signed-in staff see a price on every base metal card. The engine asks the server for those prices when it draws
+   the cards, and only for a design that has a ring size. In the new order Ring Size comes last, so the cards are
+   drawn with a dash - and the engine does not draw them again when the size (or the width) is chosen later; they
+   kept the dash until a card was clicked.
+   This part only notices that the cards on the Base Metal screen were drawn for another design than the one on
+   the page now, and asks the page to draw that screen again (the page's own function). The engine then asks the
+   server as it always does. No price, no formula, no request of its own.
+   Staff only (?staff), and only while the new builder is on (step names in the pricing settings). */
+(function(){
+  function builderOn(){ var c=document.body.classList; return c.contains('nb-pc')||c.contains('nb-easy'); }
+  function staff(){ try{ return typeof _staffMode!=='undefined'&&!!_staffMode; }catch(e){ return false; } }
+  function check(){
+    if(!staff()||!builderOn()) return;
+    if(typeof designReady!=='function'||!designReady()) return;            // no size yet: the dash is right
+    if(typeof staffDesignDigestLite!=='function') return;
+    var host=document.getElementById('acc-body-metal'); if(!host) return;
+    var el=host.querySelector('.mat-card .staff-price'); if(!el) return;
+    var key=el.__staffKey_text, now=staffDesignDigestLite();
+    if(typeof key==='string'&&key.slice(key.lastIndexOf('|')+1)===now) return;   // drawn for this design
+    if(!window.__V2_ROUTER__||typeof window.__V2_ROUTER__.rerenderSection!=='function') return;
+    window.__V2_ROUTER__.rerenderSection('metal');
+  }
+  var queued=false;
+  function schedule(){ if(queued) return; queued=true; setTimeout(function(){ queued=false; try{ check(); }catch(e){ if(window.console) console.error('staff prices:',e); } },80); }
+  function start(){
+    if(!staff()) return;
+    document.addEventListener('click',schedule,true);
+    document.addEventListener('change',schedule,true);
+    ['acc-sum-size','tool-sum-size','acc-sum-width','tool-sum-width','v2-price'].forEach(function(id){
+      var e=document.getElementById(id); if(!e) return;
+      try{ new MutationObserver(schedule).observe(e,{ childList:true, subtree:true, characterData:true }); }catch(err){}
+    });
+    schedule();
+  }
+  window.__V2_STAFFPRICES__={ check:check };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
 </script>
