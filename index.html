@@ -1267,6 +1267,21 @@ body.nb-easy .nb-w-hint{font-size:13px !important;line-height:1.5 !important;col
 @media(max-width:767.98px){
   body.nb-easy .v2-strip-row .nb-w{width:64px;height:44px;font-size:16px}
 }
+/* ===== NEW BUILDER (2026-11-11, Johan 17:49): THE "ESTIMATED TOTAL" BOX CLEARS THE BACK / NEXT BAR =====
+   The engine's total box (#v2-price, shown to signed-in staff; customers when prices are switched on) is fixed to
+   the bottom right corner - exactly where the new bar has its Next button. It now sits just above the bar.
+   Position only: the amount, who sees it and when are the engine's and the server's, unchanged. */
+@media(min-width:768px){
+  body.nb-pc .v2-price{bottom:88px !important}
+  /* the last lines of a tool can scroll clear of the box (only while the box is shown) */
+  body.nb-pc:not(.v2-hide-prices) .acc-stack{padding-bottom:124px !important}
+}
+@media(max-width:767px){
+  /* phones: only while the new builder is on (the class nb-easy comes with the step names, like nb-pc) */
+  body.nb-easy .v2-price{bottom:calc(76px + env(safe-area-inset-bottom,0px)) !important}
+}
+/* PRICE POINT IN DETAILS (2026-11-11, Johan 17:49): the Comfortable Price Point inside "Show all details" */
+details.nb-all > .nb-inner > #quoteBudgetBox.nb-pp{margin:8px 0 16px !important}
 </style>
 </head>
 <body>
@@ -7272,6 +7287,9 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     b.addEventListener('click',function(){ try{ window.__V2_ROUTER__.openSection(sec); }catch(e){} });
     row.appendChild(b); return row;
   }
+  // PRICE POINT IN DETAILS (2026-11-11, Johan 17:49): "Show all details" now also holds the Comfortable Price Point.
+  // The Summary is drawn again from time to time; the box must not snap shut while the customer is using it.
+  var allOpen=false;
   function apply(){
     var h=document.getElementById('acc-body-summary');
     if(!h||!phone()||h.querySelector('.nb-receipt')) return;
@@ -7288,7 +7306,8 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     rec.appendChild(receiptRow('Ring size',valueOf(c,'Ring Size')||'Not chosen yet','size'));
     cfg.parentNode.insertBefore(rec,cfg);
     // 2. the long tables fold away
-    var all=fold('Show all details','nb-all',false); rec.parentNode.insertBefore(all,rec.nextSibling);
+    var all=fold('Show all details','nb-all',allOpen); rec.parentNode.insertBefore(all,rec.nextSibling);
+    all.addEventListener('toggle',function(){ allOpen=!!all.open; });
     all._inner.appendChild(cfg); if(band) all._inner.appendChild(band);
     for(var k=0;k<h.children.length;k++){ var kid=h.children[k]; if(kid.tagName==='P'&&/Not seeing what/.test(kid.textContent||'')){ all._inner.appendChild(kid); break; } }
     // 3. engraving is optional: folded unless something is already typed
@@ -7299,17 +7318,18 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       if(font&&font.parentNode===fe.parentNode) fe._inner.appendChild(font);
       fe._inner.appendChild(eng);
     }
-    // 4. note + price point are optional: folded unless already used
+    // 4. the note is optional: folded unless already used
+    // PRICE POINT IN DETAILS (2026-11-11, Johan 17:49): the Comfortable Price Point (the engine's own box, moved, not
+    // rebuilt - same six choices, still optional, still sent as `budget`) is the first thing inside "Show all details".
     var form=h.querySelector('.email-form');
     if(form){
       var ta=form.querySelector('textarea'), notes=ta?ta.closest('.form-row'):null, budget=form.querySelector('#quoteBudgetBox');
-      var used=false; try{ used=!!(ta&&ta.value)||!!(budget&&budget.querySelector('input:checked')); }catch(e){}
-      var first=notes||budget;
-      if(first&&first.parentNode===form){
-        var fo=fold('Add a note or a price point (optional)','nb-opt',used); form.insertBefore(fo,first);
-        if(notes&&notes.parentNode===form) fo._inner.appendChild(notes);
-        if(budget&&budget.parentNode===form) fo._inner.appendChild(budget);
+      var used=false; try{ used=!!(ta&&ta.value); }catch(e){}
+      if(notes&&notes.parentNode===form){
+        var fo=fold('Add a note (optional)','nb-opt',used); form.insertBefore(fo,notes);
+        fo._inner.appendChild(notes);
       }
+      if(budget&&budget.parentNode===form){ budget.classList.add('nb-pp'); all._inner.insertBefore(budget,all._inner.firstChild); }
       // 2026-11-11 (unknown size + price range): the folded details go BELOW the form, so the price range and the
       // size groups fit above Submit on a small phone. Nothing is removed.
       if(all.parentNode===form.parentNode) form.parentNode.insertBefore(all,form.nextSibling);
