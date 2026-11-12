@@ -1282,6 +1282,10 @@ body.nb-easy .nb-w-hint{font-size:13px !important;line-height:1.5 !important;col
 }
 /* PRICE POINT IN DETAILS (2026-11-11, Johan 17:49): the Comfortable Price Point inside "Show all details" */
 details.nb-all > .nb-inner > #quoteBudgetBox.nb-pp{margin:8px 0 16px !important}
+/* TOTAL ABOVE ZERO (2026-11-11, Johan 18:58): signed-in staff see the box only while it holds an amount above 0
+   (router part 369g marks the box; the engine sets display inline, hence !important) */
+body.staff-mode #v2-price.nb-total-empty{display:none !important}
+@media(min-width:768px){ body.nb-pc.staff-mode:has(#v2-price.nb-total-empty) .acc-stack{padding-bottom:44px !important} }
 </style>
 </head>
 <body>
@@ -7519,7 +7523,8 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
           row.appendChild(b);
         });
         gw.appendChild(row);
-        gw.appendChild(el('span','nb-range-n','Smaller sizes cost less. We send a ring sizer first and confirm your exact price.'));
+        // SIZE WORDING (2026-11-11, Johan 20:16): was "Smaller sizes cost less. We send a ring sizer first and confirm your exact price."
+        gw.appendChild(el('span','nb-range-n','Price may vary depending on the ring size.'));
         box.appendChild(gw);
       }
       if(NB.range||(NB.rangeSeen&&NB.pending&&!(showGroups&&NB.group==null))){
@@ -7623,6 +7628,8 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     var wrapped=function(message){
       var args=Array.prototype.slice.call(arguments);
       if(reordered()&&typeof message==='string') args[0]=message.replace('Please choose a Base Metal first (Section 2) before making changes here.','Please choose a Base Metal first.');
+      // SIZE WORDING (2026-11-11, Johan 20:16): "...choose your ring size again (Section 1)." - Ring Size is no longer section 1.
+      if(reordered()&&typeof args[0]==='string') args[0]=args[0].replace(/(choose your ring size again) \(Section 1\)\./,'$1.');
       return original.apply(this,args);
     };
     wrapped.__nbThreeSteps=true; window.showRuleToast=wrapped;
@@ -8251,6 +8258,32 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     schedule();
   }
   window.__V2_WIDTHS__={ on:on, plan:plan, apply:apply, plusWant:plusWant };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+})();
+/* ===== NEW BUILDER (2026-11-11, Johan 18:58): STAFF SEE THE "ESTIMATED TOTAL" BOX ONLY WHEN IT IS ABOVE 0 =====
+   "If '/?staff' = true, Show the 'Estimate Total' button only when it is > 0."
+   The engine always shows the box to signed-in staff - with a dash while there is no estimate yet. This part only
+   reads the text the engine wrote into the box and marks the box "empty" when that text holds no amount above 0;
+   the CSS part 109e then hides it for staff. It computes nothing and knows no price.
+   Only while the new builder is on (step names in the pricing settings). */
+(function(){
+  function builderOn(){ var c=document.body.classList; return c.contains('nb-pc')||c.contains('nb-easy'); }
+  function amount(txt){ var m=String(txt||'').replace(/,/g,'').match(/\d+(?:\.\d+)?/g); if(!m) return 0; var best=0; for(var i=0;i<m.length;i++){ var n=parseFloat(m[i]); if(n>best) best=n; } return best; }
+  function update(){
+    var box=document.getElementById('v2-price'); if(!box) return;
+    var amt=document.getElementById('v2-price-amount')||box;
+    var empty=builderOn()&&!(amount(amt.textContent)>0);
+    if(box.classList.contains('nb-total-empty')!==empty) box.classList.toggle('nb-total-empty',empty);
+  }
+  var queued=false;
+  function schedule(){ if(queued) return; queued=true; setTimeout(function(){ queued=false; try{ update(); }catch(e){ if(window.console) console.error('total box:',e); } },0); }
+  function start(){
+    var box=document.getElementById('v2-price'); if(!box) return;
+    try{ new MutationObserver(schedule).observe(box,{ childList:true, subtree:true, characterData:true }); }catch(e){}
+    try{ new MutationObserver(schedule).observe(document.body,{ attributes:true, attributeFilter:['class'] }); }catch(e){}
+    schedule();
+  }
+  window.__V2_TOTALBOX__={ update:update, amount:amount };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
 </script>
