@@ -1403,6 +1403,48 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
      above the bar (part 109f), and those 64 px lifted the bar off the window's bottom edge at the end of a screen */
   body.nb-pc.staff-mode{padding-bottom:0}
 }
+/* ===== NEW BUILDER (2026-11-12, Johan 22:59 - to-do section 3): PC - THE ADD / EDIT INLAY DIALOG USES THE WINDOW =====
+   Measured 2026-11-12 (1920 x 1080, 1366 x 768, 1024 x 768): the dialog was 580 px wide whatever the window; 3 materials
+   per row; the materials window was 200 px high (2 rows of 124 in view, set in the dialog's own code); 6 rows of group
+   chips; at 768 px high the dialog scrolled as well as the materials window and Add Strip was out of view.
+   Here, from 900 px wide while the new builder is on (body class "nb-pc"): the dialog is as wide as the window allows
+   (up to 1080 px) and as high as the window (up to 900 px); the materials window takes all the room that is left, so
+   more materials stand in a row and more rows are in view; the title, the chips, the search box, the strip width and
+   the buttons stay where they are and only the materials scroll. In a very low window the dialog scrolls as before.
+   The Edit Strip dialog is the same box with the same parts and gets the same room.
+   Size and position only - the dialog's code (engine part 190, locked) is not touched; "!important" only where that
+   code sets a size on the element itself. Under 900 px (768 - 899 px and phones) and without step names nothing here applies. */
+@media(min-width:900px){
+  body.nb-pc #addStripModal .v2-modal-frame:has(> #addStripModalInner.v2-add-strip-mode),
+  body.nb-pc #addStripModal .v2-modal-frame:has(> #addStripModalInner.v2-edit-strip-mode){max-width:min(1080px,calc(100vw - 72px))}
+  body.nb-pc #addStripModalInner.v2-add-strip-mode,
+  body.nb-pc #addStripModalInner.v2-edit-strip-mode{display:flex;flex-direction:column;height:min(900px,calc(100vh - 48px));max-height:none}
+  body.nb-pc #addStripModalInner.v2-add-strip-mode > *,
+  body.nb-pc #addStripModalInner.v2-edit-strip-mode > *{flex:0 0 auto}
+  body.nb-pc #addStripModalInner.v2-add-strip-mode > .mat-grid,
+  body.nb-pc #addStripModalInner.v2-edit-strip-mode > .mat-grid{flex:1 1 0;min-height:176px;max-height:none !important;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));align-content:start}
+  body.nb-pc #addStripModalInner.v2-add-strip-mode > .mat-groups,
+  body.nb-pc #addStripModalInner.v2-edit-strip-mode > .mat-groups{gap:6px}
+}
+/* a low window (a 768 px high laptop screen): less air around the fixed parts, and "Strip Width" stands on one line with
+   its box, so the materials window gets about a row more. */
+@media(min-width:900px) and (max-height:860px){
+  body.nb-pc #addStripModalInner.v2-add-strip-mode,
+  body.nb-pc #addStripModalInner.v2-edit-strip-mode{height:calc(100vh - 40px);padding:20px 24px 18px}
+  body.nb-pc #addStripModalInner.v2-add-strip-mode > h3,
+  body.nb-pc #addStripModalInner.v2-edit-strip-mode > h3{margin-bottom:10px}
+  body.nb-pc #addStripModalInner.v2-add-strip-mode > .mat-search,
+  body.nb-pc #addStripModalInner.v2-edit-strip-mode > .mat-search{margin-bottom:10px;padding-top:10px;padding-bottom:10px}
+  body.nb-pc #addStripModalInner.v2-add-strip-mode > div:has(> .width-picker),
+  body.nb-pc #addStripModalInner.v2-edit-strip-mode > div:has(> .width-picker){display:flex;flex-wrap:wrap;align-items:center;column-gap:14px;margin:8px 0 0 !important}
+  body.nb-pc #addStripModalInner.v2-add-strip-mode > div:has(> .width-picker) > label,
+  body.nb-pc #addStripModalInner.v2-edit-strip-mode > div:has(> .width-picker) > label{margin-bottom:0 !important}
+  body.nb-pc #addStripModalInner.v2-add-strip-mode > div:has(> .width-picker) > .width-picker ~ *,
+  body.nb-pc #addStripModalInner.v2-edit-strip-mode > div:has(> .width-picker) > .width-picker ~ *{flex:1 1 100%}
+  body.nb-pc #addStripModalInner.v2-add-strip-mode > div:last-child,
+  body.nb-pc #addStripModalInner.v2-edit-strip-mode > div:last-child{margin-top:8px !important}
+}
+/* ===== END PC INLAY DIALOG ===== */
 </style>
 </head>
 <body>
