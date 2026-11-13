@@ -7969,7 +7969,9 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     s.selectedStrip=-1; s.wantsInlays=true;
     s._touched=s._touched||{}; s._touched.compose=true;
     moreOpen=false;
+    ownAction=true; /* KEEP THE COMPOSER IN PLACE (2026-11-12, Johan): a card was pressed - the box folds under the finger, no correction */
     try{ window.__V2_ROUTER__.rerenderSection('compose'); }catch(e){}
+    ownAction=false;
     try{ if(typeof renderRing==='function') renderRing(); }catch(e){}
     try{ if(typeof updatePrice==='function') updatePrice(); }catch(e){}
     schedule();
@@ -8028,8 +8030,63 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     var parent=anchor?anchor.parentNode:host.firstElementChild||host;
     if(anchor) parent.insertBefore(box,anchor); else parent.appendChild(box);
   }
+  /* ===== KEEP THE COMPOSER IN PLACE (2026-11-12, Johan) - START =====
+     Fault found with tests\mobile-scroll-lock.mjs (new builder on): the page's own redraw of the Inlays screen throws
+     this box away and the box came back 40 ms later. In between the page was 439 px shorter, so the browser moved it:
+     after Add Strip the new strip and the Add Inlay button were out of sight (phone), the tool column jumped to the
+     top (PC), and the stepper / Edit dialog moved the page.
+     Now the box is put back in the same step as the redraw, and the scroll position the customer had is kept. When
+     the box itself changes height because of the redraw (first inlay added, last inlay removed) the page moves by
+     that difference, so the controls under the box stay where they were. While a dialog holds the page (phones) the
+     difference is applied when the dialog lets go. No rule, no price, no width here. */
+  var ownAction=false, wrapped=null, inside=0, pendingShift=0, lockWatch=null;
+  function newBuilderOn(){ var b=document.body; return !!(b&&(b.classList.contains('nb-pc')||b.classList.contains('nb-easy'))); }
+  function pageLocked(){ return document.documentElement.classList.contains('v2-modal-lock'); }
+  function boxHeight(){ var h=document.getElementById('acc-body-compose'), b=h&&h.querySelector('.nb-layouts'); return b?b.getBoundingClientRect().height:0; }
+  function scroller(){
+    var e=document.getElementById('acc-body-compose');
+    for(e=e&&e.parentElement;e&&e!==document.body&&e!==document.documentElement;e=e.parentElement){
+      var oy=''; try{ oy=getComputedStyle(e).overflowY; }catch(x){}
+      if((oy==='auto'||oy==='scroll')&&e.scrollHeight>e.clientHeight+1) return e;
+    }
+    return null; /* the page itself scrolls */
+  }
+  function getY(sc){ return sc?sc.scrollTop:(window.scrollY||window.pageYOffset||0); }
+  function setY(sc,y){ if(y<0) y=0; if(sc) sc.scrollTop=y; else if(Math.abs(getY(null)-y)>=1) window.scrollTo(0,y); }
+  function applyPending(){
+    if(!pendingShift||pageLocked()) return;
+    var d=pendingShift; pendingShift=0;
+    try{ var sc=scroller(); setY(sc,getY(sc)+d); }catch(e){}
+  }
+  function keepInPlace(inner,self,args){
+    if(inside||!newBuilderOn()||!cfg()) return inner.apply(self,args);
+    inside++;
+    var sc=null,y0=0,h0=0,locked=false,own=ownAction,result;
+    try{ sc=scroller(); locked=!sc&&pageLocked(); y0=getY(sc); h0=boxHeight(); }catch(e){}
+    try{ result=inner.apply(self,args); }
+    finally{
+      inside--;
+      try{
+        paint();
+        var h1=boxHeight(), shift=(!own&&h0>0)?Math.round(h1-h0):0;
+        if(locked){ pendingShift+=shift; }
+        else setY(sc,y0+shift);
+      }catch(e){ if(window.console) console.error('ready layouts (keep in place):',e); }
+    }
+    return result;
+  }
+  function wrapRender(){
+    try{
+      if(typeof renderComposePanel!=='function'||renderComposePanel===wrapped) return;
+      var inner=renderComposePanel;
+      wrapped=function(){ return keepInPlace(inner,this,arguments); };
+      renderComposePanel=wrapped;
+      if(!lockWatch){ lockWatch=new MutationObserver(applyPending); lockWatch.observe(document.documentElement,{ attributes:true, attributeFilter:['class'] }); }
+    }catch(e){}
+  }
+  /* ===== KEEP THE COMPOSER IN PLACE (2026-11-12, Johan) - END ===== */
   var queued=false;
-  function schedule(){ if(queued) return; queued=true; setTimeout(function(){ queued=false; try{ paint(); }catch(e){ if(window.console) console.error('ready layouts:',e); } },40); }
+  function schedule(){ wrapRender(); if(queued) return; queued=true; setTimeout(function(){ queued=false; try{ paint(); }catch(e){ if(window.console) console.error('ready layouts:',e); } },40); }
   function start(){
     var host=document.getElementById('acc-body-compose'); if(!host) return;
     try{ new MutationObserver(schedule).observe(host,{ childList:true, subtree:true }); }catch(e){}
