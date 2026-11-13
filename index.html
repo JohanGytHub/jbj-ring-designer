@@ -1445,6 +1445,48 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
   body.nb-pc #addStripModalInner.v2-edit-strip-mode > div:last-child{margin-top:8px !important}
 }
 /* ===== END PC INLAY DIALOG ===== */
+/* === INLAY DIALOG COLOURS (2026-11-13, Johan - PC test feedback item 1) - START ===
+   "When selecting 'Add Inlay' ... it shows a very dark background color (black) which makes it difficult to read some
+   lower intensity texts. Change the background and text so they are clearly visible."
+   Cause: the Add / Edit Inlay dialog (#addStripModal) stands outside the tool column (.studio-controls), so it took the
+   page's dark ring-side colours (part 100, :root) while the tools beside it are light. Here the dialog gets the tool
+   column's colours (light; dark when the customer switched the page to dark), and its faint texts get full strength:
+   every text in the dialog is 4.5 to 1 or better against what it stands on. Colours only - no size (part 109k), no
+   price, no rule. New builder on only (nb-pc from 768 px, nb-easy under it); PC, tablet and phone. */
+:is(body.nb-pc, body.nb-easy) #addStripModal{
+  --bg:#f4f6fa;--bg2:#ffffff;--bg3:#edf0f6;--bg4:#e4e8f0;
+  --gold:#4a59dc;--gold-light:#5f6eea;--gold-dim:#4a59dc;
+  --gold-grad:linear-gradient(135deg,#5362e6 0%,#4654d2 58%,#3a46b4 100%);
+  --gold-grad-hover:linear-gradient(135deg,#4a59dc 0%,#3f4cc6 58%,#3440a6 100%);
+  --gold-wash:rgba(83,98,230,.08);--gold-ring:rgba(83,98,230,.25);
+  --text:#151823;--text-dim:#3f4758;--text-muted:#566074;
+  --border:#d3d8e3;--border-light:#bcc4d3;--input-bg:#ffffff;--done-dot-text:#ffffff;--btn-next-text:#ffffff;
+  --val-info-bg:#eef6f0;--val-info-border:#a9cdb4;--val-info-text:#245533;
+  --nb-dlg-off-bg:#edf0f6;--nb-dlg-off-text:#566074;--nb-dlg-off-btn:#e4e8f0;
+  color:var(--text);
+}
+[data-theme="dark"] :is(body.nb-pc, body.nb-easy) #addStripModal{
+  --bg:#10131a;--bg2:#171b24;--bg3:#1d222d;--bg4:#272d39;
+  --gold:#96a2ff;--gold-light:#b3bcff;--gold-dim:#96a2ff;
+  --gold-wash:rgba(104,118,255,.14);--gold-ring:rgba(104,118,255,.4);
+  --text:#f2f4f9;--text-dim:#d2d7e2;--text-muted:#aeb6c6;
+  --border:#333a48;--border-light:#465064;--input-bg:#151a23;
+  --val-info-bg:#16261d;--val-info-border:#2f5a40;--val-info-text:#8fd3a5;
+  --nb-dlg-off-bg:#1d222d;--nb-dlg-off-text:#aeb6c6;--nb-dlg-off-btn:#272d39;
+}
+/* material names: full strength */
+:is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner .mat-card .name{color:var(--text)}
+/* a material that does not fit the strip width: was the whole card at 62% - now a grey card with readable text */
+:is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner .mat-card.disabled{opacity:1;background:var(--nb-dlg-off-bg);box-shadow:none}
+:is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner .mat-card.disabled .name{color:var(--nb-dlg-off-text)}
+:is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner .mat-card.disabled .swatch{filter:saturate(.35)}
+/* the button before a material is chosen: was 40% see-through - now a grey button with readable text */
+:is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner .btn-gold:disabled{opacity:1;background:var(--nb-dlg-off-btn);color:var(--nb-dlg-off-text);border:1px solid var(--border-light);box-shadow:none}
+/* the small zoom mark on a photo, the link, the hint in the search box */
+:is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner .swatch-zoom-btn{color:var(--text);background:var(--bg2)}
+:is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner a{color:var(--gold)}
+:is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner .mat-search::placeholder{color:var(--text-muted);opacity:1}
+/* === INLAY DIALOG COLOURS (2026-11-13) - END === */
 </style>
 </head>
 <body>
