@@ -1375,6 +1375,34 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
     body.nb-pc #nbStepMid .nb-step-dots i.on{width:36px}
   }
 }
+/* ===== NEW BUILDER (2026-11-12, Johan 21:45 - to-do section 3): WINDOWS 768 - 899 px WIDE - THE RING STAYS IN VIEW =====
+   Measured 2026-11-12 (768 x 1024, 820 x 1180, 899 x 700): from 768 px the step header and the Back / Next bar are
+   used, but up to 899 px the ring sits above the tools and the page scrolls, so the ring (370 - 614 px high) left the
+   screen after 350 - 600 px of scrolling. From 900 px the ring has its own column and never moves.
+   Here, for 768 - 899 px while the new builder is on (body class "nb-pc"): the ring is pinned to the top of the window,
+   lower than before (36% of the window height, 200 - 440 px) so the tools keep room; the step header sticks directly
+   under it; the tools scroll between the header and the Back / Next bar.
+   Position and size only. Under 768 px (phone part 106), from 900 px and without step names nothing here applies.
+   Must stay after parts 109c and 109i. */
+@media(min-width:768px) and (max-width:899px){
+  body.nb-pc{--nb-ring-h:clamp(200px,36svh,440px)}
+  body.nb-pc .v2-preview{position:sticky;top:0;z-index:50;height:var(--nb-ring-h);min-height:0;padding:14px 18px;box-shadow:0 6px 18px rgba(0,0,0,.32)}
+  body.nb-pc .v2-preview #ringPreview{height:100%;min-height:0;width:100%}
+  body.nb-pc .v2-preview #ringPreview canvas{height:100%;width:auto;max-width:100%;max-height:100%;object-fit:contain}
+  body.nb-pc .v2-preview #dragCaption{bottom:14px}
+  body.nb-pc .v2-preview #crossSectionHost{bottom:14px}
+  body.nb-pc .v2-header{z-index:51}
+  body.nb-pc .stage-label{display:none}
+  body.nb-pc .studio-controls{margin-top:0;border-radius:0;min-height:calc(100svh - var(--nb-ring-h))}
+  body.nb-pc .nb-pc-steps{top:var(--nb-ring-h)}
+  /* what the page scrolls to (a panel, the size buttons, the price range, a control a click needs) lands in the room
+     between the step header and the Back / Next bar - not under the ring, the header (129 px) or the bar (73 px) */
+  html:has(body.nb-pc){scroll-padding-top:calc(clamp(200px,36svh,440px) + 132px);scroll-padding-bottom:76px}
+  body.nb-pc .acc-panel{scroll-margin-top:16px !important}
+  /* signed-in staff: the engine keeps 64 px free under the page for its floating total box; here the total is a line
+     above the bar (part 109f), and those 64 px lifted the bar off the window's bottom edge at the end of a screen */
+  body.nb-pc.staff-mode{padding-bottom:0}
+}
 </style>
 </head>
 <body>
