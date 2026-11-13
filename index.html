@@ -1343,14 +1343,17 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
    It assumes the phone bar is 65 px high (part 106: 48 px buttons + 8 + 8 + 1 px line) - change the two together.
    Without step names (live order) and from 768 px: nothing here applies. */
 @media(max-width:767px){
+  /* SAME COLOURS AS THE BAR (2026-11-12, Johan 20:35): the bar hangs on the page body (dark), the total sits inside the tool
+     column (light) - the body's own colours are handed down under their own names so the line can wear them */
+  body.nb-easy{--nb-bar-bg:var(--bg2,#fff);--nb-bar-text:var(--text,#1c1f2b);--nb-bar-muted:var(--text-muted,#6b7080);--nb-bar-border:var(--border,#d8dbe6)}
   body.nb-easy #v2-price{
     left:0 !important;right:0 !important;bottom:calc(65px + env(safe-area-inset-bottom,0px)) !important;z-index:95;
     flex-direction:row !important;align-items:center !important;justify-content:space-between;gap:12px;
     min-width:0;margin:0;padding:8px 16px !important;border-radius:0;border-width:1px 0 0 0;
-    background:var(--bg2,#fff);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 -4px 14px rgba(0,0,0,.10);
+    background:var(--nb-bar-bg);border-color:var(--nb-bar-border);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 -6px 20px rgba(0,0,0,.14);
   }
-  body.nb-easy #v2-price .v2-price-label{font-size:12px;letter-spacing:.12em}
-  body.nb-easy #v2-price .v2-price-amount{font-size:1.15rem;line-height:1.1}
+  body.nb-easy #v2-price .v2-price-label{font-size:12px;letter-spacing:.12em;color:var(--nb-bar-muted)}
+  body.nb-easy #v2-price .v2-price-amount{font-size:1.15rem;line-height:1.1;color:var(--nb-bar-text)}
   /* the bar's own shadow would fall on the line: the line carries it instead while it is shown */
   body.nb-easy:has(#v2-price:not(.nb-total-empty):not(.nb-total-twice)):not(.v2-hide-prices) #nbStepBar{box-shadow:none}
 }
