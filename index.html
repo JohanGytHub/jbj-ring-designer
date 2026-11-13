@@ -1331,6 +1331,29 @@ body.nb-easy.staff-mode .mat-card:has(> .staff-price){display:grid;grid-template
 body.nb-easy.staff-mode .mat-card:has(> .staff-price) > .swatch{grid-row:1 / span 2}
 body.nb-easy.staff-mode .mat-card:has(> .staff-price) > .name{grid-column:2;align-self:end;min-width:0}
 body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;justify-self:start;margin-left:0;padding-left:0;font-size:12px;line-height:1.25;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+/* ===== NEW BUILDER (2026-11-12, Johan 19:36 - to-do section 3): PHONES - THE "ESTIMATED TOTAL" NO LONGER HIDES A CONTROL =====
+   Measured 2026-11-12 on 320 / 360 / 390 / 430 px wide phones (signed-in staff, a size chosen): the engine's fixed
+   box (168 x 56 px, bottom right, above the bar) lay over size buttons, width buttons, Zoom buttons and the strip
+   rows' Remove / width box / + while they scrolled past - and because the box lets taps through, a hidden control
+   could still be pressed. Same fault as on PC (part 109f), same answer:
+   under 768 px, while the new builder is on (nb-easy), the total is a slim line across the screen that sits
+   directly on top of the Back / Next bar and reads as part of it. Label left, amount right.
+   Position and shape only: the amount, who sees it and when are the engine's and the server's, unchanged.
+   Hidden with no amount (staff, part 369g) and on the last screen (part 369i) as before - those rules are untouched.
+   It assumes the phone bar is 65 px high (part 106: 48 px buttons + 8 + 8 + 1 px line) - change the two together.
+   Without step names (live order) and from 768 px: nothing here applies. */
+@media(max-width:767px){
+  body.nb-easy #v2-price{
+    left:0 !important;right:0 !important;bottom:calc(65px + env(safe-area-inset-bottom,0px)) !important;z-index:95;
+    flex-direction:row !important;align-items:center !important;justify-content:space-between;gap:12px;
+    min-width:0;margin:0;padding:8px 16px !important;border-radius:0;border-width:1px 0 0 0;
+    background:var(--bg2,#fff);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 -4px 14px rgba(0,0,0,.10);
+  }
+  body.nb-easy #v2-price .v2-price-label{font-size:12px;letter-spacing:.12em}
+  body.nb-easy #v2-price .v2-price-amount{font-size:1.15rem;line-height:1.1}
+  /* the bar's own shadow would fall on the line: the line carries it instead while it is shown */
+  body.nb-easy:has(#v2-price:not(.nb-total-empty):not(.nb-total-twice)):not(.v2-hide-prices) #nbStepBar{box-shadow:none}
+}
 </style>
 </head>
 <body>
