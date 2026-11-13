@@ -1357,6 +1357,24 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
   /* the bar's own shadow would fall on the line: the line carries it instead while it is shown */
   body.nb-easy:has(#v2-price:not(.nb-total-empty):not(.nb-total-twice)):not(.v2-hide-prices) #nbStepBar{box-shadow:none}
 }
+/* ===== NEW BUILDER (2026-11-12, Johan 21:01 - to-do section 3): PC - THE BAR'S STEP NAME IS NO LONGER CUT IN A NARROW COLUMN =====
+   Measured 2026-11-12: from 900 px window width the tools are a column beside the ring; at 900 px that column is
+   405 px wide and the bar's middle got 43 px - "Your band", "Make it yours" and "Get my quote" were cut
+   ("Get ..."), and the three progress marks (136 px) stuck out over Back and Next. Cut up to about 1010 px.
+   Cause: part 109c has smaller Back / Next / marks for a narrow column, but its general bar rules come after them
+   with the same weight and win, so the smaller sizes never applied.
+   Here, after part 109c: the same smaller sizes for a column of 540 px or less (the switch part 109c uses).
+   The bar keeps its height (parts 109f / 109g assume 73 px): only the side padding changes.
+   Size only. Under 768 px and without step names nothing here applies. */
+@media(min-width:768px){
+  @container studio (max-width:540px){
+    body.nb-pc #nbStepBar{padding:12px 16px;gap:8px}
+    body.nb-pc #nbStepBack{min-width:88px;padding:0 12px}
+    body.nb-pc #nbStepNext{min-width:128px;padding:0 14px;font-size:15px}
+    body.nb-pc #nbStepMid .nb-step-dots i{width:22px}
+    body.nb-pc #nbStepMid .nb-step-dots i.on{width:36px}
+  }
+}
 </style>
 </head>
 <body>
