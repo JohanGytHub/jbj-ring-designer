@@ -7694,10 +7694,40 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       return nativeFetch.apply(this,arguments);
     };
   }
+  /* ===== SHARE LINK CARRIES "SIZE UNKNOWN" (2026-11-13, Johan - to-do section 3) - START =====
+     The engine's "Copy Share Link" button builds its own link (locked part 220) without "size unknown", so a shared
+     design opened as a normal size 10. The link is completed here on its way to the clipboard (and in the engine's
+     "Copy this share link:" box when the clipboard refuses): &su=1, and &sg=<group> when a size group was tapped -
+     the same two marks the link sent with a quote carries. Opening such a link is handled at the top of this part.
+     No price, no size border: the server decides what it prices, as before. */
+  function linkWithUnknown(url){
+    try{
+      if(typeof url!=='string'||!NB.unknown||!cfg()) return url;
+      if(url.indexOf('?design=')<0||/[?&]su=1(&|$)/.test(url)) return url;
+      return url+'&su=1'+(NB.group!=null?('&sg='+NB.group):'');
+    }catch(e){ return url; }
+  }
+  try{
+    var clip=navigator.clipboard;
+    if(clip&&typeof clip.writeText==='function'){
+      var nativeWrite=clip.writeText;
+      clip.writeText=function(text){ return nativeWrite.call(clip,linkWithUnknown(text)); };
+    }
+  }catch(e){}
+  try{
+    var nativePrompt=window.prompt;
+    if(typeof nativePrompt==='function'){
+      window.prompt=function(message,value){ return (arguments.length>1)?nativePrompt.call(window,message,linkWithUnknown(value)):nativePrompt.call(window,message); };
+    }
+  }catch(e){}
+  /* ===== SHARE LINK CARRIES "SIZE UNKNOWN" - END ===== */
   function applyEstimate(json){
     var ok=!!(json&&json.ok), r=ok?json.priceRange:null, u=ok?json.unknownSize:null;
     NB.range=(r&&isFinite(r.low)&&isFinite(r.high))?{ low:Number(r.low), high:Number(r.high) }:null;
     if(NB.range) NB.rangeSeen=true;
+    /* RANGE ONLY WITH UNKNOWN SIZE (2026-11-13, Johan): the server sends a customer the range only when the size is
+       Unknown (staff: always). An answer without a range = no "Calculating..." line while the next estimate runs. */
+    else if(ok) NB.rangeSeen=false;
     if(ok) NB.groupNeeded=!!(NB.unknown&&u&&u.groupNeeded);
     schedule();
   }
@@ -8105,7 +8135,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     }catch(e){}
     return '';
   }
-  var moreOpen=false, userToggled=null;
+  var moreOpen=false, userToggled=null, hadInlays=null; /* FOLD IN BOTH CASES (2026-11-13, Johan): hadInlays */
   function paint(){
     var host=document.getElementById('acc-body-compose'); if(!host) return;
     var c=cfg(), s=st(), old=host.querySelector('.nb-layouts');
@@ -8113,6 +8143,11 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     if(!list.length){ if(old) old.remove(); return; }
     var hasInlays=Array.isArray(s.strips)&&s.strips.some(function(x){ return x&&x.material!==s.baseMetal; });
     var current=-1; list.forEach(function(item){ if(sameStrips(item.strips,s.strips)) current=item.index; });
+    /* FOLD IN BOTH CASES (2026-11-13, Johan - to-do section 3): the box is open only while the band has no inlay.
+       When the first inlay arrives (by hand or from a card) or the last one goes, the customer's earlier open / close
+       choice no longer counts. */
+    if(hadInlays!==null&&hadInlays!==hasInlays) userToggled=null;
+    hadInlays=hasInlays;
     var open=(userToggled!=null)?userToggled:!hasInlays;
     var first=Math.max(1,Number(c.show_first)||6), showAll=moreOpen||list.length<=first;
     var sig=[s.baseMetal,s.ringWidth,s.profile,list.map(function(i){ return i.index+':'+i.strips.map(function(x){ return x.width; }).join('/'); }).join(','),current,open?1:0,showAll?1:0,hasInlays?1:0].join('|');
@@ -8121,7 +8156,9 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     var box=el('details','nb-layouts'); box.setAttribute('data-sig',sig); if(open) box.open=true;
     var sum=el('summary',null,hasInlays?'Popular designs':String(c.title||'Start from a popular design'));
     box.appendChild(sum);
-    box.addEventListener('toggle',function(){ userToggled=box.open; });
+    /* FOLD IN BOTH CASES (2026-11-13, Johan): the box's own first opening also fires "toggle" - only a change away from
+       how the box was drawn is the customer's choice. Was: userToggled=box.open; */
+    box.addEventListener('toggle',function(){ if(box.open!==open) userToggled=box.open; });
     if(c.note) box.appendChild(el('p','nb-lay-note',String(c.note)));
     var grid=el('div','nb-lay-grid');
     (showAll?list:list.slice(0,first)).forEach(function(item){
