@@ -7364,6 +7364,13 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
          emailTyped:false,attempt:0,failed:0,submitted:false,quoteId:'',share:0,
          vw:window.innerWidth||0,touch:(('ontouchstart' in window)||(navigator.maxTouchPoints||0)>0),ref:(document.referrer||'').slice(0,300)};
   var timer=null,lastSent='';
+  // NEW BUILDER TRACKER FIELDS (2026-11-14, Johan 13:48): the furthest tool by NAME in THIS page's tool order (STEPS = builder_config.steps).
+  // maxStep above keeps the old fixed ORDER (the tracker recomputes its own max_step from steps as before); maxTool -> max_step_tool.
+  // Worked out at each snapshot from the tools seen, so it follows the order the page has then. forgetTool(): the new page's
+  // boot opens Ring Size for a moment before the first tool (part 369 undoes that) - that moment is not "reached".
+  var seenTools={};
+  function toolPos(id){ try{ for(var k=0;k<STEPS.length;k++){ if(STEPS[k]&&STEPS[k].id===id) return k; } }catch(e){} return -1; }
+  function furthestTool(){ var best='',bp=-1; for(var id in seenTools){ var p=toolPos(id); if(p>bp){ bp=p; best=id; } } return best; }
   function snap(){
     try{ F.sid=String(ringAudit.sessionId||''); F.vid=String(ringAudit.visitorId||''); }catch(e){}
     try{ F.staff=F.staff||!!(typeof _staffMode!=='undefined'&&_staffMode); }catch(e){}
@@ -7374,6 +7381,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       F.emailTyped=F.emailTyped||!!(st.email&&/@/.test(String(st.email)));
     }catch(e){}
     F.last=Date.now();
+    var mt=furthestTool(); if(mt) F.maxTool=mt; else delete F.maxTool;   // NEW BUILDER TRACKER FIELDS (2026-11-14, Johan 13:48)
     return F;
   }
   function send(beacon){
@@ -7395,7 +7403,8 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     if(type==='interaction') return;                       // scroll/touch/pointer spam: ignored
     F.events++;
     var step=stepOf(name,payload);
-    if(step&&ORDER.indexOf(step)!==-1){ F.steps[step]=1; var i=ORDER.indexOf(step); if(i>F.maxStep) F.maxStep=i; F.lastStep=step; }
+    if(step&&ORDER.indexOf(step)!==-1){ F.steps[step]=1; var i=ORDER.indexOf(step); if(i>F.maxStep) F.maxStep=i; F.lastStep=step;
+      seenTools[step]=1; }   // NEW BUILDER TRACKER FIELDS (2026-11-14, Johan 13:48)
     if(name==='composer_rule_blocked'){ F.rule++; F.lastRule=String((payload&&payload.message)||'').slice(0,160); }
     else if(name==='estimate_unavailable') F.est++;
     else if(type==='error') F.err++;
@@ -7419,7 +7428,8 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   window.addEventListener('unhandledrejection',function(){ F.err++; mark(); });
   document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='hidden') send(true); });
   window.addEventListener('pagehide',function(){ send(true); });
-  window.__V2_FUNNEL__={ snapshot:snap, flush:function(){ clearTimeout(timer); send(false); } };
+  window.__V2_FUNNEL__={ snapshot:snap, flush:function(){ clearTimeout(timer); send(false); },
+    forgetTool:function(id){ delete seenTools[id]; } };   // NEW BUILDER TRACKER FIELDS (2026-11-14, Johan 13:48): + forgetTool
 })();
 /* ===== NEW BUILDER (2026-11-11, Johan): RING PICTURE THAT ALWAYS FITS + FORM FIELD HELP =====
    The engine is not changed. This block replaces ONE engine helper from outside (_getCanvasImage) and adds helpers.
@@ -8103,6 +8113,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     // the engine's boot opened Ring Size; with a new first tool, open that one instead
     if(reordered()&&stt._openSection==='size'){
       if(stt._touched) delete stt._touched.size;
+      try{ if(window.__V2_FUNNEL__&&window.__V2_FUNNEL__.forgetTool) window.__V2_FUNNEL__.forgetTool('size'); }catch(e){}   // NEW BUILDER TRACKER FIELDS (2026-11-14, Johan 13:48): the boot moment is not "reached"
       stt._skipNextStudioScroll=true;
       try{ window.__V2_ROUTER__.openSection(s[0].id); }catch(e){}
       try{ window.scrollTo(0,0); }catch(e){}
