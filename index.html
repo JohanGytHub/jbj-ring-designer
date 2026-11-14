@@ -1487,6 +1487,52 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
 :is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner a{color:var(--gold)}
 :is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner .mat-search::placeholder{color:var(--text-muted);opacity:1}
 /* === INLAY DIALOG COLOURS (2026-11-13) - END === */
+/* ===== PHONE INLAY GROUPS (2026-11-13, Johan - to-do section 5, line 1: proposal B) - START =====
+   "The nine rows of material-group chips in the Add Inlay dialog on a small phone." Measured 2026-11-13 (360 x 640,
+   390 x 844, 393 x 852): 24 group chips in 9 rows took 452 px (53 - 71% of the screen); 0 - 2 materials in view; the
+   materials window was a 200 px box scrolling inside a dialog that scrolled too; Add Strip 234 - 475 px below the screen.
+   Johan 16:57 chose proposal B: "All" + the first two groups and a "More Material groups (n)" button (router part 369j) that opens
+   the full list; the chosen group always stays in view. Here: the look of that button, the hidden chips, and - as on PC
+   (part 109k) - the materials window takes the room that is left, so only the materials scroll and Add Strip stays on
+   the screen. A short screen (700 px high or lower) gets less air around the fixed parts.
+   Phones only (under 768 px) while the new builder is on (body class "nb-easy"); Add and Edit dialog. Colours come from
+   part 109l. Display only - no price, no rule; the dialog's code (engine part 190, locked) is not touched; "!important"
+   only where that code sets a size on the element itself (the materials window's 200 px). */
+@media(max-width:767.98px){
+  body.nb-easy #addStripModalInner.v2-add-strip-mode .mat-groups:not(.nb-groups-open) > .mat-group-btn.nb-group-folded,
+  body.nb-easy #addStripModalInner.v2-edit-strip-mode .mat-groups:not(.nb-groups-open) > .mat-group-btn.nb-group-folded{display:none}
+  body.nb-easy #addStripModalInner .nb-more-groups{flex:0 0 auto;min-height:44px;min-width:44px;padding:0 16px;border-radius:22px;border:1px dashed var(--text-muted);background:var(--bg2);color:var(--text);font:inherit;font-size:15px;font-weight:500;line-height:1.2;cursor:pointer}
+  body.nb-easy #addStripModalInner .nb-more-groups:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  body.nb-easy #addStripModalInner.v2-add-strip-mode,
+  body.nb-easy #addStripModalInner.v2-edit-strip-mode{display:flex;flex-direction:column;height:92vh;height:92dvh;max-height:none}
+  body.nb-easy #addStripModalInner.v2-add-strip-mode > *,
+  body.nb-easy #addStripModalInner.v2-edit-strip-mode > *{flex:0 0 auto}
+  body.nb-easy #addStripModalInner.v2-add-strip-mode > .mat-grid,
+  body.nb-easy #addStripModalInner.v2-edit-strip-mode > .mat-grid{flex:1 1 0;min-height:150px;max-height:none !important;align-content:start}
+}
+/* a short phone screen (360 x 640 and the like): the dialog a little higher (96% of the screen),
+   less air around the fixed parts, a smaller lowest height for the materials window */
+@media(max-width:767.98px) and (max-height:700px){
+  body.nb-easy #addStripModalInner.v2-add-strip-mode,
+  body.nb-easy #addStripModalInner.v2-edit-strip-mode{height:96vh;height:96dvh;padding-top:16px;padding-bottom:max(12px,env(safe-area-inset-bottom))}
+  body.nb-easy #addStripModalInner.v2-add-strip-mode > .mat-grid,
+  body.nb-easy #addStripModalInner.v2-edit-strip-mode > .mat-grid{min-height:128px}
+  body.nb-easy #addStripModalInner.v2-add-strip-mode > h3,
+  body.nb-easy #addStripModalInner.v2-edit-strip-mode > h3{margin-bottom:8px !important}
+  body.nb-easy #addStripModalInner.v2-add-strip-mode > .validation-msg,
+  body.nb-easy #addStripModalInner.v2-edit-strip-mode > .validation-msg{padding:6px 10px !important;margin-bottom:8px !important;font-size:13px !important}
+  body.nb-easy #addStripModalInner.v2-add-strip-mode > .mat-groups,
+  body.nb-easy #addStripModalInner.v2-edit-strip-mode > .mat-groups{margin-bottom:6px !important}
+  body.nb-easy #addStripModalInner.v2-add-strip-mode > .mat-search,
+  body.nb-easy #addStripModalInner.v2-edit-strip-mode > .mat-search{margin-bottom:6px !important}
+  body.nb-easy #addStripModalInner.v2-add-strip-mode > div:has(> a),
+  body.nb-easy #addStripModalInner.v2-edit-strip-mode > div:has(> a){margin:4px 0 0 !important;font-size:12px !important;line-height:1.3}
+  body.nb-easy #addStripModalInner.v2-add-strip-mode > div:has(> .width-picker),
+  body.nb-easy #addStripModalInner.v2-edit-strip-mode > div:has(> .width-picker){margin:6px 0 0 !important}
+  body.nb-easy #addStripModalInner.v2-add-strip-mode > div:last-child,
+  body.nb-easy #addStripModalInner.v2-edit-strip-mode > div:last-child{margin-top:8px !important}
+}
+/* ===== PHONE INLAY GROUPS (2026-11-13) - END ===== */
 </style>
 </head>
 <body>
@@ -8743,6 +8789,66 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   window.__V2_ONETOTAL__={ update:update };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
+/* ===== PHONE INLAY GROUPS (2026-11-13, Johan - to-do section 5, line 1: proposal B) - START =====
+   "The nine rows of material-group chips in the Add Inlay dialog on a small phone." Johan 16:57: "proposal=B".
+   In the Add and the Edit Inlay dialog on a phone (under 768 px, new builder on): "All" + the first two groups stay in
+   view, the other groups fold behind a "More Material groups (n) ▾" button (wording: Johan 17:04); open, the button
+   reads "Fewer Material groups ▴". The chosen
+   group always stays in view. Choosing a group in the open list folds the list again. Each time the dialog opens it
+   starts folded. The dialog's code (engine part 190, locked) draws the chips again on every choice and keystroke; this
+   part only marks the chips (class "nb-group-folded") and adds its own button after each drawing - the chips' own clicks,
+   the filter and every rule stay the engine's. Look: CSS part 109m. Display only - no price, no rule. */
+(function(){
+  var phone=window.matchMedia?window.matchMedia('(max-width:767.98px)'):null;
+  var SHOW=3;          // "All" + the first two groups
+  var open=false;      // the fold, for the dialog that is open now
+  function on(){ return !!(phone&&phone.matches&&document.body&&document.body.classList.contains('nb-easy')); }
+  function inMode(inner){ return inner.classList.contains('v2-add-strip-mode')||inner.classList.contains('v2-edit-strip-mode'); }
+  function decorate(){
+    var inner=document.getElementById('addStripModalInner'); if(!inner) return;
+    var groups=inner.querySelector('.mat-groups'); if(!groups) return;
+    var chips=groups.querySelectorAll('.mat-group-btn'), btn=groups.querySelector('.nb-more-groups');
+    if(!on()||!inMode(inner)||chips.length<=SHOW+1){
+      // only write what changes: a class written again makes the watcher below run again (endless on PC otherwise)
+      if(btn) btn.remove(); if(groups.classList.contains('nb-groups-open')) groups.classList.remove('nb-groups-open');
+      for(var k=0;k<chips.length;k++) if(chips[k].classList.contains('nb-group-folded')) chips[k].classList.remove('nb-group-folded');
+      return;
+    }
+    var folded=0;
+    for(var i=0;i<chips.length;i++){
+      var hide=i>=SHOW&&!chips[i].classList.contains('active');
+      chips[i].classList.toggle('nb-group-folded',hide); if(hide) folded++;
+    }
+    groups.classList.toggle('nb-groups-open',open);
+    if(!groups.__nbFoldClick){   // a chip chosen in the open list: fold before the engine draws the chips again
+      groups.__nbFoldClick=true;
+      groups.addEventListener('click',function(ev){ if(ev.target.closest&&ev.target.closest('.mat-group-btn')) open=false; },true);
+    }
+    if(!btn){
+      btn=document.createElement('button'); btn.type='button'; btn.className='nb-more-groups';
+      btn.addEventListener('click',function(ev){ ev.preventDefault(); ev.stopPropagation(); open=!open; decorate(); });
+      groups.appendChild(btn);
+    }
+    var label=open?'Fewer Material groups \u25B4':'More Material groups ('+folded+') \u25BE';   /* wording: Johan 17:04 */
+    if(btn.textContent!==label) btn.textContent=label;
+    btn.setAttribute('aria-expanded',open?'true':'false');
+  }
+  function start(){
+    var overlay=document.getElementById('addStripModal'), inner=document.getElementById('addStripModalInner');
+    if(!overlay||!inner) return;
+    try{   // created first, so it runs before the drawing watcher: a dialog that opens starts folded
+      new MutationObserver(function(list){
+        for(var i=0;i<list.length;i++){ var was=String(list[i].oldValue||''); if(!/\bopen\b/.test(was)&&overlay.classList.contains('open')) open=false; }
+      }).observe(overlay,{ attributes:true, attributeFilter:['class'], attributeOldValue:true });
+      new MutationObserver(function(){ try{ decorate(); }catch(e){ if(window.console) console.error('inlay groups:',e); } }).observe(inner,{ childList:true, subtree:true, attributes:true, attributeFilter:['class'] });
+    }catch(e){}
+    if(phone&&phone.addEventListener) phone.addEventListener('change',decorate);
+    decorate();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+  window.__V2_INLAY_GROUPS__={ run:decorate, isOpen:function(){ return open; } };
+})();
+/* ===== PHONE INLAY GROUPS (2026-11-13) - END ===== */
 </script>
 </body>
 </html>
