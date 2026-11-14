@@ -1078,6 +1078,10 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
 .nb-range .nb-group.selected{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);background:linear-gradient(135deg,var(--gold-wash),transparent 70%),var(--bg2)}
 .nb-range.nb-nudge{border-color:#c0392b;box-shadow:0 0 0 1px #c0392b}
 .nb-range.nb-nudge .nb-groups .nb-k{color:#c0392b;font-weight:700}
+/* PRICE RANGE RULES (2026-11-13, Johan 20:30): staff only - "Customer sees: ..." under the Estimated Total + small print. Layout only. */
+.nb-cust-sees{display:flex;flex-direction:column;gap:2px;margin:6px 0 8px;padding:8px 12px;border:1px dashed var(--border);border-radius:10px;background:var(--bg2)}
+.nb-cust-sees .nb-cs-v{font-size:14px;line-height:1.35;font-weight:700;color:var(--text)}
+.nb-cust-sees .nb-cs-n{font-size:12px;line-height:1.4;color:var(--text-muted)}
 /* ===== NEW BUILDER (2026-11-11, Johan): THREE STEPS =====
    The tools are grouped into the steps named in the pricing settings (builder_config.steps[].group):
    Your band / Make it yours / Get my quote. Layout only. Without groups in the settings nothing here applies. */
@@ -7706,9 +7710,13 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
    The page holds no price, no percentage and no size-group border. It only tells the server "size unknown" (+ the
    group tapped) and shows what comes back. The engine is untouched: with Unknown the engine keeps a stand-in size
    (the default size) so the drawing and its own checks keep working; the server decides which size it prices.
-   Feature off (settings missing in the pricing data): no Unknown button, no range - the page is as before. */
+   Feature off (settings missing in the pricing data): no Unknown button, no range - the page is as before.
+   PRICE RANGE RULES (2026-11-13, Johan 19:56 / 20:30 / 20:41): the server now sends a customer range with a chosen size too (SHOW_PRICES "range"),
+   or "From $X" (priceRange.from) - the page shows the text, it computes nothing. Every ring asks for the size group when
+   the server says so (groupNeeded). Staff answers carry priceRangeBasis: staff see "Customer sees: ..." + that small
+   print under their Estimated Total instead of the range box (the group buttons stay in the box). */
 (function(){
-  var NB={ unknown:false, group:null, groupNeeded:false, range:null, rangeSeen:false, pending:false, seq:0, nudge:false };
+  var NB={ unknown:false, group:null, groupNeeded:false, range:null, rangeSeen:false, pending:false, seq:0, nudge:false, basis:null };   // basis: PRICE RANGE RULES (2026-11-13, Johan 19:56 / 20:30 / 20:41)
   function builder(){ try{ return (typeof BUILDER!=='undefined'&&BUILDER)?BUILDER:null; }catch(e){ return null; } }
   function cfg(){ var b=builder(); var u=b&&b.unknown_size; return (u&&typeof u.label==='string'&&u.label&&Array.isArray(u.groups)&&u.groups.length)?u:null; }
   function services(){ try{ return (typeof SERVICES!=='undefined'&&SERVICES)?SERVICES:null; }catch(e){ return null; } }
@@ -7811,7 +7819,10 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   /* ===== SHARE LINK CARRIES "SIZE UNKNOWN" - END ===== */
   function applyEstimate(json){
     var ok=!!(json&&json.ok), r=ok?json.priceRange:null, u=ok?json.unknownSize:null;
-    NB.range=(r&&isFinite(r.low)&&isFinite(r.high))?{ low:Number(r.low), high:Number(r.high) }:null;
+    /* PRICE RANGE RULES (2026-11-13, Johan 19:56 / 20:30 / 20:41): { low, high } or { low, from:true } ("From $X"). Was:
+       NB.range=(r&&isFinite(r.low)&&isFinite(r.high))?{ low:Number(r.low), high:Number(r.high) }:null; */
+    NB.range=(r&&isFinite(r.low)&&(r.from===true||isFinite(r.high)))?{ low:Number(r.low), high:r.from===true?null:Number(r.high), from:r.from===true }:null;
+    if(ok) NB.basis=(NB.range&&typeof json.priceRangeBasis==='string'&&json.priceRangeBasis)?json.priceRangeBasis:null;   // staff only
     if(NB.range) NB.rangeSeen=true;
     /* RANGE ONLY WITH UNKNOWN SIZE (2026-11-13, Johan): the server sends a customer the range only when the size is
        Unknown (staff: always). An answer without a range = no "Calculating..." line while the next estimate runs. */
@@ -7876,17 +7887,22 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       if(text&&text.textContent!==c.label) text.textContent=c.label;
     }
     var showGroups=!!(c&&NB.unknown&&NB.groupNeeded);
-    var showRange=!!(NB.range||(NB.rangeSeen&&NB.pending)||(showGroups&&NB.group==null));
+    paintStaffLine(h);   // PRICE RANGE RULES (2026-11-13, Johan 19:56 / 20:30 / 20:41)
+    var staffLine=!!NB.basis;   // staff: the range is the "Customer sees" line, not the box
+    var showRange=!staffLine&&!!(NB.range||(NB.rangeSeen&&NB.pending)||(showGroups&&NB.group==null));
     var s=st(), ready=!!(s&&s.baseMetal&&s.ringSize!=null);
     if(!ready||(!showGroups&&!showRange)){ if(box) box.remove(); return; }
-    var sig=[showGroups?1:0,NB.group,NB.range?NB.range.low+'-'+NB.range.high:'',NB.pending?1:0,NB.nudge?1:0,c?c.groups.length:0].join('|');
+    var sig=[showGroups?1:0,NB.group,NB.range?rangeText(NB.range):'',NB.pending?1:0,NB.nudge?1:0,c?c.groups.length:0,staffLine?1:0].join('|');
     if(!box){ box=el('div','nb-range'); }
     if(box.getAttribute('data-sig')!==sig){
       box.setAttribute('data-sig',sig); box.textContent='';
       box.classList.toggle('nb-nudge',!!(NB.nudge&&showGroups&&NB.group==null));
       if(showGroups){
         var gw=el('div','nb-groups'); gw.setAttribute('role','group'); gw.setAttribute('aria-label','Closest ring size');
-        gw.appendChild(el('span','nb-k',NB.group==null?'Size unknown: tap the closest size to see your price range':'Closest ring size'));
+        /* PRICE RANGE RULES (2026-11-13): with SHOW_PRICES "off" no range comes (price_display from the designer config),
+           so the prompt does not promise one. Was always: 'Size unknown: tap the closest size to see your price range' */
+        var noRange=!!(builderCfgDisplay()==='off'&&!NB.basis);
+        gw.appendChild(el('span','nb-k',NB.group==null?(noRange?'Size unknown: tap the closest size':'Size unknown: tap the closest size to see your price range'):'Closest ring size'));
         var row=el('div','nb-group-row');
         c.groups.forEach(function(gr){
           var b=el('button','nb-group'+(NB.group===gr.index?' selected':''),gr.label); b.type='button';
@@ -7899,10 +7915,10 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
         gw.appendChild(el('span','nb-range-n','Price may vary depending on the ring size.'));
         box.appendChild(gw);
       }
-      if(NB.range||(NB.rangeSeen&&NB.pending&&!(showGroups&&NB.group==null))){
+      if(!staffLine&&(NB.range||(NB.rangeSeen&&NB.pending&&!(showGroups&&NB.group==null)))){
         var main=el('div','nb-range-main');
         main.appendChild(el('span','nb-k','Estimated price range'));
-        main.appendChild(el('span','nb-range-v',NB.range?(money(NB.range.low)+' – '+money(NB.range.high)):'Calculating…'));
+        main.appendChild(el('span','nb-range-v',NB.range?rangeText(NB.range):'Calculating…'));   // PRICE RANGE RULES (2026-11-13, Johan 19:56 / 20:30 / 20:41): was money(low)+' – '+money(high)
         // RANGE NOTE (2026-11-11, Johan 22:26): was "Your exact price comes with our reply."
         if(!showGroups) main.appendChild(el('span','nb-range-n','Price may vary depending on the ring size.'));
         box.appendChild(main);
@@ -7920,6 +7936,25 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     if(box.parentNode!==parent||box.nextSibling!==anchor) parent.insertBefore(box,anchor);
   }
 
+  /* ===== PRICE RANGE RULES (2026-11-13, Johan 19:56 / 20:30 / 20:41) - START =====
+     "From $X" or "$low – $high", exactly as the server sent it. Staff (the answer carries priceRangeBasis): one line
+     "Customer sees: ..." directly under the Estimated Total + the server's small print of what it is built from.
+     Their total, breakdown and card prices are not touched. Nothing is computed here. */
+  function builderCfgDisplay(){ var b=builder(); return (b&&typeof b.price_display==='string')?b.price_display:''; }   // 'off' / 'on' / 'range' from the worker
+  function rangeText(r){ return r.from?('From '+money(r.low)):(money(r.low)+' – '+money(r.high)); }
+  function paintStaffLine(h){
+    var line=h.querySelector('.nb-cust-sees'), tot=h.querySelector('.summary-total');
+    if(!NB.basis||!NB.range||!tot){ if(line) line.remove(); return; }
+    var sig=rangeText(NB.range)+'|'+NB.basis;
+    if(!line){ line=el('div','nb-cust-sees'); }
+    if(line.getAttribute('data-sig')!==sig){
+      line.setAttribute('data-sig',sig); line.textContent='';
+      line.appendChild(el('span','nb-cs-v','Customer sees: '+rangeText(NB.range)));
+      line.appendChild(el('span','nb-cs-n',NB.basis));
+    }
+    if(line.previousSibling!==tot||line.parentNode!==tot.parentNode) tot.parentNode.insertBefore(line,tot.nextSibling);
+  }
+  /* ===== PRICE RANGE RULES (2026-11-13, Johan 19:56 / 20:30 / 20:41) - END ===== */
   function paint(){ try{ sync(); paintSize(); paintHeaders(); paintSummary(); }catch(e){ if(window.console) console.error('size and range:',e); } }
   var queued=false;
   function schedule(){ if(queued) return; queued=true; setTimeout(function(){ queued=false; paint(); },40); }
