@@ -1537,6 +1537,32 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
   body.nb-easy #addStripModalInner.v2-edit-strip-mode > div:last-child{margin-top:8px !important}
 }
 /* ===== PHONE INLAY GROUPS (2026-11-13) - END ===== */
+/* ===== NEW DESIGN + METAL CHANGE (2026-11-14, Johan - to-do section 9) - START =====
+   The "New design" button + question, the step-list item, the Base Metal note. Layout only. */
+.nb-new-btn{
+  pointer-events:auto;position:absolute;top:26px;height:40px;padding:0 14px;z-index:5;
+  display:inline-flex;align-items:center;gap:7px;white-space:nowrap;cursor:pointer;
+  border:1px solid rgba(255,255,255,.14);border-radius:13px;color:#d7dced;background:rgba(255,255,255,.055);
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);font:600 .78rem/1 var(--font-body);letter-spacing:.01em;
+  transition:transform .2s ease,border-color .2s ease,background .2s ease;
+}
+.nb-new-btn:hover{transform:translateY(-2px);border-color:rgba(142,155,255,.6);background:rgba(104,118,255,.14)}
+.nb-new-btn .nb-new-ico{font-size:1rem;line-height:1}
+@media(max-width:899px){ .nb-new-btn{top:19px;height:38px;padding:0 12px} }
+@media(max-width:767px){ .nb-new-btn{min-height:44px;height:44px;font-size:13px} }
+#nbNewAsk{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(5,7,12,.62)}
+#nbNewAsk .nb-new-box{width:min(380px,100%);border-radius:16px;padding:22px 22px 18px;background:#fff;color:#14161f;box-shadow:0 18px 50px rgba(0,0,0,.4);border:1px solid var(--border,rgba(0,0,0,.12))}
+#nbNewAsk h3{margin:0 0 8px;font:600 1.1rem/1.3 var(--font-body);color:inherit}
+#nbNewAsk p{margin:0 0 18px;font-size:.92rem;line-height:1.45;color:#4b5165}
+#nbNewAsk .nb-new-row{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+#nbNewAsk button{min-height:44px;padding:0 16px;border-radius:12px;font:600 .9rem/1 var(--font-body);cursor:pointer;border:1px solid rgba(20,22,31,.25);background:#fff;color:#14161f}
+#nbNewAsk button.nb-new-go{background:var(--accent,#5b6cff);border-color:var(--accent,#5b6cff);color:#fff}
+#nbStepList .nb-new-item{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;margin-top:8px;padding:0 14px;border-top:1px solid rgba(255,255,255,.12);background:transparent;color:inherit;font-size:14px;font-weight:600;text-align:left;cursor:pointer}
+#nb-metal-change-note{margin:10px 0 14px;padding:10px 12px;border:1px solid rgba(91,108,255,.45);border-radius:10px;background:rgba(91,108,255,.08);font-size:.8rem;line-height:1.45;color:var(--text,inherit)}
+#nb-metal-change-note strong{display:block;margin-bottom:4px}
+#nb-metal-change-note ul{margin:0;padding-left:18px}
+@media(max-width:767px){ #nb-metal-change-note{font-size:13px} }
+/* ===== NEW DESIGN + METAL CHANGE (2026-11-14) - END ===== */
 </style>
 </head>
 <body>
@@ -8921,6 +8947,301 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   window.__V2_INLAY_GROUPS__={ run:decorate, isOpen:function(){ return open; } };
 })();
 /* ===== PHONE INLAY GROUPS (2026-11-13) - END ===== */
+/* ===== METAL CHANGE KEEPS THE DESIGN (2026-11-14, Johan - to-do section 9, line 2) - START =====
+   Back from Summary + a new Base Metal: the layout is kept, the old metal's strips follow the new metal, every rule runs
+   again (precut blanks, widths, sleeve, profile, finish, size, the page's own sweeps), then a new server estimate.
+   Rules and widths from the pricing data only; no price or formula. Details: claude\build-2026-11-14-new-design-metal-change.md */
+(function(){
+  function st(){ return state; }
+  function B(){ return BUILDER; }
+  function M(n){ return DATA.m[n]||null; }
+  function eps(){ return BUILDER.width_epsilon||0.01; }
+  function r2(x){ return parseFloat(Number(x).toFixed(2)); }
+  function metal(n){ try{ return !!isMetal(n); }catch(e){ return false; } }
+  function inc(n){ return Number((BUILDER.rules.width_increment_materials||{})[n])||BUILDER.strip_width.step; }
+  function minFor(n){
+    var m=M(n), b=B(); if(!m||!b) return 0;
+    if(metal(n)){ try{ return Number(metalStripMin(n))||0; }catch(e){ return Number(m.mi&&m.mi.edge_same_sleeve)||b.strip_width.min||0; } }
+    return Number(m.mi&&(m.mi.solid_inlay||m.mi.inlay_swarf))||Number(b.material_default_min_width)||0;
+  }
+  function blanks(base){ var l=(BUILDER.rules.precut_blanks||{})[base]; return (Array.isArray(l)&&l.length)?l:null; }
+  function bSegs(bl,flip){ var s=(bl&&Array.isArray(bl.segments)?bl.segments:[]).map(function(g){ return {t:g.t==='base'?'base':'inlay',w:Number(g.w)}; }); return flip?s.reverse():s; }
+  function plain(bl){ return !!bl&&(bl.plain===true||!bSegs(bl,false).some(function(g){ return g.t==='inlay'; })); }
+  function used(strips){ return (strips||[]).reduce(function(a,s){ return a+((s&&s.width)||0); },0); }
+  function runs(strips,W,base){
+    var out=[];
+    (strips||[]).forEach(function(s,i){ if(!s||!(s.width>0)) return; var t=s.material===base?'base':'inlay'; var last=out[out.length-1];
+      if(last&&last.t===t){ last.w=r2(last.w+s.width); last.items.push({s:s,i:i}); } else out.push({t:t,w:r2(s.width),items:[{s:s,i:i}]}); });
+    var rem=r2(W-used(strips));
+    if(rem>eps()){ var l=out[out.length-1]; if(l&&l.t==='base') l.w=r2(l.w+rem); else out.push({t:'base',w:rem,items:[]}); }
+    return out;
+  }
+
+  var pending=null;
+  function relabel(oldBase,newBase){
+    var s=st(); var notes=[];
+    (s.strips||[]).forEach(function(x){
+      if(!x) return;
+      if(x.material===oldBase) x.material=newBase;
+      else if(x.material===newBase){ x.material=oldBase; notes.push('The '+newBase+' inlay is now '+oldBase+', so it still shows on the '+newBase+' band.'); }
+    });
+    try{ if(typeof undoStack!=='undefined') undoStack.length=0; }catch(e){}
+    s.selectedStrip=-1;
+    return notes.filter(function(n,i,a){ return a.indexOf(n)===i; });
+  }
+  document.addEventListener('click',function(ev){
+    var card=ev.target&&ev.target.closest?ev.target.closest('#acc-panel-metal .mat-card'):null; if(!card) return;
+    var s=st(); if(!s) return;
+    var nm=card.querySelector('.name'); var newBase=nm?String(nm.textContent||'').trim():'';
+    var oldBase=s.baseMetal;
+    if(!newBase||!oldBase||newBase===oldBase||!M(newBase)) return;
+    var hasLayout=Array.isArray(s.strips)&&s.strips.length>0;
+    var notes=hasLayout?relabel(oldBase,newBase):[];
+    pending={ oldBase:oldBase, newBase:newBase, sleeve:s.sleeve, notes:notes, strips:(s.strips||[]).map(function(x){ return {material:x.material,width:x.width}; }), width:s.ringWidth, profile:s.profile, toast:document.querySelector('.rule-toast') };
+    setTimeout(after,0);
+  },true);
+
+  function snapPrecut(base,notes){
+    var s=st(), b=B(), list=blanks(base); if(!list) return;
+    var W=Number(s.ringWidth), P=s.profile, d=runs(s.strips,W,base), chans=d.filter(function(g){ return g.t==='inlay'; });
+    var cands=[];
+    list.forEach(function(bl){ [false,true].forEach(function(fl){
+      if(fl&&plain(bl)) return;
+      var g=bSegs(bl,fl), gi=g.filter(function(x){ return x.t==='inlay'; });
+      if(!chans.length){ if(gi.length) return; } else if(!gi.length||gi.length>chans.length) return;
+      var keep=chans.map(function(c,k){ return {c:c,k:k}; }).sort(function(x,y){ return y.c.w-x.c.w; }).slice(0,gi.length).sort(function(x,y){ return x.k-y.k; }).map(function(x){ return x.c; });
+      var score=Math.abs(Number(bl.width)-W)*10+(bl.profile!==P?5:0)+(chans.length-gi.length)*20;
+      if(g.length===d.length&&g.every(function(x,k){ return x.t===d[k].t; })) g.forEach(function(x,k){ score+=Math.abs(x.w-d[k].w); });
+      else { score+=3; gi.forEach(function(x,k){ score+=Math.abs(x.w-keep[k].w); }); }
+      cands.push({bl:bl,g:g,keep:keep,score:score});
+    }); });
+    cands.sort(function(x,y){ return x.score-y.score; });
+    if(cands.length&&cands[0].score<eps()&&cands[0].keep.length===chans.length&&Number(cands[0].bl.width)===W&&cands[0].g.length===d.length) return;
+    var keepW=s.ringWidth, keepP=s.profile, keepS=s.strips;
+    for(var c=0;c<cands.length;c++){
+      var cd=cands[c], out=[], ok=true, k=0;
+      cd.g.forEach(function(x){
+        if(!ok) return;
+        if(x.t==='base'){ out.push({material:base,width:x.w}); return; }
+        var ch=cd.keep[k++], items=ch.items.map(function(it){ return it.s; });
+        if(items.length===1){ out.push({material:items[0].material,width:x.w}); return; }
+        var sum=0, part=[];
+        items.forEach(function(it,j){
+          if(j===items.length-1){ part.push({material:it.material,width:r2(x.w-sum)}); return; }
+          var step=inc(it.material), w=Math.floor((it.width*x.w/ch.w)/step+1e-9)*step; w=r2(w); sum=r2(sum+w); part.push({material:it.material,width:w});
+        });
+        if(part.some(function(p){ return !(p.width>0)||p.width<minFor(p.material)-eps(); })) ok=false; else out=out.concat(part);
+      });
+      if(!ok) continue;
+      if(!chans.length&&!(keepS||[]).length) out=[];
+      s.ringWidth=Number(cd.bl.width); s.profile=cd.bl.profile; s.strips=out;
+      var bad=null; try{ bad=validateProposedStrips(out.map(function(x){ return {material:x.material,width:x.width}; })); }catch(e){ bad=null; }
+      if(bad){ s.ringWidth=keepW; s.profile=keepP; s.strips=keepS; continue; }
+      var dropped=chans.filter(function(ch){ return cd.keep.indexOf(ch)<0; }).map(function(ch){ return ch.items.map(function(it){ return it.s.material; }).join(' + '); });
+      var txt=plain(cd.bl)?'a plain band':out.map(function(x){ return x.width+'mm '+x.material; }).join(' · ');
+      notes.push(base+' is made from precut blanks - the closest one was chosen: '+(Number(cd.bl.width)!==Number(keepW)?Number(cd.bl.width)+'mm wide, ':'')+(cd.bl.profile!==keepP?cd.bl.profile+' profile, ':'')+txt+'.');
+      if(dropped.length) notes.push('Left out (no room on a '+base+' blank): '+dropped.join(', ')+'.');
+      return;
+    }
+    var widths=[]; list.forEach(function(bl){ var w=Number(bl.width); if(widths.indexOf(w)<0) widths.push(w); }); widths.sort(function(a,b){ return a-b; });
+    if(widths.length&&widths.indexOf(W)<0){ var best=widths[0]; widths.forEach(function(x){ if(Math.abs(x-W)<=Math.abs(best-W)) best=x; }); s.ringWidth=best; s.strips=[]; notes.push(base+' blanks are '+widths.join('mm / ')+'mm wide - width set to '+best+'mm.'); }
+    notes.push('Please choose one of the '+base+' layouts in Band Composer.');
+  }
+  function metalGroup(n){ try{ return !!isMetalGroup(n); }catch(e){ return false; } }
+  function smallest(strips,i,base){
+    var x=strips[i], mn=minFor(x.material), m=M(x.material), last=strips.length-1, eff=st().sleeve||base;
+    var rem=r2(Number(st().ringWidth)-used(strips)), edges=(rem>eps()||strips.length===1)?[0]:[0,last];
+    if(edges.indexOf(i)>=0&&m&&m.mi&&(metalGroup(x.material)||m.g===(B().groups&&B().groups.mokume_composite))){
+      var e=(x.material===eff)?Number(m.mi.edge_same_sleeve)||0:Number(m.mi.edge_diff_sleeve)||0; if(e>mn) mn=e;
+    }
+    return mn;
+  }
+  function widen(strips,base){
+    var short=[], gave={};
+    strips.forEach(function(x,i){
+      if(!x) return; var mn=smallest(strips,i,base); if(!(mn>0)||x.width>=mn-eps()) return;
+      var need=r2(mn-x.width), free=r2(Number(st().ringWidth)-used(strips)), rest=r2(need-Math.max(0,Math.min(need,free)));
+      var plan=[];
+      if(rest>eps()){
+        var donors=strips.map(function(y,j){ return {y:y,j:j}; }).filter(function(o){ return o.j!==i&&o.y&&o.y.material!==base; })
+          .map(function(o){ var stp=inc(o.y.material), spare=Math.floor((o.y.width-minFor(o.y.material)+eps())/stp)*stp; return {y:o.y,stp:stp,spare:r2(spare)}; })
+          .filter(function(o){ return o.spare>eps(); }).sort(function(p,q){ return q.spare-p.spare; });
+        var left=rest;
+        for(var d=0;d<donors.length&&left>eps();d++){ var o=donors[d], take=r2(Math.min(o.spare,Math.ceil((left-eps())/o.stp)*o.stp)); plan.push({y:o.y,take:take}); left=r2(left-take); }
+        if(left>eps()){ short.push(i); return; }
+      }
+      plan.forEach(function(q){ q.y.width=r2(q.y.width-q.take); gave[q.y.material]=r2((gave[q.y.material]||0)+q.take); });
+      var was=x.width; x.width=r2(mn);
+      x.__nbWidened={was:was,to:x.width};
+    });
+    return {short:short,gave:gave};
+  }
+  function fixMinimums(base,notes,p){
+    var s=st(), strips=s.strips||[];
+    var rem=r2(Number(s.ringWidth)-used(strips));
+    if(rem>eps()&&strips.length){ var lastS=strips[strips.length-1]; if(lastS.material===base) lastS.width=r2(lastS.width+rem); else strips.push({material:base,width:rem}); }
+    if(s.sleeve&&s.sleeve!==base){
+      var copy=strips.map(function(x){ return {material:x.material,width:x.width}; }), dry=widen(copy,base);
+      var edgeShort=dry.short.some(function(i){ var x=copy[i]; var m=M(x.material); return m&&m.mi&&Number(m.mi.edge_diff_sleeve)>minFor(x.material)&&x.material!==s.sleeve; });
+      if(edgeShort){ var sl=s.sleeve; s.sleeve=base; notes.push('The '+sl+' sleeve needs wider '+base+' edges than there is room for - sleeve set to '+base+'.'); }
+    }
+    var res=widen(strips,base);
+    for(var k=res.short.length-1;k>=0;k--){
+      var i=res.short[k], x=strips[i];
+      if(x.material!==base||i===0||i===strips.length-1) continue;
+      var trial=strips.filter(function(y,j){ return j!==i; }).map(function(y){ return {material:y.material,width:y.width}; });
+      var bad=null; try{ bad=validateProposedStrips(trial); }catch(e){ bad=null; }
+      if(!bad){ strips.splice(i,1); res.short.splice(k,1); notes.push('A '+x.width+'mm '+base+' pinstripe was taken out (no room for '+minFor(base)+'mm).'); }
+    }
+    var gaveTxt=Object.keys(res.gave).map(function(n){ return n+' '+res.gave[n]+'mm'; }).join(', ');
+    strips.forEach(function(x){ if(x&&x.__nbWidened){ notes.push(x.material+' strip widened from '+x.__nbWidened.was+'mm to '+x.__nbWidened.to+'mm (its smallest width).'); delete x.__nbWidened; } });
+    if(gaveTxt) notes.push('Width taken from: '+gaveTxt+'.');
+    res.short.forEach(function(i){ var x=strips[i]; if(x) notes.push('The '+x.width+'mm '+x.material+' strip is too narrow and there is no room to widen it - please adjust it in Band Composer.'); });
+  }
+  function keepSleeve(p,notes){
+    var s=st(), old=p.sleeve, base=p.newBase;
+    if(!old||old===p.oldBase||old===base) return;
+    if(blanks(base)){ notes.push(base+' blanks have a '+base+' sleeve - the '+old+' sleeve was removed.'); return; }
+    var blocked=false; try{ blocked=(typeof crushedOnlySleeveBlocked==='function')&&crushedOnlySleeveBlocked(old); }catch(e){}
+    if(blocked){ notes.push('The '+old+' sleeve cannot be used with '+base+' - sleeve set to '+base+'.'); return; }
+    s.sleeve=old;
+  }
+  function fixProfile(base,notes){
+    var s=st(), b=B(), m=M(base); if(!m||!Array.isArray(m.p)||!m.p.length||!s.profile||m.p.indexOf(s.profile)>=0) return;
+    var d=b&&b.defaults&&b.defaults.profile, next=(d&&m.p.indexOf(d)>=0)?d:m.p[0], was=s.profile; s.profile=next;
+    notes.push(base+' is not made in the '+was+' profile - profile set to '+next+'.');
+  }
+  function fixFinish(base,notes){
+    var s=st(), b=B(), m=M(base); if(!m||!s.finish) return;
+    var allowed=Array.isArray(m.f)?m.f.slice():null; if(!allowed) return;
+    (s.strips||[]).forEach(function(x){ var mm=x&&M(x.material); if(mm&&Array.isArray(mm.f)) allowed=allowed.filter(function(f){ return mm.f.indexOf(f)>=0; }); });
+    try{ if(HAMMERED_FINISH&&HAMMERED_PROFILES.length&&HAMMERED_PROFILES.indexOf(s.profile)<0) allowed=allowed.filter(function(f){ return f!==HAMMERED_FINISH; }); }catch(e){}
+    if(!allowed.length||allowed.indexOf(s.finish)>=0) return;
+    var d=b&&b.defaults&&b.defaults.finish, next=(d&&allowed.indexOf(d)>=0)?d:allowed[0], was=s.finish; s.finish=next;
+    notes.push('The '+was+' finish is not available here - finish set to '+next+'.');
+  }
+  function runSweeps(notes){
+    var own=(typeof showRuleToast==='function')?showRuleToast:null;
+    try{ showRuleToast=function(m){ notes.push(String(m)); }; }catch(e){}
+    try{ window.__V2_ROUTER__.rerenderSection('compose'); }catch(e){}
+    try{ if(own) showRuleToast=own; }catch(e){}
+  }
+  var shown=null, watching=false;
+  function insertNote(){
+    var host=document.getElementById('acc-body-metal'); if(!host||!shown) return;
+    var s=st(); if(!s||s.baseMetal!==shown.base||s._openSection!=='metal'){ shown=null; var gone=document.getElementById('nb-metal-change-note'); if(gone) gone.remove(); return; }
+    if(document.getElementById('nb-metal-change-note')) return;
+    var box=document.createElement('div'); box.id='nb-metal-change-note'; box.setAttribute('role','status');
+    var t=document.createElement('strong'); t.textContent='Now '+shown.base+' - your layout was kept:'; box.appendChild(t);
+    var ul=document.createElement('ul'); shown.notes.forEach(function(n){ var li=document.createElement('li'); li.textContent=n; ul.appendChild(li); }); box.appendChild(ul);
+    var desc=host.querySelector('.panel-desc'); if(desc&&desc.parentNode) desc.parentNode.insertBefore(box,desc.nextSibling); else host.insertBefore(box,host.firstChild);
+  }
+  function paintNote(base,notes){
+    var old=document.getElementById('nb-metal-change-note'); if(old) old.remove();
+    shown=notes.length?{base:base,notes:notes}:null;
+    insertNote();
+    var host=document.getElementById('acc-body-metal');
+    if(host&&!watching){ watching=true; try{ new MutationObserver(function(){ if(shown) insertNote(); }).observe(host,{childList:true,subtree:true}); }catch(e){} }
+  }
+  function after(){
+    var p=pending; pending=null; var s=st(); if(!p||!s||s.baseMetal!==p.newBase) return;
+    var base=p.newBase, notes=p.notes.slice(), hasLayout=Array.isArray(s.strips)&&s.strips.length>0;
+    keepSleeve(p,notes);
+    if(blanks(base)&&p.strips.length&&!(s.strips||[]).length){ s.strips=p.strips.map(function(x){ return {material:x.material,width:x.width}; }); s.ringWidth=p.width; s.profile=p.profile; }
+    if(blanks(base)) snapPrecut(base,notes);
+    else { fixProfile(base,notes); if(hasLayout) fixMinimums(base,notes,p); }
+    fixFinish(base,notes);
+    runSweeps(notes);
+    ['width','sleeve','finish'].forEach(function(id){ try{ window.__V2_ROUTER__.rerenderSection(id); }catch(e){} });
+    try{ renderRing(); }catch(e){}
+    try{ updatePrice(); }catch(e){}
+    try{ if(typeof requestEstimate==='function') requestEstimate(); }catch(e){}
+    try{ window.__V2_ROUTER__.updatePriceBar(); }catch(e){}
+    notes=notes.filter(function(n,i,a){ return n&&a.indexOf(n)===i; });
+    var pageToast=document.querySelector('.rule-toast'); if(pageToast&&pageToast===p.toast) pageToast=null;
+    if(pageToast){ var pt=String(pageToast.textContent||'').replace(/^\u26a0\s*/,''); if(pt&&notes.indexOf(pt)<0) notes.unshift(pt); }
+    paintNote(base,notes);
+    if(notes.length&&!pageToast){ try{ showRuleToast('Now '+base+' - see the note under the heading.'); }catch(e){} }
+    try{ ringAudit.record('selection','metal_change_kept_design',{from:p.oldBase,to:base,notes:notes.length}); }catch(e){}
+    window.__V2_METAL_CHANGE__.last={from:p.oldBase,to:base,notes:notes};
+  }
+  window.__V2_METAL_CHANGE__={ last:null };
+})();
+/* ===== METAL CHANGE KEEPS THE DESIGN (2026-11-14) - END ===== */
+/* ===== NEW DESIGN BUTTON (2026-11-14, Johan - to-do section 9, line 1) - START =====
+   "New design" in the header (+ the phone's step list): asks first, then opens the page again without the share-link
+   marks (design, su, sg) = clean first screen, new funnel session; ?staff and other marks kept. Details: claude\build-2026-11-14-new-design-metal-change.md */
+(function(){
+  var DESIGN_MARKS=['design','su','sg'];
+  function st(){ try{ return (typeof state!=='undefined'&&state)?state:null; }catch(e){ return null; } }
+  function started(){ var s=st(); return !!(s&&(s.baseMetal||s.ringSize!=null||(s.strips&&s.strips.length)||(window.__V2_SIZE__&&window.__V2_SIZE__.state&&window.__V2_SIZE__.state.unknown))); }
+  function freshUrl(){
+    var u=new URL(window.location.href);
+    DESIGN_MARKS.forEach(function(k){ u.searchParams.delete(k); });
+    u.hash='';
+    return u.toString();
+  }
+  function startFresh(){
+    try{ window.removeEventListener('beforeunload',_exitGuard); }catch(e){}
+    try{ document.removeEventListener('mouseout',_exitIntentHandler); }catch(e){}
+    try{ ringAudit.record('navigation','new_design',{}); }catch(e){}
+    window.__V2_NEW_DESIGN__.leaving=true;
+    try{ window.__V2_NEW_DESIGN__.go(freshUrl()); }catch(e){ window.location.replace(freshUrl()); }
+  }
+  function closeAsk(){ var a=document.getElementById('nbNewAsk'); if(a) a.remove(); document.removeEventListener('keydown',onKey,true); }
+  function onKey(ev){ if(ev.key==='Escape'){ ev.preventDefault(); closeAsk(); } }
+  function ask(){
+    if(!started()){ startFresh(); return; }
+    if(document.getElementById('nbNewAsk')) return;
+    var o=document.createElement('div'); o.id='nbNewAsk'; o.setAttribute('role','dialog'); o.setAttribute('aria-modal','true'); o.setAttribute('aria-labelledby','nbNewAskTitle');
+    var box=document.createElement('div'); box.className='nb-new-box';
+    var h=document.createElement('h3'); h.id='nbNewAskTitle'; h.textContent='Start a new design?';
+    var p=document.createElement('p'); p.textContent='Your current design will be cleared.';
+    var row=document.createElement('div'); row.className='nb-new-row';
+    var no=document.createElement('button'); no.type='button'; no.className='nb-new-cancel'; no.textContent='Cancel';
+    var go=document.createElement('button'); go.type='button'; go.className='nb-new-go'; go.textContent='Start a new design';
+    no.addEventListener('click',closeAsk); go.addEventListener('click',function(){ closeAsk(); startFresh(); });
+    o.addEventListener('click',function(ev){ if(ev.target===o) closeAsk(); });
+    row.appendChild(no); row.appendChild(go); box.appendChild(h); box.appendChild(p); box.appendChild(row); o.appendChild(box);
+    document.body.appendChild(o); document.addEventListener('keydown',onKey,true);
+    try{ no.focus(); }catch(e){}
+  }
+  function place(btn){
+    var theme=document.getElementById('v2-theme-btn'), exit=document.getElementById('v2-exit-btn');
+    var ref=(exit&&exit.offsetParent&&exit.getBoundingClientRect().width>0)?exit:theme;
+    if(!ref||!btn.offsetParent) return;
+    var par=btn.offsetParent.getBoundingClientRect(), r=ref.getBoundingClientRect();
+    btn.style.right=Math.max(0,Math.round(par.right-r.left+8))+'px';
+    var bh=btn.getBoundingClientRect().height, head=btn.parentNode.getBoundingClientRect();
+    var phone=window.matchMedia&&window.matchMedia('(max-width:767px)').matches;
+    btn.style.top=Math.round(phone?(head.top-par.top+(head.height-bh)/2):(r.top-par.top+(r.height-bh)/2))+'px';
+  }
+  function addButton(){
+    var head=document.getElementById('v2-theme-btn'); head=head&&head.parentNode; if(!head||document.getElementById('nbNewDesign')) return;
+    var b=document.createElement('button'); b.type='button'; b.id='nbNewDesign'; b.className='nb-new-btn'; b.setAttribute('aria-label','Start a new design');
+    var i=document.createElement('span'); i.className='nb-new-ico'; i.setAttribute('aria-hidden','true'); i.textContent='↺';
+    var t=document.createElement('span'); t.className='nb-new-txt'; t.textContent='New design';
+    b.appendChild(i); b.appendChild(t); b.addEventListener('click',ask);
+    head.appendChild(b);
+    var redo=function(){ try{ place(b); }catch(e){} };
+    redo(); setTimeout(redo,300); setTimeout(redo,1500);
+    window.addEventListener('resize',redo);
+  }
+  function addToStepList(){
+    var list=document.getElementById('nbStepList'); if(!list) return false;
+    var put=function(){ if(list.querySelector('.nb-new-item')) return; var b=document.createElement('button'); b.type='button'; b.className='nb-new-item'; b.setAttribute('role','menuitem');
+      b.textContent='↺  Start a new design'; b.addEventListener('click',function(){ try{ var sc=document.getElementById('nbStepScrim'); if(sc) sc.click(); }catch(e){} ask(); }); list.appendChild(b); };
+    put(); try{ new MutationObserver(put).observe(list,{childList:true}); }catch(e){}
+    return true;
+  }
+  function boot(){
+    addButton();
+    if(!addToStepList()){ var n=0, t=setInterval(function(){ if(addToStepList()||++n>40) clearInterval(t); },250); }
+  }
+  window.__V2_NEW_DESIGN__={ ask:ask, freshUrl:freshUrl, leaving:false, go:function(u){ window.location.replace(u); } };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
+})();
+/* ===== NEW DESIGN BUTTON (2026-11-14) - END ===== */
 </script>
 </body>
 </html>
