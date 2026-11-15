@@ -7128,13 +7128,18 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       col.querySelectorAll('p').forEach(function(pEl){ if(/Showing Flat and Round profiles/.test(pEl.textContent||'')) pEl.textContent='Profiles available for '+state.ringWidth+'mm '+base+' blanks: '+profiles.join(', ')+'.'; });
     }
   }
+  function v2PsLink(u){ return (typeof u==='string'&&state.precutStyle!=null&&v2IsPrecut()&&u.indexOf('?design=')>0&&u.indexOf('&ps=')<0)?u+'&ps='+encodeURIComponent(state.precutStyle):u; }   // SHARE LINK STYLE 2026-11-15
   function installPrecutBlanks(){
     if(window.__v2PrecutInstalled) return; window.__v2PrecutInstalled=true;
     // PRECUT CHOICE 2026-11-14: with the blank cards (builder_config.precut_choice) the blank's own metal parts are not edited, and the
     // card's style goes with every estimate / quote (the server checks it; 5 / 9 / 12 share their layout with 2 / 8 / 13).
     if(typeof openEditStripModal==='function'){ var oe=openEditStripModal; openEditStripModal=function(i){ var s=state.strips[i]; if(BUILDER.precut_choice&&v2IsPrecut()&&s&&s.material===state.baseMetal){ try{ showRuleToast('The '+state.baseMetal+' parts come with the blank - tap a ? to choose an inlay.'); }catch(e){} return; } return oe(i); }; }
     var nf=window.fetch;
-    window.fetch=function(u,o){ try{ var sv=typeof SERVICES!=='undefined'?SERVICES:null; if(sv&&o&&typeof o.body==='string'&&(u===sv.estimate_url||u===sv.quote_url)&&v2IsPrecut()&&state.precutStyle!=null){ var b=JSON.parse(o.body); b.precutStyle=state.precutStyle; o=Object.assign({},o,{body:JSON.stringify(b)}); } }catch(e){} return nf.apply(this,[u,o]); };
+    window.fetch=function(u,o){ try{ var sv=typeof SERVICES!=='undefined'?SERVICES:null; if(sv&&o&&typeof o.body==='string'&&(u===sv.estimate_url||u===sv.quote_url)&&v2IsPrecut()&&state.precutStyle!=null){ var b=JSON.parse(o.body); b.precutStyle=state.precutStyle; b.shareUrl=v2PsLink(b.shareUrl); o=Object.assign({},o,{body:JSON.stringify(b)}); } }catch(e){} return nf.apply(this,[u,o]); };
+    // SHARE LINK STYLE 2026-11-15: the card's style rides on the share link (&ps=) - copied, in the quote, and read when the link is opened
+    var cb=navigator.clipboard, cw=cb&&cb.writeText, np=window.prompt;
+    if(cw) cb.writeText=function(x){ return cw.call(cb,v2PsLink(x)); };
+    window.prompt=function(m,v){ return arguments.length>1?np.call(window,m,v2PsLink(v)):np.call(window,m); };
     // auto edges/pinstripes on a blank default to the blank's edge width
     if(typeof getBaseMetalMinWidth==='function'&&!window.__v2NativeBaseMin){
       window.__v2NativeBaseMin=getBaseMetalMinWidth;
@@ -7202,6 +7207,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
         if(cfg&&v2PrecutBlanks(cfg.bm)){ numberRange(v2PrecutSizeRange()).forEach(function(sz){ if(RING_SIZES.indexOf(sz)<0){ RING_SIZES.push(sz); extra.push(sz); } }); }
       }catch(e){}
       var ok=window.__v2NativeLoadDesign();
+      try{ var ps=new URLSearchParams(window.location.search).get('ps'); if(ok&&ps&&v2PrecutBlanks(state.baseMetal)) state.precutStyle=/^\d+$/.test(ps)?Number(ps):ps; }catch(e){}   // SHARE LINK STYLE 2026-11-15
       extra.forEach(function(sz){ var at=RING_SIZES.indexOf(sz); if(at>=0) RING_SIZES.splice(at,1); });
       return ok;
     };
