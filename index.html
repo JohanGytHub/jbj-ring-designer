@@ -1563,6 +1563,9 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
 #nb-metal-change-note ul{margin:0;padding-left:18px}
 @media(max-width:767px){ #nb-metal-change-note{font-size:13px} }
 /* ===== NEW DESIGN + METAL CHANGE (2026-11-14) - END ===== */
+/* PRECUT CHOICE 2026-11-14 (Johan 23:12): blank cards on Tungsten / Black Ceramic */
+.nb-lay-bar i.nb-ch{background:repeating-linear-gradient(45deg,#c3c8d2 0 3px,#eef0f4 3px 6px)}
+body.nb-pre #acc-body-compose .width-control,body.nb-pre .composer-actions .btn-gold,body.nb-pre .composer-actions .btn-outline:not(.btn-undo),body.nb-pre .remaining-width,body.nb-pre .s-remove,body.nb-pre .nb-row-remove,body.nb-pre .nb-w-hint,body.nb-pre .v2-row-group,body.nb-pre .v2-grip,body.nb-pre #acc-body-compose .panel-desc,body.nb-pre #addStripModalInner div:has(>.width-picker){display:none!important}
 </style>
 </head>
 <body>
@@ -6972,6 +6975,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       }
       return pos===strips.length;
     }
+    var ps=state.precutStyle; list=list.filter(function(b){ return b.style===ps; }).concat(list.filter(function(b){ return b.style!==ps; }));   // PRECUT CHOICE 2026-11-14
     for(var i=0;i<list.length;i++){
       var b=list[i];
       if(Math.abs(Number(b.width)-state.ringWidth)>eps||b.profile!==state.profile) continue;
@@ -7009,7 +7013,8 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   }
   // Gate (Johan 2026-08-23): on a blank the layout must be complete before Continue / steps 5–7.
   var V2_PRECUT_LOCKED_STEPS=['sleeve','finish','summary'];
-  function v2PrecutLocked(){ return v2IsPrecut() && !v2MatchBlank(state.strips); }
+  function v2Choosing(){ return (state.strips||[]).some(function(s){ return s.material==='(choose)'; }); }   // PRECUT CHOICE 2026-11-14
+  function v2PrecutLocked(){ return v2IsPrecut() && (!v2MatchBlank(state.strips)||v2Choosing()); }
   function v2ApplyPrecutLocks(){
     var locked=false; try{ locked=v2PrecutLocked(); }catch(e){}
     V2_PRECUT_LOCKED_STEPS.forEach(function(id){
@@ -7033,7 +7038,8 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     try{ v2ConstrainComposerWidth(col); }catch(e){}
     var base=state.baseMetal, m=v2MatchBlank(state.strips);
     var note;
-    if(m){
+    if(m&&v2Choosing()) note=h('div',{id:'v2-precut-note',class:'v2-precut-note v2-precut-open'},['Style '+m.blank.style+': tap each ? to choose its inlay.']);   // PRECUT CHOICE 2026-11-14
+    else if(m){
       var b=m.blank;
       var corner=(b.corner==='beveled')?', beveled corners':'';
       var txt=v2BlankIsPlain(b)?('✓ Plain '+b.width+'mm '+b.profile+' '+base+' band — available as a precut blank.')
@@ -7124,6 +7130,11 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   }
   function installPrecutBlanks(){
     if(window.__v2PrecutInstalled) return; window.__v2PrecutInstalled=true;
+    // PRECUT CHOICE 2026-11-14: with the blank cards (builder_config.precut_choice) the blank's own metal parts are not edited, and the
+    // card's style goes with every estimate / quote (the server checks it; 5 / 9 / 12 share their layout with 2 / 8 / 13).
+    if(typeof openEditStripModal==='function'){ var oe=openEditStripModal; openEditStripModal=function(i){ var s=state.strips[i]; if(BUILDER.precut_choice&&v2IsPrecut()&&s&&s.material===state.baseMetal){ try{ showRuleToast('The '+state.baseMetal+' parts come with the blank - tap a ? to choose an inlay.'); }catch(e){} return; } return oe(i); }; }
+    var nf=window.fetch;
+    window.fetch=function(u,o){ try{ var sv=typeof SERVICES!=='undefined'?SERVICES:null; if(sv&&o&&typeof o.body==='string'&&(u===sv.estimate_url||u===sv.quote_url)&&v2IsPrecut()&&state.precutStyle!=null){ var b=JSON.parse(o.body); b.precutStyle=state.precutStyle; o=Object.assign({},o,{body:JSON.stringify(b)}); } }catch(e){} return nf.apply(this,[u,o]); };
     // auto edges/pinstripes on a blank default to the blank's edge width
     if(typeof getBaseMetalMinWidth==='function'&&!window.__v2NativeBaseMin){
       window.__v2NativeBaseMin=getBaseMetalMinWidth;
@@ -8176,14 +8187,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
   window.__V2_THREESTEPS__={ applyOrder:applyOrder, grouped:grouped, reordered:reordered };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): READY-MADE LAYOUTS =====
-   Cards at the top of the Inlays screen: "Start from a popular design". One tap fills the inlay layout for the
-   base metal and ring width already chosen; after that the customer edits it like any other layout.
-   - The list (names, materials, widths as drawn on a ring of designed_for_width mm) is a pricing setting:
-     builder_config.ready_layouts. No setting = no cards.
-   - A card is shown only when the engine's OWN rules accept that layout for the current metal, width and
-     profile (stripRuleBlock, validateProposedStrips, the material minimum / maximum widths). Nothing is forced.
-   - No price here. The engine and its rules are untouched; applying a layout goes through the engine's undo. */
+/* ===== NEW BUILDER (2026-11-11, Johan): READY-MADE LAYOUTS ===== - comment moved to claude\build-2026-11-14-precut-blank-choice.md (page weight, 2026-11-14) */
 (function(){
   function builder(){ try{ return (typeof BUILDER!=='undefined'&&BUILDER)?BUILDER:null; }catch(e){ return null; } }
   function st(){ try{ return (typeof state!=='undefined'&&state)?state:null; }catch(e){ return null; } }
@@ -8289,9 +8293,30 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     try{ if(typeof validateProposedStrips==='function'&&validateProposedStrips(strips)) return null; }catch(e){ return null; }
     return strips;
   }
-  function available(){ var c=cfg(); if(!c) return []; var out=[]; c.layouts.forEach(function(l,i){ var strips=compute(l); if(strips) out.push({ index:i, name:String(l.name||''), strips:strips }); }); return out; }
+  /* PRECUT CHOICE 2026-11-14 - START: precut blank cards (builder_config.precut_choice) */
+  function pre(){ var b=builder(); return (b&&b.precut_choice&&isPrecut())?b.precut_choice:null; }
+  function blanks(){ var b=builder(), s=st(); return ((b.rules.precut_blanks||{})[s.baseMetal]||[]).map(function(x,i){ return { index:'b'+i, blank:x,
+    name:(x.plain?'Plain band':'Style '+x.style)+' · '+x.width+'mm '+x.profile+(x.corner==='beveled'?', beveled corners':''),
+    strips:x.segments.map(function(g){ return { material:g.t==='base'?s.baseMetal:'(choose)', width:Number(g.w) }; }) }; }); }
+  function applyBlank(i){
+    var s=st(), item=blanks()[i]; if(!s||!item) return false;
+    try{ if(typeof pushUndo==='function') pushUndo(); }catch(e){}
+    var x=item.blank; s.ringWidth=Number(x.width); s.profile=x.profile; s.precutStyle=x.style;
+    s.strips=x.plain?[]:item.strips; s.selectedStrip=-1; s.wantsInlays=!x.plain;
+    s._touched=s._touched||{}; s._touched.compose=true; moreOpen=false; ownAction=true;
+    try{ window.__V2_ROUTER__.rerenderSection('compose'); }catch(e){}
+    ownAction=false;
+    try{ renderRing(); updatePrice(); }catch(e){}
+    schedule();
+    var k=s.strips.map(function(z){ return z.material; }).indexOf('(choose)');
+    if(k>=0) setTimeout(function(){ try{ openEditStripModal(k); }catch(e){} },80);
+    return true;
+  }
+  /* PRECUT CHOICE 2026-11-14 - END */
+  function available(){ if(pre()) return blanks(); var c=cfg(); if(!c) return []; var out=[]; c.layouts.forEach(function(l,i){ var strips=compute(l); if(strips) out.push({ index:i, name:String(l.name||''), strips:strips }); }); return out; }
   function sameStrips(a,b){ if(!a||!b||a.length!==b.length) return false; for(var i=0;i<a.length;i++){ if(a[i].material!==b[i].material||Math.abs(a[i].width-b[i].width)>1e-6) return false; } return true; }
   function apply(index){
+    if(String(index).charAt(0)==='b') return applyBlank(Number(String(index).slice(1)));   // PRECUT CHOICE 2026-11-14
     var c=cfg(), s=st(); if(!c||!s) return false;
     var strips=compute(c.layouts[index]); if(!strips) return false;
     try{ if(typeof pushUndo==='function') pushUndo(); }catch(e){}
@@ -8324,14 +8349,14 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   var moreOpen=false, userToggled=null, hadInlays=null; /* FOLD IN BOTH CASES (2026-11-13, Johan): hadInlays */
   function paint(){
     var host=document.getElementById('acc-body-compose'); if(!host) return;
-    var c=cfg(), s=st(), old=host.querySelector('.nb-layouts');
+    var pc=pre(), c=pc||cfg(), s=st(), old=host.querySelector('.nb-layouts');   // PRECUT CHOICE 2026-11-14
+    document.body.classList.toggle('nb-pre',!!pc);
+    if(pc) host.querySelectorAll('.v2-row-name').forEach(function(n){ var f=n.firstChild; if(f&&f.nodeType===3) f.nodeValue=f.nodeValue.replace('(choose)','? - tap to choose the inlay'); });
     var list=(c&&s)?available():[];
     if(!list.length){ if(old) old.remove(); return; }
     var hasInlays=Array.isArray(s.strips)&&s.strips.some(function(x){ return x&&x.material!==s.baseMetal; });
-    var current=-1; list.forEach(function(item){ if(sameStrips(item.strips,s.strips)) current=item.index; });
-    /* FOLD IN BOTH CASES (2026-11-13, Johan - to-do section 3): the box is open only while the band has no inlay.
-       When the first inlay arrives (by hand or from a card) or the last one goes, the customer's earlier open / close
-       choice no longer counts. */
+    var current=-1; list.forEach(function(item){ if(pc?(item.blank.style===s.precutStyle&&Number(item.blank.width)===Number(s.ringWidth)&&item.blank.profile===s.profile):sameStrips(item.strips,s.strips)) current=item.index; });   // PRECUT CHOICE 2026-11-14
+    /* FOLD IN BOTH CASES (2026-11-13, Johan - to-do section 3) - comment moved to claude\build-2026-11-14-precut-blank-choice.md (page weight, 2026-11-14) */
     if(hadInlays!==null&&hadInlays!==hasInlays) userToggled=null;
     hadInlays=hasInlays;
     var open=(userToggled!=null)?userToggled:!hasInlays;
@@ -8340,10 +8365,9 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     var anchor=host.querySelector('.width-control')||null;
     if(old&&old.getAttribute('data-sig')===sig&&old.parentNode){ return; }
     var box=el('details','nb-layouts'); box.setAttribute('data-sig',sig); if(open) box.open=true;
-    var sum=el('summary',null,hasInlays?'Popular designs':String(c.title||'Start from a popular design'));
+    var sum=el('summary',null,(hasInlays&&!pc)?'Popular designs':String(c.title||'Start from a popular design'));   // PRECUT CHOICE 2026-11-14
     box.appendChild(sum);
-    /* FOLD IN BOTH CASES (2026-11-13, Johan): the box's own first opening also fires "toggle" - only a change away from
-       how the box was drawn is the customer's choice. Was: userToggled=box.open; */
+    /* FOLD IN BOTH CASES (2026-11-13, Johan) - comment moved to claude\build-2026-11-14-precut-blank-choice.md (page weight, 2026-11-14) */
     box.addEventListener('toggle',function(){ if(box.open!==open) userToggled=box.open; });
     if(c.note) box.appendChild(el('p','nb-lay-note',String(c.note)));
     var grid=el('div','nb-lay-grid');
@@ -8351,31 +8375,23 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       var card=el('button','nb-lay-card'+(item.index===current?' selected':'')); card.type='button';
       card.setAttribute('data-nb-layout',String(item.index)); card.setAttribute('aria-pressed',item.index===current?'true':'false');
       var bar=el('span','nb-lay-bar'); bar.setAttribute('aria-hidden','true');
-      item.strips.forEach(function(x){ var seg=document.createElement('i'); seg.style.flex=String(x.width)+' 1 0'; var bg=look(x.material); if(bg) seg.style.background=bg; bar.appendChild(seg); });
+      item.strips.forEach(function(x){ var seg=document.createElement('i'); seg.style.flex=String(x.width)+' 1 0'; var bg=x.material==='(choose)'?'':look(x.material); if(bg) seg.style.background=bg; else seg.className='nb-ch'; bar.appendChild(seg); });   // PRECUT CHOICE 2026-11-14
       card.appendChild(bar); card.appendChild(el('span','nb-lay-name',item.name));
       card.addEventListener('click',function(){ userToggled=null; apply(item.index); });
       grid.appendChild(card);
     });
     box.appendChild(grid);
     if(!showAll){
-      var more=el('button','nb-lay-more','More designs ('+(list.length-first)+')'); more.type='button';
+      var more=el('button','nb-lay-more',(pc?'More blanks (':'More designs (')+(list.length-first)+')'); more.type='button';   // PRECUT CHOICE 2026-11-14
       more.addEventListener('click',function(){ moreOpen=true; schedule(); });
       box.appendChild(more);
     }
-    if(!hasInlays) box.appendChild(el('p','nb-lay-plain','Or build your own below - or keep the band plain and continue.'));
+    if(!hasInlays&&!pc) box.appendChild(el('p','nb-lay-plain','Or build your own below - or keep the band plain and continue.'));   // PRECUT CHOICE 2026-11-14
     if(old) old.remove();
     var parent=anchor?anchor.parentNode:host.firstElementChild||host;
     if(anchor) parent.insertBefore(box,anchor); else parent.appendChild(box);
   }
-  /* ===== KEEP THE COMPOSER IN PLACE (2026-11-12, Johan) - START =====
-     Fault found with tests\mobile-scroll-lock.mjs (new builder on): the page's own redraw of the Inlays screen throws
-     this box away and the box came back 40 ms later. In between the page was 439 px shorter, so the browser moved it:
-     after Add Strip the new strip and the Add Inlay button were out of sight (phone), the tool column jumped to the
-     top (PC), and the stepper / Edit dialog moved the page.
-     Now the box is put back in the same step as the redraw, and the scroll position the customer had is kept. When
-     the box itself changes height because of the redraw (first inlay added, last inlay removed) the page moves by
-     that difference, so the controls under the box stay where they were. While a dialog holds the page (phones) the
-     difference is applied when the dialog lets go. No rule, no price, no width here. */
+  /* ===== KEEP THE COMPOSER IN PLACE (2026-11-12, Johan) - START ===== (comment moved to claude\build-2026-11-14-precut-blank-choice.md, page weight 2026-11-14) */
   var ownAction=false, wrapped=null, inside=0, pendingShift=0, lockWatch=null;
   function newBuilderOn(){ var b=document.body; return !!(b&&(b.classList.contains('nb-pc')||b.classList.contains('nb-easy'))); }
   function pageLocked(){ return document.documentElement.classList.contains('v2-modal-lock'); }
@@ -8396,7 +8412,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     try{ var sc=scroller(); setY(sc,getY(sc)+d); }catch(e){}
   }
   function keepInPlace(inner,self,args){
-    if(inside||!newBuilderOn()||!cfg()) return inner.apply(self,args);
+    if(inside||!newBuilderOn()||!(cfg()||pre())) return inner.apply(self,args);   // PRECUT CHOICE 2026-11-14
     inside++;
     var sc=null,y0=0,h0=0,locked=false,own=ownAction,result;
     try{ sc=scroller(); locked=!sc&&pageLocked(); y0=getY(sc); h0=boxHeight(); }catch(e){}
@@ -8427,6 +8443,8 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   function start(){
     var host=document.getElementById('acc-body-compose'); if(!host) return;
     try{ new MutationObserver(schedule).observe(host,{ childList:true, subtree:true }); }catch(e){}
+    host.addEventListener('click',function(e){ var n=pre()&&e.target.closest&&e.target.closest('.v2-row-name'), s=st(), i=n?parseInt(n.textContent,10)-1:-1;   // PRECUT CHOICE 2026-11-14
+      if(s&&s.strips[i]&&s.strips[i].material!==s.baseMetal){ e.preventDefault(); e.stopPropagation(); try{ openEditStripModal(i); }catch(x){} } },true);
     schedule();
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
