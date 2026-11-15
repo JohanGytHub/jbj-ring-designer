@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>TEST - JBJ Inlay Price Manager — Staff</title>
+<style>
+:root { --ink:#1c2430; --mut:#5b6572; --line:#d9dee5; --bg:#f2f4f7; --card:#ffffff; --teal:#0d7d8c; --teal-dk:#0a606c; --red:#b3261e; --green:#1c7c3c; --amber:#8a5a00; --amber-bg:#fff4dc; }
+* { box-sizing:border-box; }
+body { margin:0; font:14px/1.45 "Segoe UI", system-ui, sans-serif; color:var(--ink); background:var(--bg); }
+header { background:#12333a; color:#fff; padding:10px 16px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+header h1 { font-size:17px; margin:0; font-weight:600; }
+.badge { background:#1d4b54; border-radius:20px; padding:3px 12px; font-size:12.5px; }
+.badge.warn { background:#7a4a00; }
+main { display:flex; gap:12px; padding:12px 16px; align-items:flex-start; flex-wrap:wrap; }
+.col { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; }
+#listCol { flex:0 0 295px; max-width:295px; }
+#detailCol { flex:1 1 420px; min-width:320px; }
+#cartCol { flex:0 0 330px; max-width:330px; }
+h2 { font-size:14px; margin:0 0 8px; }
+input, select, button { font:inherit; }
+input[type=text], input[type=number], input[type=password], select { border:1px solid var(--line); border-radius:7px; padding:6px 9px; background:#fff; color:var(--ink); }
+input:focus, select:focus { outline:2px solid #9fc9d0; }
+#search { width:100%; margin-bottom:7px; }
+.filters { display:flex; gap:8px; align-items:center; margin-bottom:8px; font-size:12.5px; color:var(--mut); }
+.filters select { flex:1; min-width:0; padding:4px 6px; font-size:12.5px; }
+#count { font-size:12px; color:var(--mut); margin-bottom:6px; }
+#list { max-height:64vh; overflow:auto; border-top:1px solid var(--line); }
+.mrow { padding:7px 8px; border-bottom:1px solid #eef1f4; cursor:pointer; display:flex; gap:8px; align-items:center; }
+.mrow:hover { background:#f2f8f9; }
+.mrow.sel { background:#e2f1f3; }
+.mrow .nm { flex:1; }
+.tag { font-size:10.5px; border-radius:9px; padding:1px 7px; background:#eceff3; color:var(--mut); white-space:nowrap; }
+.tag.hid { background:#fbe4e2; color:var(--red); }
+button.act { background:var(--teal); color:#fff; border:none; border-radius:7px; padding:7px 14px; cursor:pointer; }
+button.act:hover { background:var(--teal-dk); }
+button.act:disabled { background:#9fb2b6; cursor:default; }
+button.lite { background:#fff; border:1px solid var(--line); border-radius:7px; padding:5px 11px; cursor:pointer; color:var(--ink); }
+button.danger { background:var(--red); color:#fff; border:none; border-radius:7px; padding:6px 12px; cursor:pointer; }
+.sec { border:1px solid var(--line); border-radius:8px; padding:10px; margin-top:10px; }
+.sec h3 { margin:0 0 7px; font-size:13px; }
+.frow { display:flex; align-items:center; gap:8px; padding:3px 0; }
+.frow label { flex:0 0 150px; color:var(--mut); font-size:12.5px; }
+.frow .cur { flex:0 0 90px; text-align:right; font-variant-numeric:tabular-nums; }
+.frow input { width:100px; }
+.wtable { display:grid; grid-template-columns:70px 90px 100px; gap:3px 10px; align-items:center; max-height:330px; overflow:auto; padding-right:4px; }
+.wtable .hd { font-size:11.5px; color:var(--mut); position:sticky; top:0; background:var(--card); padding-bottom:2px; }
+.wtable .cur { text-align:right; font-variant-numeric:tabular-nums; }
+.wtable input { width:95px; padding:3px 7px; }
+.pct { display:flex; gap:7px; align-items:center; margin:6px 0 8px; font-size:12.5px; color:var(--mut); }
+.pct input { width:75px; }
+.note { background:var(--amber-bg); border:1px solid #ead9a8; border-radius:7px; padding:8px 10px; font-size:12.5px; color:var(--amber); margin-top:8px; }
+.hint { font-size:12.5px; color:var(--mut); }
+.crow { border-bottom:1px solid #eef1f4; padding:6px 2px; display:flex; gap:7px; align-items:flex-start; font-size:12.8px; }
+.crow .tx { flex:1; }
+.crow .rm { background:none; border:none; color:var(--red); font-size:15px; cursor:pointer; line-height:1; padding:2px 4px; }
+.prow { border-bottom:1px solid #eef1f4; padding:6px 2px; font-size:12.6px; }
+.prow .meta { color:var(--mut); font-size:11.5px; }
+.prow select { padding:2px 5px; font-size:12px; margin-top:3px; }
+.stale { color:var(--amber); font-size:11.5px; }
+#msg { position:fixed; left:16px; right:16px; bottom:12px; z-index:50; display:flex; flex-direction:column; gap:6px; pointer-events:none; }
+.toast { border-radius:8px; padding:9px 14px; font-size:13px; box-shadow:0 4px 14px rgba(0,0,0,.18); background:#20323d; color:#fff; max-width:640px; }
+.toast.ok { background:var(--green); }
+.toast.err { background:var(--red); }
+.big { font-size:15px; font-weight:600; }
+.okline { color:var(--green); font-size:12.5px; }
+#staffName { width:100%; margin:4px 0 8px; }
+.help { font-size:12.5px; color:var(--mut); background:#eef4f5; border-radius:8px; padding:8px 10px; margin-bottom:8px; }
+hr.thin { border:0; border-top:1px solid var(--line); margin:12px 0 10px; }
+/* STAFF BLANK STOCK VIEW (2026-11-15, Johan 13:31) - START: the read-only Blank stock table */
+.bswrap { overflow:auto; max-height:60vh; border:1px solid var(--line); border-radius:7px; margin:6px 0 8px; }
+table.bst { border-collapse:separate; border-spacing:0; font-size:12.5px; }
+table.bst th, table.bst td { padding:3px 6px; border-bottom:1px solid #eef1f4; text-align:center; white-space:nowrap; }
+table.bst thead th { position:sticky; top:0; background:var(--card); z-index:2; font-weight:600; color:var(--mut); }
+table.bst .bsst { position:sticky; left:0; background:var(--card); z-index:1; text-align:left; min-width:130px; }
+table.bst thead .bsst { z-index:3; }
+table.bst th.out { color:#9aa1aa; font-weight:400; }
+table.bst td { font-variant-numeric:tabular-nums; }
+table.bst td.zero { color:var(--red); }
+.bstag { font-size:11px; font-weight:400; color:var(--green); }
+.bstag.none { color:var(--red); }
+/* STAFF BLANK STOCK VIEW (2026-11-15, Johan 13:31) - END */
+</style>
+</head>
+<body>
+<header>
+  <h1>TEST COPY — JBJ Inlay Price Manager — Staff</h1>
+  <span class="badge" id="verBadge">Loading…</span>
+  <span class="badge warn" id="pendBadge" hidden></span>
+</header>
+
+<main>
+  <section class="col" id="listCol">
+    <input type="text" id="search" placeholder="Search materials — try koa, dino, agate…" oninput="renderList()">
+    <button class="lite" style="width:100%; margin-bottom:7px" onclick="showAddForm()">+ Add a new material</button>
+    <button class="lite" style="width:100%; margin-bottom:7px" onclick="showAddMetalForm()">+ Add a new metal</button>
+    <button class="lite" style="width:100%; margin-bottom:7px" onclick="showSpotFloorForm()">$ Fixed metal prices</button>
+    <button class="lite" style="width:100%; margin-bottom:7px" onclick="showUpsellForm()">✦ Customer offer message</button>
+    <!-- STAFF BLANK STOCK VIEW (2026-11-15, Johan 13:31): read-only precut blank stock (staff key sign-in) -->
+    <button class="lite" style="width:100%; margin-bottom:7px" onclick="showBlankStockForm()" id="bsTabBtn">▦ Blank stock (view)</button>
+    <div class="filters">
+      <select id="groupFilter" onchange="renderList()"><option value="">All groups</option></select>
+      <label><input type="checkbox" id="hiddenOnly" onchange="renderList()"> hidden</label>
+    </div>
+    <div id="count"></div>
+    <div id="list"></div>
+  </section>
+
+  <section class="col" id="detailCol">
+    <div class="help" id="helpBox">
+      <b>How it works:</b> scroll or search the list on the left, click a material, type new prices (only the lines you want to change) or use Hide / Restore, press <b>Stage these changes</b>. "+ Add a new material" creates one as a copy of an existing material. "+ Add a new metal" adds a metal to the Alternative or Precious tab (you type its prices; precious golds price themselves by the live formula). Metals also get <b>Hide as Base Metal</b> / <b>Hide as Inlay</b> buttons to hide them from just one place. "$ Fixed metal prices" sets a fixed market price per precious metal — ring pricing always uses the HIGHER of the live spot price and the fixed price, and also holds the precious-metal <b>Keys</b> multiplier (same as the CS calculator). "✦ Customer offer message" changes or turns off the gold offer banner customers see in the builder once their ring has an inlay. Repeat as needed, then <b>Submit for approval</b> on the right. Johan reviews and publishes — nothing goes live until he approves.
+    </div>
+    <div id="detail"><span class="hint">Select a material from the list.</span></div>
+  </section>
+
+  <aside class="col" id="cartCol">
+    <h2 id="cartTitle">Changes to submit (0)</h2>
+    <div id="cartList"><span class="hint">Nothing staged yet.</span></div>
+    <div id="staffSubmitBox">
+      <hr class="thin">
+      <label class="hint" for="staffName">Your name (required)</label>
+      <input type="text" id="staffName" maxlength="60" placeholder="e.g. Jackie">
+      <button class="act" style="width:100%" onclick="staffSubmit()">Submit for approval</button>
+    </div>
+    <hr class="thin">
+    <h2 id="pendTitle">Awaiting Johan's review (0)</h2>
+    <div id="pendList"><span class="hint">No pending requests.</span></div>
+  </aside>
+</main>
+
+<div id="msg"></div>
+
+<script>
+'use strict';
+var API = 'https://jbj-spot-prices.johan-475.workers.dev';
+var VIEW_URL = API + '/staff/pricing-view';
+var PENDING_URL = API + '/staff/pending';
+var CLEAR_URL = API + '/staff/pending/clear';
+var UPSELL_URL = API + '/staff/upsell-message';
+var PRICING_URL = API + '/pricing';
+
+var view = null;        // trimmed tables (staff + owner browsing)
+var fullData = null;    // owner only: complete pricing JSON
+var pending = [];       // server-side queue
+var cart = [];          // locally staged changes
+var selected = null;
+var ownerMode = false;
+var panelFields = [];   // editable descriptors for the open detail panel
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmt(n) { return '$' + (Math.round(n * 100) / 100).toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
+function round2(n) { return Math.round(n * 100) / 100; }
+function toast(text, cls) {
+  var box = document.getElementById('msg');
+  var el = document.createElement('div');
+  el.className = 'toast ' + (cls || '');
+  el.textContent = text;
+  box.appendChild(el);
+  setTimeout(function () { el.remove(); }, cls === 'err' ? 8000 : 4500);
+}
+function suggestedVersion(v) {
+  var parts = String(v || '0.0').split('.');
+  var last = Number(parts[parts.length - 1]);
+  if (isFinite(last)) { parts[parts.length - 1] = String(last + 1); return parts.join('.'); }
+  return String(v) + '.1';
+}
+
+// ---------- boot ----------
+boot();
+async function boot() {
+  try { var saved = localStorage.getItem('jbj_staff_name'); if (saved) document.getElementById('staffName').value = saved; } catch (e) {}
+  await loadView();
+  await loadPending();
+}
+
+async function loadView() {
+  try {
+    var r = await fetch(VIEW_URL, { cache: 'no-store' });
+    if (r.status === 404) throw new Error('the pricing server does not have the staff routes yet. Johan must run: npx wrangler deploy --config wrangler.spot.jsonc — then press F5 here.');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    view = await r.json();
+    document.getElementById('verBadge').textContent = 'Live pricing v' + view._version;
+    fillGroupFilter();
+    renderList();
+  } catch (e) {
+    document.getElementById('verBadge').textContent = 'Load failed';
+    toast('Could not load pricing: ' + e.message + ' — check your internet connection and try again (F5).', 'err');
+  }
+}
+
+async function loadPending() {
+  try {
+    var r = await fetch(PENDING_URL, { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    pending = (await r.json()).pending || [];
+  } catch (e) { pending = []; }
+  renderPending();
+}
+
+function fillGroupFilter() {
+  var groups = {};
+  Object.keys(view.materials).forEach(function (n) { groups[view.materials[n].g] = 1; });
+  var sel = document.getElementById('groupFilter');
+  sel.innerHTML = '<option value="">All groups</option>' + Object.keys(groups).sort().map(function (g) {
+    return '<option value="' + esc(g) + '">' + esc(g) + '</option>';
+  }).join('');
+}
+
+// ---------- material list ----------
+var listNames = [];
+function renderList() {
+  if (!view) return;
+  var q = document.getElementById('search').value.trim().toLowerCase();
+  var g = document.getElementById('groupFilter').value;
+  var hidOnly = document.getElementById('hiddenOnly').checked;
+  var hidden = view.disabled_materials || [];
+  listNames = Object.keys(view.materials).sort().filter(function (n) {
+    if (q && n.toLowerCase().indexOf(q) === -1) return false;
+    if (g && view.materials[n].g !== g) return false;
+    if (hidOnly && hidden.indexOf(n) === -1) return false;
+    return true;
+  });
+  document.getElementById('count').textContent = listNames.length + ' of ' + Object.keys(view.materials).length + ' materials';
+  var html = '';
+  for (var i = 0; i < listNames.length; i++) {
+    var n = listNames[i];
+    var isHid = hidden.indexOf(n) !== -1;
+    html += '<div class="mrow' + (n === selected ? ' sel' : '') + '" data-i="' + i + '">' +
+      '<span class="nm">' + esc(n) + '</span>' +
+      (isHid ? '<span class="tag hid">Hidden</span>' : '') +
+      '<span class="tag">' + esc(view.materials[n].g) + '</span></div>';
+  }
+  document.getElementById('list').innerHTML = html || '<div class="hint" style="padding:8px">No matches.</div>';
+}
+document.getElementById('list').addEventListener('click', function (event) {
+  var row = event.target.closest('.mrow');
+  if (!row) return;
+  selected = listNames[Number(row.dataset.i)];
+  renderList();
+  renderDetail();
+});
+
+// ---------- detail panel ----------
+var MOKUME_GROUP = 'Mokume Composite';
+var FORMULA_GROUPS = { 'Metals': 1, 'Metals Precious': 1 };
+
+function widthTableHtml(title, table, op, material, extra) {
+  var startIndex = panelFields.length;
+  var rows = '';
+  for (var i = 0; i < table.length; i++) {
+    var point = table[i];
+    panelFields.push({ op: op, material: material, width: point[0], current: point[1] });
+    rows += '<div>' + point[0] + ' mm</div><div class="cur">' + fmt(point[1]) + '</div>' +
+      '<div><input type="number" step="any" min="0" data-f="' + (panelFields.length - 1) + '" placeholder="new $"></div>';
+  }
+  return '<div class="sec"><h3>' + esc(title) + '</h3>' + (extra || '') +
+    '<div class="pct">Adjust whole table: <input type="number" step="any" id="pct_' + startIndex + '" placeholder="%"> ' +
+    '<button class="lite" onclick="applyPct(' + startIndex + ',' + table.length + ')">Fill new prices</button>' +
+    '<button class="lite" onclick="clearPct(' + startIndex + ',' + table.length + ')">Clear</button></div>' +
+    '<div class="wtable"><div class="hd">Width</div><div class="hd cur">Current</div><div class="hd">New</div>' + rows + '</div></div>';
+}
+
+function applyPct(start, count) {
+  var pct = Number(document.getElementById('pct_' + start).value);
+  if (!isFinite(pct) || pct === 0) { toast('Enter a % first, e.g. 5 or -10.', 'err'); return; }
+  for (var i = start; i < start + count; i++) {
+    var input = document.querySelector('input[data-f="' + i + '"]');
+    if (input) input.value = round2(panelFields[i].current * (1 + pct / 100));
+  }
+}
+function clearPct(start, count) {
+  for (var i = start; i < start + count; i++) {
+    var input = document.querySelector('input[data-f="' + i + '"]');
+    if (input) input.value = '';
+  }
+}
+
+function renderDetail() {
+  var box = document.getElementById('detail');
+  if (!selected || !view) { box.innerHTML = '<span class="hint">Select a material from the list.</span>'; return; }
+  panelFields = [];
+  var name = selected;
+  var info = view.materials[name];
+  var hidden = (view.disabled_materials || []).indexOf(name) !== -1;
+  var html = '<div class="big">' + esc(name) + '</div>' +
+    '<div class="hint" style="margin:2px 0 8px">' + esc(info.g) + (info.s ? ' · ' + esc(info.s) : '') +
+    (hidden ? ' · <b style="color:var(--red)">Hidden from customers</b>' : ' · visible to customers') + '</div>' +
+    (hidden
+      ? '<button class="act" onclick="stageHideRestore(\'restore\')">Restore (show to customers again)</button>'
+      : '<button class="danger" onclick="stageHideRestore(\'hide\')">Hide from customers</button>') +
+    '<span class="hint" style="margin-left:8px">Hiding is safe and reversible — this is how inlays are deleted.</span>';
+
+  if (FORMULA_GROUPS[info.g]) {
+    var baseHidden = (view.disabled_base_metals || []).indexOf(name) !== -1;
+    var inlayHidden = (view.disabled_metal_inlays || []).indexOf(name) !== -1;
+    html += '<div class="sec"><h3>Metal visibility (scoped)</h3>' +
+      '<div class="hint" style="margin:0 0 6px">Metals only: hide it as a Base Metal choice but keep it as an inlay, or the other way round. "Hide from customers" above hides it everywhere.</div>' +
+      (baseHidden
+        ? '<button class="act" onclick="stageHideRestore(\'restore_base\')">Restore as Base Metal</button>'
+        : '<button class="danger" onclick="stageHideRestore(\'hide_base\')">Hide as Base Metal</button>') + ' ' +
+      (inlayHidden
+        ? '<button class="act" onclick="stageHideRestore(\'restore_inlay\')">Restore as Inlay</button>'
+        : '<button class="danger" onclick="stageHideRestore(\'hide_inlay\')">Hide as Inlay</button>') +
+      '<div class="hint" style="margin-top:4px">' +
+      (baseHidden ? 'Now hidden from the Base Metal step. ' : 'Now offered as a Base Metal. ') +
+      (inlayHidden ? 'Now hidden from the Add Inlay list (its own ring edges still work).' : 'Now offered as an inlay.') +
+      '</div></div>';
+  }
+
+  var priced = false;
+
+  var base = view.base_prices[name];
+  if (base) {
+    var fields = Object.keys(base).filter(function (k) { return typeof base[k] === 'number'; }).sort();
+    if (fields.length) {
+      priced = true;
+      html += '<div class="sec"><h3>Prices</h3>';
+      fields.forEach(function (field) {
+        panelFields.push({ op: 'set_base', material: name, field: field, current: base[field] });
+        html += '<div class="frow"><label>' + esc(field.replace(/_/g, ' ')) + '</label>' +
+          '<span class="cur">' + fmt(base[field]) + '</span>' +
+          '<input type="number" step="any" min="0" data-f="' + (panelFields.length - 1) + '" placeholder="new $"></div>';
+      });
+      html += '</div>';
+    }
+    if (Array.isArray(base.inlay_by_width) && base.inlay_by_width.length) {
+      priced = true;
+      html += widthTableHtml('Inlay price by width', base.inlay_by_width, 'set_base_width', name);
+    }
+  }
+
+  var wt = view.width_prices[name];
+  if (Array.isArray(wt) && wt.length) {
+    priced = true;
+    html += widthTableHtml('Price by width', wt, 'set_width', name);
+  }
+
+  var met = view.meteorite_prices.filter(function (r) { return r && r.m === name; });
+  if (met.length) {
+    priced = true;
+    var startIndex = panelFields.length;
+    var rows = '';
+    met.forEach(function (r) {
+      panelFields.push({ op: 'set_meteorite', material: name, width: r.w, current: r.mm });
+      rows += '<div>' + r.w + ' mm</div><div class="cur">' + fmt(r.mm) + '</div>' +
+        '<div><input type="number" step="any" min="0" data-f="' + (panelFields.length - 1) + '" placeholder="new $"></div>';
+    });
+    html += '<div class="sec"><h3>Meteorite price grid</h3>' +
+      '<div class="pct">Adjust whole table: <input type="number" step="any" id="pct_' + startIndex + '" placeholder="%"> ' +
+      '<button class="lite" onclick="applyPct(' + startIndex + ',' + met.length + ')">Fill new prices</button>' +
+      '<button class="lite" onclick="clearPct(' + startIndex + ',' + met.length + ')">Clear</button></div>' +
+      '<div class="wtable"><div class="hd">Width</div><div class="hd cur">Current</div><div class="hd">New</div>' + rows + '</div></div>';
+  }
+
+  if (info.g === MOKUME_GROUP && Array.isArray(view.mokume_prices) && view.mokume_prices.length) {
+    priced = true;
+    var shared = Object.keys(view.materials).filter(function (n) { return view.materials[n].g === MOKUME_GROUP; });
+    html += widthTableHtml('Mokume table — SHARED', view.mokume_prices, 'set_mokume', name,
+      '<div class="note">One table is shared by all ' + shared.length + ' Mokume materials — changing it changes every one of them.</div>');
+  }
+
+  if (!priced) {
+    html += FORMULA_GROUPS[info.g]
+      ? '<div class="note">This metal is priced live by the metal formula (spot price × weight). There are no fixed prices to edit here.</div>'
+      : '<div class="note">No editable price rows were found for this material.</div>';
+  }
+
+  if (panelFields.length) {
+    html += '<div style="margin-top:12px"><button class="act" onclick="stagePanel()">Stage these changes</button> ' +
+      '<span class="hint">Only boxes you filled in are staged.</span></div>';
+  }
+  box.innerHTML = html;
+}
+
+function showAddForm() {
+  if (!view) return;
+  selected = null;
+  renderList();
+  var templates = Object.keys(view.materials).sort().filter(function (n) {
+    var g = view.materials[n].g;
+    return g !== 'Metals' && g !== 'Metals Precious';
+  });
+  document.getElementById('detail').innerHTML =
+    '<div class="big">Add a new material</div>' +
+    '<div class="hint" style="margin:4px 0 10px">The new material starts as an exact copy of an existing one — same group, rules, and prices. After it is published you can find it in the list and change its prices like any other. It will show without a photo until Johan adds a swatch.</div>' +
+    '<div class="frow"><label>New material name</label><input type="text" id="addName" maxlength="60" style="width:240px" placeholder="e.g. Pine (Blue)"></div>' +
+    '<div class="frow"><label>Copy everything from</label><select id="addTemplate" style="max-width:240px">' +
+    templates.map(function (n) { return '<option>' + esc(n) + '</option>'; }).join('') + '</select></div>' +
+    '<div class="hint" style="margin:4px 0 10px">Tip: pick the material it is most like — a new wood from a wood, a new crushed stone from a crushed stone. (To add a metal, use "+ Add a new metal" instead.)</div>' +
+    '<button class="act" onclick="stageAdd()">Stage the new material</button>';
+}
+
+function stageAdd() {
+  var name = document.getElementById('addName').value.trim();
+  var template = document.getElementById('addTemplate').value;
+  if (name.length < 2) { toast('Type the new material name first.', 'err'); return; }
+  if (!/^[A-Za-z0-9][A-Za-z0-9 '()/.&-]{1,59}$/.test(name)) { toast('Name can use letters, numbers, spaces and basic punctuation only.', 'err'); return; }
+  var lower = name.toLowerCase();
+  var exists = Object.keys(view.materials).some(function (n) { return n.toLowerCase() === lower; });
+  if (exists) { toast('"' + name + '" already exists.', 'err'); return; }
+  cartAdd({ op: 'add_material', material: name, template: template });
+  toast('New material "' + name + '" staged (copy of ' + template + ') — submit on the right.', 'ok');
+}
+
+function stageHideRestore(op) {
+  cartAdd({ op: op, material: selected });
+  toast(describeChange({ op: op, material: selected }) + ' — staged, submit it on the right.', 'ok');
+}
+
+// ---------- fixed metal prices / spot floors (2026-08-28) ----------
+// Ring pricing uses max(live spot, fixed price) per metal — a fixed price
+// below the live spot never lowers anything.
+function showSpotFloorForm() {
+  if (!view) return;
+  selected = null;
+  renderList();
+  var floors = view.spot_floors || {};
+  var live = view.live_spot || null;
+  var html = '<div class="big">Fixed metal prices</div>' +
+    '<div class="hint" style="margin:4px 0 10px">Sets a fixed market price ($ per troy oz) for Platinum, Gold or Silver, individually. Ring pricing always uses the <b>higher</b> of the live market spot price and the fixed price — a fixed price below live spot changes nothing. Clear a fixed price to go back to live spot only.</div>';
+  ['Gold', 'Platinum', 'Silver'].forEach(function (metal) {
+    var cur = (typeof floors[metal] === 'number') ? floors[metal] : null;
+    var liveTxt = (live && typeof live[metal] === 'number') ? fmt(live[metal]) + '/toz' : 'unavailable';
+    html += '<div class="frow"><label>' + metal + '</label>' +
+      '<span class="hint">live spot ' + liveTxt + ' · fixed ' + (cur != null ? fmt(cur) + '/toz' : 'none') + '</span>' +
+      '<input type="number" step="any" min="0" id="sf_' + metal + '" placeholder="new fixed $/toz" style="width:140px">' +
+      '<button class="lite" onclick="stageSpotFloor(\'' + metal + '\')">Stage</button>' +
+      (cur != null ? '<button class="lite" onclick="stageClearSpotFloor(\'' + metal + '\')">Clear</button>' : '') +
+      '</div>';
+  });
+  if (live && live.updated) html += '<div class="hint" style="margin-top:6px">Live spot last refreshed: ' + esc(String(live.updated).slice(0, 16).replace('T', ' ')) + ' UTC (updates daily)</div>';
+  // PRECIOUS KEYS (2026-11-06): the workbook "Keys (Production)" multiplier used on every precious metal cost
+  var keys = (typeof view.precious_keys === 'number') ? view.precious_keys : null;
+  html += '<hr class="thin"><div class="big" style="font-size:15px">Keys (precious metal multiplier)</div>' +
+    '<div class="hint" style="margin:4px 0 8px">Same as the "Keys (Production)" cell in the CS ring calculator: metal cost (incl. 10% markup) × Keys, plus the casting cost. Applies to gold, platinum and silver base rings and sleeves. Use the SAME value in the CS calculator so both systems match.</div>' +
+    '<div class="frow"><label>Keys</label>' +
+    '<span class="hint">current ' + (keys != null ? esc(String(keys)) : 'not set (KV 25.25 upload needed)') + '</span>' +
+    '<input type="number" step="0.1" min="0.5" max="10" id="pk_keys" placeholder="new keys e.g. 2.2" style="width:140px"' + (keys == null ? ' disabled' : '') + '>' +
+    '<button class="lite" onclick="stagePreciousKeys()"' + (keys == null ? ' disabled' : '') + '>Stage</button></div>';
+  document.getElementById('detail').innerHTML = html;
+}
+
+function stagePreciousKeys() {
+  var input = document.getElementById('pk_keys');
+  var value = parseFloat(input.value);
+  if (!isFinite(value) || value < 0.5 || value > 10) { toast('Type the keys value first (0.5 to 10, e.g. 2.2).', 'err'); return; }
+  var before = (typeof view.precious_keys === 'number') ? view.precious_keys : null;
+  if (before == null) { toast('The live pricing has no keys value yet — upload KV 25.25 first.', 'err'); return; }
+  if (round2(value) === before) { toast('Keys is already ' + before + '.', 'err'); return; }
+  cartAdd({ op: 'set_precious_keys', material: 'Precious metal keys', value: round2(value), before: before });
+  input.value = '';
+  toast('Keys ' + before + ' → ' + round2(value) + ' staged — ' + (ownerMode ? 'publish on the right.' : 'submit it on the right.'), 'ok');
+}
+
+function stageSpotFloor(metal) {
+  var input = document.getElementById('sf_' + metal);
+  var value = parseFloat(input.value);
+  if (!isFinite(value) || value <= 0) { toast('Type the fixed price for ' + metal + ' first ($ per troy oz).', 'err'); return; }
+  var floors = view.spot_floors || {};
+  var before = (typeof floors[metal] === 'number') ? floors[metal] : null;
+  cartAdd({ op: 'set_spot_floor', material: metal, value: round2(value), before: before });
+  input.value = '';
+  toast(metal + ' fixed price staged — ' + (ownerMode ? 'publish on the right.' : 'submit it on the right.'), 'ok');
+}
+
+function stageClearSpotFloor(metal) {
+  var floors = view.spot_floors || {};
+  var before = (typeof floors[metal] === 'number') ? floors[metal] : null;
+  if (before == null) { toast(metal + ' has no fixed price to clear.', 'err'); return; }
+  cartAdd({ op: 'clear_spot_floor', material: metal, before: before });
+  toast(metal + ' back-to-live-spot staged — ' + (ownerMode ? 'publish on the right.' : 'submit it on the right.'), 'ok');
+}
+
+// ---------- customer offer message (2026-09-15) ----------
+// The gold banner + exit overlay in the builder (KV `upsell_message`). Shows only
+// when the customer's ring has at least one inlay. Blank = off. Goes through the
+// same approval queue as prices; the owner publish writes it to KV.
+function upsellState() {
+  var cur = (view && typeof view.upsell_message === 'string') ? view.upsell_message.trim() : '';
+  var prev = (view && typeof view.upsell_message_prev === 'string') ? view.upsell_message_prev.trim() : '';
+  return { current: cur, prev: prev, enabled: !!cur };
+}
+function showUpsellForm() {
+  if (!view) return;
+  selected = null;
+  renderList();
+  var st = upsellState();
+  var html = '<div class="big">Customer offer message</div>' +
+    '<div class="hint" style="margin:4px 0 10px">This is the gold banner (and the exit pop-up) customers see in the ring builder as soon as their design has an inlay. Type the new text and press <b>Stage new message</b>, or press <b>Turn off</b> to hide the banner. Nothing changes until Johan approves and publishes.</div>' +
+    '<div class="frow"><label>Status</label><span id="upsellStatus" style="font-weight:600; color:' + (st.enabled ? '#1c7c3c' : '#a33') + '">' + (st.enabled ? 'ON — customers see it' : 'OFF — no banner shown') + '</span></div>' +
+    '<div class="frow" style="align-items:flex-start"><label>Current text</label><span id="upsellCurrent" class="hint" style="flex:1">' + (st.enabled ? esc(st.current) : '(none)' + (st.prev ? ' — last message was: “' + esc(st.prev) + '”' : '')) + '</span></div>' +
+    '<div class="frow" style="align-items:flex-start"><label for="upsellText">New text</label>' +
+      '<textarea id="upsellText" rows="3" maxlength="300" style="flex:1; min-width:260px; font:inherit; padding:6px" placeholder="e.g. Purchase this ring within the next 3 days and get 20% OFF">' + esc(st.enabled ? st.current : st.prev) + '</textarea></div>' +
+    '<div class="frow"><label></label>' +
+      '<button class="act" onclick="stageUpsellMessage()">Stage new message</button>' +
+      (st.enabled ? '<button class="lite" onclick="stageUpsellOff()">Turn off</button>' : '') +
+      '<span class="hint">max 300 characters · shows only when the ring has an inlay</span></div>';
+  document.getElementById('detail').innerHTML = html;
+}
+function stageUpsellMessage() {
+  var box = document.getElementById('upsellText');
+  var text = (box ? box.value : '').replace(/\s+/g, ' ').trim();
+  var st = upsellState();
+  if (!text) { toast('Type the message first — or use Turn off to hide the banner.', 'err'); return; }
+  if (text.length > 300) { toast('Keep the message under 300 characters.', 'err'); return; }
+  if (text === st.current) { toast('That is already the live message.', 'err'); return; }
+  cartAdd({ op: 'set_upsell_message', material: 'Customer offer message', value: text, before: st.current });
+  toast('New customer message staged — ' + (ownerMode ? 'publish on the right.' : 'submit it on the right.'), 'ok');
+}
+function stageUpsellOff() {
+  var st = upsellState();
+  if (!st.enabled) { toast('The customer message is already off.', 'err'); return; }
+  cartAdd({ op: 'set_upsell_message', material: 'Customer offer message', value: '', before: st.current });
+  toast('Turning the customer message OFF is staged — ' + (ownerMode ? 'publish on the right.' : 'submit it on the right.'), 'ok');
+}
+function isUpsellOp(entry) { return entry && entry.op === 'set_upsell_message'; }
+
+// ===== STAFF BLANK STOCK VIEW (2026-11-15, Johan 13:31) - START =====
+// "Blank stock" for staff, READ ONLY: the precut blank stock (Tungsten, Black Ceramic) as one table per metal - one row per
+// blank style, one column per ring size, the number in stock. No edit, no save, no price. Staff sign in with the staff key (the
+// same key as ?staff in the ring builder); the quote worker answers POST /staff/precut-stock only with that session.
+// Changes to the stock: Johan in Owner mode (inlay-manager.html) until go-live.
+var QUOTE_API = 'https://jbj-ring-quote-test.johan-475.workers.dev';   // STAFF BLANK STOCK VIEW (2026-11-15): the quote worker (test copy: the test worker)
+var bsToken = '';      // staff session (memory only, gone on reload). The key box is a text box shown as dots: the staff page carries no password box (tests: no owner key here).
+var bsStock = null;    // last answer
+
+function bsStyleName(b) { return b.plain ? 'Plain band ' + b.style : 'Style ' + b.style; }
+function bsBlankText(b) { return (b.width ? b.width + 'mm ' : '') + (b.profile || '') + (b.corner ? ', ' + b.corner + ' corners' : '') + (b.label ? ' · ' + b.label : ''); }
+
+function showBlankStockForm() {
+  selected = null;
+  if (view) renderList();
+  var head = '<div id="bsPanel"><div class="big">Blank stock</div>' +
+    '<div class="hint" style="margin:4px 0 10px">Read only. Tungsten and Black Ceramic blanks in stock, per style and ring size. ' +
+    'A dash = that size is not on the stock list (counts as none). A style with no size above 0 is <b>not offered</b> to customers; ' +
+    'a style that is <b>not counted</b> (the plain bands) is always offered. To change the stock, ask Johan.</div>';
+  if (!bsToken) {
+    document.getElementById('detail').innerHTML = head +
+      '<div class="frow"><label for="bsKey">Staff key</label><input type="text" id="bsKey" autocomplete="off" spellcheck="false" style="width:220px; -webkit-text-security:disc" placeholder="same key as ?staff in the builder">' +
+      '<button class="act" onclick="bsSignIn()" id="bsSignInBtn">Show the stock</button></div><div id="bsMsg" class="hint"></div></div>';
+    return;
+  }
+  document.getElementById('detail').innerHTML = head + '<div id="bsMsg" class="hint">Loading…</div><div id="bsBody"></div></div>';
+  bsLoad();
+}
+
+async function bsSignIn() {
+  var keyBox = document.getElementById('bsKey'), msg = document.getElementById('bsMsg');
+  var key = keyBox ? keyBox.value.trim() : '';
+  if (!key) { toast('Enter the staff key first.', 'err'); return; }
+  try {
+    var r = await fetch(QUOTE_API + '/staff/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: key }) });
+    var j = await r.json();
+    if (!r.ok || !j.token) throw new Error(r.status === 401 ? 'wrong staff key' : (j.error || 'HTTP ' + r.status));
+    bsToken = j.token;
+    showBlankStockForm();
+  } catch (e) {
+    if (msg) msg.innerHTML = '<span style="color:var(--red)">Sign-in failed: ' + esc(e.message) + '</span>';
+  }
+}
+
+async function bsLoad() {
+  var msg = document.getElementById('bsMsg');
+  try {
+    var r = await fetch(QUOTE_API + '/staff/precut-stock', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + bsToken }, body: '{}', cache: 'no-store' });
+    if (r.status === 401) { bsToken = ''; showBlankStockForm(); var m2 = document.getElementById('bsMsg'); if (m2) m2.textContent = 'Your staff sign-in has ended - enter the staff key again.'; return; }
+    var j = await r.json();
+    if (!r.ok) throw new Error(j.error || 'HTTP ' + r.status);
+    bsStock = j;
+    bsRender();
+  } catch (e) {
+    if (msg) msg.innerHTML = '<span style="color:var(--red)">Could not load the stock: ' + esc(e.message) + '</span>';
+  }
+}
+
+function bsRender() {
+  var msg = document.getElementById('bsMsg'), body = document.getElementById('bsBody');
+  if (!msg || !body) return;
+  var s = bsStock && bsStock.stock;
+  if (!s) { msg.textContent = 'This pricing (v' + (bsStock && bsStock.version) + ') has no blank stock yet - it comes with the new ring builder.'; body.innerHTML = ''; return; }
+  msg.innerHTML = 'Pricing v' + esc(String(bsStock.version)) + ' · counted <b>' + esc(s.counted || '?') + '</b>' + (s.source ? ' · ' + esc(s.source) : '') +
+    ' <button class="lite" onclick="bsLoad()" style="margin-left:8px">Refresh</button>';
+  var range = s.ring_size;
+  var html = '';
+  (s.metals || []).forEach(function (metal) {
+    var counted = metal.blanks.filter(function (b) { return b.counted; });
+    var notCounted = metal.blanks.filter(function (b) { return !b.counted; });
+    var sizes = {};
+    counted.forEach(function (b) { Object.keys(b.sizes).forEach(function (z) { sizes[z] = 1; }); });
+    var cols = Object.keys(sizes).sort(function (a, b) { return Number(a) - Number(b); });
+    html += '<div class="sec"><h3>' + esc(metal.name) + '</h3>';
+    if (counted.length) {
+      html += '<div class="bswrap"><table class="bst" data-bsmetal="' + esc(metal.name) + '"><thead><tr><th class="bsst">Style \\ ring size</th>';
+      cols.forEach(function (z) {
+        var out = range && (Number(z) < range.min || Number(z) > range.max);
+        html += '<th' + (out ? ' class="out" title="Outside the precut sizes - never offered"' : '') + '>' + esc(z) + '</th>';
+      });
+      html += '</tr></thead><tbody>';
+      counted.forEach(function (b) {
+        html += '<tr><th class="bsst">' + esc(bsStyleName(b)) + '<div class="hint">' + esc(bsBlankText(b)) + '</div><div class="bstag' + (b.offered ? '' : ' none') + '">' +
+          (b.offered ? 'offered' : 'not offered — none in stock') + '</div></th>';
+        cols.forEach(function (z) {
+          var v = b.sizes[z];
+          html += '<td' + (v === 0 ? ' class="zero"' : '') + '>' + (v === undefined ? '–' : esc(String(v))) + '</td>';
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+    } else {
+      html += '<div class="hint">No ' + esc(metal.name) + ' style is counted — every ' + esc(metal.name) + ' blank is offered.</div>';
+    }
+    if (notCounted.length) html += '<div class="hint">Not counted (always offered): ' + esc(notCounted.map(bsStyleName).join(', ')) + '</div>';
+    html += '</div>';
+  });
+  body.innerHTML = html;
+}
+// ===== STAFF BLANK STOCK VIEW (2026-11-15, Johan 13:31) - END =====
+
+// ---------- add a new metal (2026-08-27) ----------
+function showAddMetalForm() {
+  if (!view) return;
+  selected = null;
+  renderList();
+  renderAddMetalForm('Metals');
+}
+
+function metalTemplatesFor(group) {
+  var precious = view.precious_materials || [];
+  return Object.keys(view.materials).sort().filter(function (n) {
+    if (view.materials[n].g !== group) return false;
+    if (group === 'Metals' && precious.indexOf(n) !== -1) return false; // Platinum sits in Metals but is formula-priced
+    if (group === 'Metals' && !view.base_prices[n]) return false;
+    return true;
+  });
+}
+
+function renderAddMetalForm(group) {
+  var isPreciousTab = group === 'Metals Precious';
+  var templates = metalTemplatesFor(group);
+  var pp = view.precious_pricing || { name_tokens: [], gold_karats: [] };
+  var html = '<div class="big">Add a new metal</div>' +
+    '<div class="hint" style="margin:4px 0 10px">The tab also decides HOW it is priced: Alternative Metals use the prices you type below; Precious Metals are priced live by the spot formula (no prices to type). The new metal appears in the Base Metal tab AND as an inlay option. It shows without a photo until Johan adds a swatch.</div>' +
+    '<div class="frow"><label>Tab / pricing type</label><select id="amGroup" onchange="renderAddMetalForm(this.value)">' +
+    '<option value="Metals"' + (isPreciousTab ? '' : ' selected') + '>Alternative Metals — I will type the prices</option>' +
+    '<option value="Metals Precious"' + (isPreciousTab ? ' selected' : '') + '>Precious Metals — priced by the live formula</option>' +
+    '</select></div>' +
+    '<div class="frow"><label>New metal name</label><input type="text" id="amName" maxlength="60" style="width:240px" placeholder="' + (isPreciousTab ? 'e.g. Rose 10K' : 'e.g. Cobalt Chrome') + '"></div>' +
+    '<div class="frow"><label>Copy rules/profiles/finishes from</label><select id="amTemplate" style="max-width:240px" onchange="renderAddMetalPrices()">' +
+    templates.map(function (n) { return '<option>' + esc(n) + '</option>'; }).join('') + '</select></div>';
+  if (isPreciousTab) {
+    html += '<div class="note">The name must contain ' + esc((pp.gold_karats || []).join(', ')) + ' (a gold karat, its own word) or ' + esc((pp.name_tokens || []).join(', ')) + ' — that is how the live formula knows what to charge. Example: "Rose 10K". A brand-new precious metal (e.g. Palladium) needs Johan and Claude first — the spot feed does not carry it.</div>';
+  } else {
+    html += '<div class="hint" style="margin:4px 0 6px">Only the SHAPE is copied (rules, profiles, finishes, minimum widths). Every price below must be typed — no prices are copied.</div><div id="amPrices"></div>';
+  }
+  html += '<div style="margin-top:12px"><button class="act" onclick="stageAddMetal()">Stage the new metal</button></div>';
+  document.getElementById('detail').innerHTML = html;
+  if (!isPreciousTab) renderAddMetalPrices();
+}
+
+function renderAddMetalPrices() {
+  var box = document.getElementById('amPrices');
+  if (!box) return;
+  var template = document.getElementById('amTemplate').value;
+  var base = (template && view.base_prices[template]) || {};
+  var fields = Object.keys(base).filter(function (k) { return typeof base[k] === 'number'; }).sort();
+  var html = '<div class="sec"><h3>Prices — all required (current ' + esc(template) + ' value shown for reference)</h3>';
+  fields.forEach(function (field) {
+    html += '<div class="frow"><label>' + esc(field.replace(/_/g, ' ')) + '</label>' +
+      '<span class="cur">' + fmt(base[field]) + '</span>' +
+      '<input type="number" step="any" min="0" data-amf="' + esc(field) + '" placeholder="new $"></div>';
+  });
+  html += '</div>';
+  if (Array.isArray(base.inlay_by_width) && base.inlay_by_width.length) {
+    html += '<div class="sec"><h3>Inlay price by width — all required</h3>' +
+      '<div class="wtable"><div class="hd">Width</div><div class="hd cur">' + esc(template) + '</div><div class="hd">New</div>';
+    base.inlay_by_width.forEach(function (point) {
+      html += '<div>' + point[0] + ' mm</div><div class="cur">' + fmt(point[1]) + '</div>' +
+        '<div><input type="number" step="any" min="0" data-amw="' + point[0] + '" placeholder="new $"></div>';
+    });
+    html += '</div></div>';
+  }
+  box.innerHTML = html;
+}
+
+function stageAddMetal() {
+  var group = document.getElementById('amGroup').value;
+  var name = document.getElementById('amName').value.trim();
+  var template = document.getElementById('amTemplate').value;
+  if (name.length < 2) { toast('Type the new metal name first.', 'err'); return; }
+  if (!/^[A-Za-z0-9][A-Za-z0-9 '()/.&-]{1,59}$/.test(name)) { toast('Name can use letters, numbers, spaces and basic punctuation only.', 'err'); return; }
+  var lower = name.toLowerCase();
+  if (Object.keys(view.materials).some(function (n) { return n.toLowerCase() === lower; })) { toast('"' + name + '" already exists.', 'err'); return; }
+  if (!template) { toast('No template metal is available for that tab.', 'err'); return; }
+  var entry = { op: 'add_metal', material: name, template: template, group: group };
+  if (group === 'Metals Precious') {
+    var pp = view.precious_pricing || { name_tokens: [], gold_karats: [] };
+    var priceable = (pp.name_tokens || []).some(function (t) { return t && name.indexOf(t) !== -1; }) ||
+      (pp.gold_karats || []).some(function (k) { return new RegExp('(^|\\s)' + k + '(\\s|$)').test(name); });
+    if (!priceable) { toast('A precious metal name must contain ' + (pp.gold_karats || []).join(', ') + ' (or ' + (pp.name_tokens || []).join(', ') + ') — e.g. "Rose 10K".', 'err'); return; }
+  } else {
+    var base = view.base_prices[template] || {};
+    var prices = {}, missing = 0, bad = 0;
+    Object.keys(base).filter(function (k) { return typeof base[k] === 'number'; }).forEach(function (field) {
+      var input = document.querySelector('input[data-amf="' + field + '"]');
+      if (!input || input.value === '') { missing++; return; }
+      var value = Number(input.value);
+      if (!isFinite(value) || value <= 0 || value > 50000) { bad++; return; }
+      prices[field] = round2(value);
+    });
+    var table = null;
+    if (Array.isArray(base.inlay_by_width) && base.inlay_by_width.length) {
+      table = [];
+      base.inlay_by_width.forEach(function (point) {
+        var input = document.querySelector('input[data-amw="' + point[0] + '"]');
+        if (!input || input.value === '') { missing++; return; }
+        var value = Number(input.value);
+        if (!isFinite(value) || value <= 0 || value > 50000) { bad++; return; }
+        table.push([point[0], round2(value)]);
+      });
+    }
+    if (missing || bad) { toast('Every price box must be filled with a price above $0' + (missing ? ' — ' + missing + ' empty' : '') + (bad ? ', ' + bad + ' invalid' : '') + '.', 'err'); return; }
+    entry.prices = prices;
+    if (table) entry.inlay_by_width = table;
+  }
+  cartAdd(entry);
+  toast('New metal "' + name + '" staged for the ' + (group === 'Metals Precious' ? 'Precious' : 'Alternative') + ' Metals tab — submit on the right.', 'ok');
+}
+
+function stagePanel() {
+  var staged = 0, bad = 0;
+  document.querySelectorAll('#detail input[data-f]').forEach(function (input) {
+    if (input.value === '') return;
+    var descriptor = panelFields[Number(input.dataset.f)];
+    var value = Number(input.value);
+    if (!isFinite(value) || value <= 0 || value > 50000) { bad++; return; }
+    if (round2(value) === round2(descriptor.current)) { input.value = ''; return; }
+    var entry = { op: descriptor.op, material: descriptor.material, value: round2(value), before: descriptor.current };
+    if (descriptor.field !== undefined) entry.field = descriptor.field;
+    if (descriptor.width !== undefined) entry.width = descriptor.width;
+    cartAdd(entry);
+    input.value = '';
+    staged++;
+  });
+  if (bad) toast(bad + ' value(s) were invalid (must be a price above $0) and were skipped.', 'err');
+  if (staged) toast(staged + ' change(s) staged — submit on the right when done.', 'ok');
+  else if (!bad) toast('Nothing to stage — type a new price in at least one box first.', 'err');
+}
+
+function cartKey(entry) { return [entry.op, entry.material, entry.field || '', entry.width != null ? entry.width : ''].join('|'); }
+function cartAdd(entry) {
+  var key = cartKey(entry);
+  cart = cart.filter(function (existing) { return cartKey(existing) !== key; });
+  cart.push(entry);
+  renderCart();
+}
+
+function describeChange(entry) {
+  if (entry.op === 'add_material') return 'Add new material "' + entry.material + '" (copy of "' + entry.template + '")';
+  if (entry.op === 'add_metal') return 'Add new metal "' + entry.material + '" to ' + (entry.group === 'Metals Precious' ? 'Precious Metals (formula-priced)' : 'Alternative Metals') + ' — shape of "' + entry.template + '"' + (entry.prices ? ', prices typed' : '');
+  if (entry.op === 'hide_base') return 'Hide "' + entry.material + '" as a Base Metal (still an inlay)';
+  if (entry.op === 'restore_base') return 'Restore "' + entry.material + '" as a Base Metal';
+  if (entry.op === 'hide_inlay') return 'Hide "' + entry.material + '" as an Inlay (still a base metal)';
+  if (entry.op === 'restore_inlay') return 'Restore "' + entry.material + '" as an Inlay';
+  if (entry.op === 'hide') return 'Hide "' + entry.material + '" from customers';
+  if (entry.op === 'restore') return 'Restore "' + entry.material + '"';
+  if (entry.op === 'set_upsell_message') return entry.value ? 'Customer offer message → “' + entry.value + '”' + (entry.before ? ' (was: “' + entry.before + '”)' : ' (was OFF)') : 'Customer offer message → OFF (was: “' + (entry.before || '') + '”)';
+  if (entry.op === 'set_spot_floor') return 'Fixed market price — ' + entry.material + ': ' + (entry.before != null ? fmt(entry.before) : 'none') + ' → ' + fmt(entry.value) + '/toz (used only when above live spot)';
+  if (entry.op === 'clear_spot_floor') return 'Clear fixed market price — ' + entry.material + ' (back to live spot only)';
+  if (entry.op === 'set_precious_keys') return 'Precious metal keys: ' + entry.before + ' → ' + entry.value + ' (× metal cost on gold / platinum / silver rings)';
+  var target = entry.material;
+  if (entry.op === 'set_base') target += ' — ' + entry.field.replace(/_/g, ' ');
+  else if (entry.op === 'set_mokume') target = 'Mokume shared table — ' + entry.width + ' mm';
+  else target += ' — ' + entry.width + ' mm';
+  var before = entry.before != null ? fmt(entry.before) : '?';
+  return target + ': ' + before + ' → ' + fmt(entry.value);
+}
+
+function renderCart() {
+  document.getElementById('cartTitle').textContent = (ownerMode ? 'My direct changes (' : 'Changes to submit (') + cart.length + ')';
+  var box = document.getElementById('cartList');
+  if (!cart.length) { box.innerHTML = '<span class="hint">Nothing staged yet.</span>'; return; }
+  box.innerHTML = cart.map(function (entry, index) {
+    return '<div class="crow"><span class="tx">' + esc(describeChange(entry)) + '</span>' +
+      '<button class="rm" title="Remove" onclick="cartRemove(' + index + ')">×</button></div>';
+  }).join('');
+}
+function cartRemove(index) { cart.splice(index, 1); renderCart(); }
+
+// ---------- staff submit ----------
+async function staffSubmit() {
+  toast('TEST COPY: "Submit for approval" is switched off here - nothing is sent to the live staff queue.', 'err'); return;   // TEST COPY (make-test-staff-page.mjs)
+  var name = document.getElementById('staffName').value.trim();
+  if (!name) { toast('Enter your name first.', 'err'); return; }
+  if (!cart.length) { toast('Stage at least one change first.', 'err'); return; }
+  try { localStorage.setItem('jbj_staff_name', name); } catch (e) {}
+  var changes = cart.map(function (entry) {
+    var out = { op: entry.op, material: entry.material };
+    if (entry.field !== undefined) out.field = entry.field;
+    if (entry.width !== undefined) out.width = entry.width;
+    if (entry.value !== undefined) out.value = entry.value;
+    if (entry.template !== undefined) out.template = entry.template;
+    if (entry.group !== undefined) out.group = entry.group;
+    if (entry.prices !== undefined) out.prices = entry.prices;
+    if (entry.inlay_by_width !== undefined) out.inlay_by_width = entry.inlay_by_width;
+    return out;
+  });
+  try {
+    var r = await fetch(PENDING_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ staffName: name, changes: changes }) });
+    var result = await r.json();
+    if (!r.ok) throw new Error(result.error + (result.validationErrors ? ' — ' + result.validationErrors.join('; ') : ''));
+    cart = [];
+    renderCart();
+    await loadPending();
+    toast('Submitted ' + result.submitted + ' change(s) for approval. Let Johan know — nothing goes live until he publishes.', 'ok');
+  } catch (e) {
+    toast('Submit failed: ' + e.message, 'err');
+  }
+}
+
+// ---------- pending queue ----------
+function pendingStale(entry) {
+  if (!view || entry.before == null) return null;
+  if (entry.op === 'set_upsell_message') { var um = upsellState().current; return um !== String(entry.before) ? (um || '(off)') : null; }
+  var current = null;
+  if (entry.op === 'set_base') { var row = view.base_prices[entry.material]; current = row ? row[entry.field] : null; }
+  else if (entry.op === 'set_width') { current = pointValue(view.width_prices[entry.material], entry.width); }
+  else if (entry.op === 'set_base_width') { var r2 = view.base_prices[entry.material]; current = r2 ? pointValue(r2.inlay_by_width, entry.width) : null; }
+  else if (entry.op === 'set_meteorite') { var met = view.meteorite_prices.find(function (r) { return r && r.m === entry.material && r.w === entry.width; }); current = met ? met.mm : null; }
+  else if (entry.op === 'set_mokume') { current = pointValue(view.mokume_prices, entry.width); }
+  else if (entry.op === 'set_spot_floor' || entry.op === 'clear_spot_floor') { var fl = view.spot_floors || {}; current = (typeof fl[entry.material] === 'number') ? fl[entry.material] : null; }
+  else if (entry.op === 'set_precious_keys') { current = (typeof view.precious_keys === 'number') ? view.precious_keys : null; }
+  if (current != null && round2(current) !== round2(entry.before)) return current;
+  return null;
+}
+function pointValue(table, width) {
+  if (!Array.isArray(table)) return null;
+  for (var i = 0; i < table.length; i++) if (Math.abs(table[i][0] - width) < 1e-9) return table[i][1];
+  return null;
+}
+
+function renderPending() {
+  document.getElementById('pendTitle').textContent = "Awaiting Johan's review (" + pending.length + ')';
+  var badge = document.getElementById('pendBadge');
+  badge.hidden = !pending.length;
+  badge.textContent = pending.length + ' pending approval';
+  var box = document.getElementById('pendList');
+  if (!pending.length) { box.innerHTML = '<span class="hint">No pending requests.</span>'; return; }
+  box.innerHTML = pending.map(function (entry, index) {
+    var stale = pendingStale(entry);
+    return '<div class="prow"><div>' + esc(describeChange(entry)) + '</div>' +
+      (stale != null ? '<div class="stale">Note: current live value is ' + fmt(stale) + '</div>' : '') +
+      '<div class="meta">' + esc(entry.staffName || '?') + ' · ' + esc(String(entry.ts || '').slice(0, 16).replace('T', ' ')) + '</div>' +
+      (ownerMode ? '<select data-p="' + index + '"><option value="approve">Approve — publish</option><option value="reject">Reject — discard</option><option value="leave">Leave in queue</option></select>' : '') +
+      '</div>';
+  }).join('');
+}
+
+// Owner mode (key entry, approve, publish) lives ONLY in Johan's LOCAL
+// inlay-manager.html. This hosted staff copy has no key field and cannot publish.
+</script>
+</body>
+</html>
