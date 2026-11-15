@@ -7752,7 +7752,11 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     if(!cfg()){ NB.unknown=false; NB.group=null; NB.groupNeeded=false; return; }
     var size=standInSize(); if(size!=null&&s.ringSize!==size) s.ringSize=size;
   }
+  // STAFF CARD PRICES WITH UNKNOWN SIZE (2026-11-14, Johan 18:50): the engine keeps staff card prices per design, and "Unknown" / the group
+  // are not part of that design - so they are dropped whenever Unknown or the group changes, and the cards ask the server again.
+  function forgetCardPrices(){ try{ if(typeof staffPriceCache!=='undefined'&&staffPriceCache&&typeof staffPriceCache.clear==='function') staffPriceCache.clear(); }catch(e){} }
   function refreshEstimate(){
+    forgetCardPrices();   // STAFF CARD PRICES WITH UNKNOWN SIZE (2026-11-14)
     NB.pending=true;
     try{ if(typeof clearEstimate==='function') clearEstimate(); }catch(e){}
     try{ if(typeof updatePrice==='function') updatePrice(); }catch(e){}
@@ -7776,6 +7780,19 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     window.fetch=function(input,init){
       var sv=services(), url=(typeof input==='string')?input:((input&&input.url)||'');
       var isEstimate=!!(sv&&url&&url===sv.estimate_url), isQuote=!!(sv&&url&&url===sv.quote_url);
+      /* STAFF CARD PRICES WITH UNKNOWN SIZE (2026-11-14, Johan 18:50): the staff card prices are told "size unknown" (+ the group) too;
+         the server decides what it prices. */
+      var isCards=!!(sv&&url&&url===sv.staff_components_url);
+      if(isCards&&init&&typeof init.body==='string'){
+        try{
+          sync();
+          if(NB.unknown&&cfg()){
+            var cb=JSON.parse(init.body);
+            if(cb&&cb.design&&typeof cb.design==='object'){ cb.design.ringSizeUnknown=true; if(NB.group!=null) cb.design.ringSizeGroup=NB.group; init=Object.assign({},init,{ body:JSON.stringify(cb) }); }
+          }
+        }catch(e){}
+        return nativeFetch.call(this,input,init);
+      }
       if((isEstimate||isQuote)&&init&&typeof init.body==='string'){
         try{
           sync();
@@ -7865,6 +7882,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     var t=ev.target&&ev.target.closest?ev.target.closest('.size-btn'):null;
     if(t&&NB.unknown&&t.closest('#acc-body-size')){
       NB.unknown=false; NB.group=null; NB.groupNeeded=false; NB.nudge=false; NB.range=null; NB.totalNeedsGroup=false;   // totalNeedsGroup: 2026-11-14
+      forgetCardPrices();   // STAFF CARD PRICES WITH UNKNOWN SIZE (2026-11-14)
       try{ if(typeof clearEstimate==='function') clearEstimate(); }catch(e){}
       schedule();
       return;
