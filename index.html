@@ -1321,31 +1321,14 @@ body.staff-mode #v2-price.nb-total-empty{display:none !important}
   /* staff with no amount yet: no line (part 369g marks it), the tools keep their usual room at the end */
   body.nb-pc.staff-mode:has(#v2-price.nb-total-empty) .acc-stack{padding-bottom:44px !important}
 }
-/* ===== NEW BUILDER (2026-11-11, Johan 22:26): ONE "ESTIMATED TOTAL" ON THE LAST SCREEN · STAFF PRICE FITS ITS CARD =====
-   1. "The Summary page shows Estimated Total twice, remove the bottom fixed one."
-      While the last screen is open and shows its own Estimated Total, the total line / box at the bottom is not
-      shown (router part 369i marks it). On every other screen it is where it was. Visibility only.
-   2. "fix the staff price being cut off at the right edge."
-      The staff price on a base metal card stood beside the name and stuck out of the card. It now stands under
-      the name, inside the card. Staff only (the element exists for signed-in staff only). Position only.
-   Only while the new builder is on (nb-easy comes with the step names, on PC and on phones). */
+/* ===== NEW BUILDER (2026-11-11, Johan 22:26): ONE "ESTIMATED TOTAL" ON THE LAST SCREEN · STAFF PRI… - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
 body.nb-easy #v2-price.nb-total-twice{display:none !important}
 @media(min-width:768px){ body.nb-pc:has(#v2-price.nb-total-twice) .acc-stack{padding-bottom:44px !important} }
 body.nb-easy.staff-mode .mat-card:has(> .staff-price){display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:10px;row-gap:1px}
 body.nb-easy.staff-mode .mat-card:has(> .staff-price) > .swatch{grid-row:1 / span 2}
 body.nb-easy.staff-mode .mat-card:has(> .staff-price) > .name{grid-column:2;align-self:end;min-width:0}
 body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;justify-self:start;margin-left:0;padding-left:0;font-size:12px;line-height:1.25;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-/* ===== NEW BUILDER (2026-11-12, Johan 19:36 - to-do section 3): PHONES - THE "ESTIMATED TOTAL" NO LONGER HIDES A CONTROL =====
-   Measured 2026-11-12 on 320 / 360 / 390 / 430 px wide phones (signed-in staff, a size chosen): the engine's fixed
-   box (168 x 56 px, bottom right, above the bar) lay over size buttons, width buttons, Zoom buttons and the strip
-   rows' Remove / width box / + while they scrolled past - and because the box lets taps through, a hidden control
-   could still be pressed. Same fault as on PC (part 109f), same answer:
-   under 768 px, while the new builder is on (nb-easy), the total is a slim line across the screen that sits
-   directly on top of the Back / Next bar and reads as part of it. Label left, amount right.
-   Position and shape only: the amount, who sees it and when are the engine's and the server's, unchanged.
-   Hidden with no amount (staff, part 369g) and on the last screen (part 369i) as before - those rules are untouched.
-   It assumes the phone bar is 65 px high (part 106: 48 px buttons + 8 + 8 + 1 px line) - change the two together.
-   Without step names (live order) and from 768 px: nothing here applies. */
+/* ===== NEW BUILDER (2026-11-12, Johan 19:36 - to-do section 3): PHONES - THE "ESTIMATED TOTAL" NO … - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
 @media(max-width:767px){
   /* SAME COLOURS AS THE BAR (2026-11-12, Johan 20:35): the bar hangs on the page body (dark), the total sits inside the tool
      column (light) - the body's own colours are handed down under their own names so the line can wear them */
@@ -1361,15 +1344,7 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
   /* the bar's own shadow would fall on the line: the line carries it instead while it is shown */
   body.nb-easy:has(#v2-price:not(.nb-total-empty):not(.nb-total-twice)):not(.v2-hide-prices) #nbStepBar{box-shadow:none}
 }
-/* ===== NEW BUILDER (2026-11-12, Johan 21:01 - to-do section 3): PC - THE BAR'S STEP NAME IS NO LONGER CUT IN A NARROW COLUMN =====
-   Measured 2026-11-12: from 900 px window width the tools are a column beside the ring; at 900 px that column is
-   405 px wide and the bar's middle got 43 px - "Your band", "Make it yours" and "Get my quote" were cut
-   ("Get ..."), and the three progress marks (136 px) stuck out over Back and Next. Cut up to about 1010 px.
-   Cause: part 109c has smaller Back / Next / marks for a narrow column, but its general bar rules come after them
-   with the same weight and win, so the smaller sizes never applied.
-   Here, after part 109c: the same smaller sizes for a column of 540 px or less (the switch part 109c uses).
-   The bar keeps its height (parts 109f / 109g assume 73 px): only the side padding changes.
-   Size only. Under 768 px and without step names nothing here applies. */
+/* ===== NEW BUILDER (2026-11-12, Johan 21:01 - to-do section 3): PC - THE BAR'S STEP NAME IS NO LON… - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
 @media(min-width:768px){
   @container studio (max-width:540px){
     body.nb-pc #nbStepBar{padding:12px 16px;gap:8px}
@@ -1407,17 +1382,7 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
      above the bar (part 109f), and those 64 px lifted the bar off the window's bottom edge at the end of a screen */
   body.nb-pc.staff-mode{padding-bottom:0}
 }
-/* ===== NEW BUILDER (2026-11-12, Johan 22:59 - to-do section 3): PC - THE ADD / EDIT INLAY DIALOG USES THE WINDOW =====
-   Measured 2026-11-12 (1920 x 1080, 1366 x 768, 1024 x 768): the dialog was 580 px wide whatever the window; 3 materials
-   per row; the materials window was 200 px high (2 rows of 124 in view, set in the dialog's own code); 6 rows of group
-   chips; at 768 px high the dialog scrolled as well as the materials window and Add Strip was out of view.
-   Here, from 900 px wide while the new builder is on (body class "nb-pc"): the dialog is as wide as the window allows
-   (up to 1080 px) and as high as the window (up to 900 px); the materials window takes all the room that is left, so
-   more materials stand in a row and more rows are in view; the title, the chips, the search box, the strip width and
-   the buttons stay where they are and only the materials scroll. In a very low window the dialog scrolls as before.
-   The Edit Strip dialog is the same box with the same parts and gets the same room.
-   Size and position only - the dialog's code (engine part 190, locked) is not touched; "!important" only where that
-   code sets a size on the element itself. Under 900 px (768 - 899 px and phones) and without step names nothing here applies. */
+/* ===== NEW BUILDER (2026-11-12, Johan 22:59 - to-do section 3): PC - THE ADD / EDIT INLAY DIALOG U… - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
 @media(min-width:900px){
   body.nb-pc #addStripModal .v2-modal-frame:has(> #addStripModalInner.v2-add-strip-mode),
   body.nb-pc #addStripModal .v2-modal-frame:has(> #addStripModalInner.v2-edit-strip-mode){max-width:min(1080px,calc(100vw - 72px))}
@@ -1565,7 +1530,8 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
 /* ===== NEW DESIGN + METAL CHANGE (2026-11-14) - END ===== */
 /* PRECUT CHOICE 2026-11-14 (Johan 23:12): blank cards on Tungsten / Black Ceramic */
 .nb-lay-bar i.nb-ch{background:repeating-linear-gradient(45deg,#c3c8d2 0 3px,#eef0f4 3px 6px)}
-body.nb-pre #acc-body-compose .width-control,body.nb-pre .composer-actions .btn-gold,body.nb-pre .composer-actions .btn-outline:not(.btn-undo),body.nb-pre .remaining-width,body.nb-pre .s-remove,body.nb-pre .nb-row-remove,body.nb-pre .nb-w-hint,body.nb-pre .v2-row-group,body.nb-pre .v2-grip,body.nb-pre #acc-body-compose .panel-desc,body.nb-pre #addStripModalInner div:has(>.width-picker){display:none!important}
+/* PRECUT CHANNELS 2026-11-15: an inlay row of a channel keeps « » − + / Remove; the hint and the dialog's width box come back (was: all hidden - build doc) */
+body.nb-pre #acc-body-compose .width-control,body.nb-pre .composer-actions .btn-gold,body.nb-pre .composer-actions .btn-outline:not(.btn-undo),body.nb-pre .remaining-width,body.nb-pre .strip-block:not(.nb-pc-ed) .s-remove,body.nb-pre .v2-strip-row:not(.nb-pc-ed) .nb-row-remove,body.nb-pre:not(.nb-pch) .nb-w-hint,body.nb-pre .v2-strip-row:not(.nb-pc-ed) .v2-row-group,body.nb-pre .v2-grip,body.nb-pre #acc-body-compose .panel-desc,body.nb-pre:not(.nb-pch) #addStripModalInner div:has(>.width-picker){display:none!important}
 </style>
 </head>
 <body>
@@ -7474,16 +7440,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   window.__V2_FUNNEL__={ snapshot:snap, flush:function(){ clearTimeout(timer); send(false); },
     forgetTool:function(id){ delete seenTools[id]; } };   // NEW BUILDER TRACKER FIELDS (2026-11-14, Johan 13:48): + forgetTool
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): RING PICTURE THAT ALWAYS FITS + FORM FIELD HELP =====
-   The engine is not changed. This block replaces ONE engine helper from outside (_getCanvasImage) and adds helpers.
-   1. Ring picture: the engine sent the preview canvas at the phone's full pixel size; on a x3 phone a wide textured
-      ring went over the server's limit (KV builder_config.limits.ring_image_max_characters) and the quote was
-      refused ("Invalid ring image"). Now the picture is at most 900px wide and is scaled down further, step by
-      step, until it is under the server's limit. If nothing fits, no picture is sent (the quote still goes).
-   2. Safety net: if the server still answers "Invalid ring image", the same quote is sent once more without the picture.
-   3. Staff only: the server's reason for a failed quote is shown under the button.
-   4. Email / name fields get the keyboard and autofill hints phones use.
-   No price, formula or rule is touched. */
+/* ===== NEW BUILDER (2026-11-11, Johan): RING PICTURE THAT ALWAYS FITS + FORM FIELD HELP - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
 (function(){
   var MAX_PICTURE_WIDTH=900, SHRINK_STEP=0.8, MAX_TRIES=7;
   function pictureLimit(){
@@ -7755,19 +7712,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
   window.__V2_QUOTESTEP__={ apply:apply };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): UNKNOWN RING SIZE + PRICE RANGE =====
-   1. Size screen: one more choice, "Unknown - Send Ring Sizer First" (label from the pricing settings).
-   2. Last step: the price range - the two numbers the SERVER sends with each estimate, nothing else.
-   3. Unknown size on a gold / platinum ring: the server asks for the "closest size group"; one tap, then the
-      range is for that group. Submit waits for that tap.
-   The page holds no price, no percentage and no size-group border. It only tells the server "size unknown" (+ the
-   group tapped) and shows what comes back. The engine is untouched: with Unknown the engine keeps a stand-in size
-   (the default size) so the drawing and its own checks keep working; the server decides which size it prices.
-   Feature off (settings missing in the pricing data): no Unknown button, no range - the page is as before.
-   PRICE RANGE RULES (2026-11-13, Johan 19:56 / 20:30 / 20:41): the server now sends a customer range with a chosen size too (SHOW_PRICES "range"),
-   or "From $X" (priceRange.from) - the page shows the text, it computes nothing. Every ring asks for the size group when
-   the server says so (groupNeeded). Staff answers carry priceRangeBasis: staff see "Customer sees: ..." + that small
-   print under their Estimated Total instead of the range box (the group buttons stay in the box). */
+/* ===== NEW BUILDER (2026-11-11, Johan): UNKNOWN RING SIZE + PRICE RANGE - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
 (function(){
   var NB={ unknown:false, group:null, groupNeeded:false, range:null, rangeSeen:false, pending:false, seq:0, nudge:false, basis:null, totalNeedsGroup:false };   // basis: PRICE RANGE RULES (2026-11-13, Johan 19:56 / 20:30 / 20:41) · totalNeedsGroup: NO TOTAL BEFORE THE SIZE GROUP (2026-11-14)
   function builder(){ try{ return (typeof BUILDER!=='undefined'&&BUILDER)?BUILDER:null; }catch(e){ return null; } }
@@ -8512,13 +8457,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
   window.__V2_TOUCH__={ run:run };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): PAGE WEIGHT - LATE PICTURES =====
-   The two big picture maps (material thumbnails, profile cross-sections) are no longer inside the page. The page
-   carries the pictures of the first screen only (parts 230a / 280a); this part fetches the rest right after the
-   first screen is up - profiles first, then materials - and puts the pictures into what is already on screen,
-   without redrawing a panel (nothing the customer typed or opened is touched).
-   If a file cannot be fetched (one retry), the page works as before with colour dots instead of thumbnails.
-   Pictures only: nothing here knows about prices, rules or the quote. */
+/* ===== NEW BUILDER (2026-11-11, Johan): PAGE WEIGHT - LATE PICTURES - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
 (function(){
   if(typeof NB_LATE_PICTURES==='undefined'||!NB_LATE_PICTURES||!NB_LATE_PICTURES.length) return;
   var maps={}; try{ maps.MATERIAL_IMAGES=MATERIAL_IMAGES; }catch(e){} try{ maps.PROFILE_IMAGES=PROFILE_IMAGES; }catch(e){}
@@ -8569,16 +8508,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='complete') start(); else { window.addEventListener('load',start); setTimeout(start,2500); }
   window.__V2_PICTURES__={ done:done, failed:failed, list:NB_LATE_PICTURES, refresh:function(){ try{ showProfilePicture(); showMaterialPictures(); }catch(e){} } };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): PC LAYOUT - "completely build and finish the PC version" =====
-   From 768 px wide, and only when the pricing settings carry the step names (builder_config.steps[].group):
-     1. the seven small tabs give way to a step header: 1 Your band - 2 Make it yours - 3 Get my quote, with the
-        tools of the current step as tabs underneath;
-     2. the Back / step / Next bar of the phone sits at the bottom of the right column (the Back / Continue buttons
-        inside the panels are hidden; the bar presses them, so every rule and message still decides);
-     3. the last screen becomes the short receipt, strip rows get their Remove button, no text under 12 px
-        (the phone parts 367 and 369b ask this part whether the PC layout is on).
-   Everything here presses the page's own tabs and buttons. Nothing knows about prices or rules.
-   Without step names in the settings (today's live pricing) this part does nothing and the PC page is as before. */
+/* ===== NEW BUILDER (2026-11-11, Johan): PC LAYOUT - "completely build and finish the PC version" - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
 (function(){
   var MQ=window.matchMedia?window.matchMedia('(min-width:768px)'):null;
   function wide(){ return !!(MQ&&MQ.matches); }
@@ -8660,15 +8590,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   window.__V2_PC__={ on:isOn, refresh:update };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): "BEFORE YOU GO..." PROMPT - A SWITCH =====
-   Johan 16:11: "Selecting the 'Back' button must not offer a 'Before you go...' popup, allow them to go back.
-   Disable the popup for now, CS might want it back later."
-   The page's own prompt (name + email, "Before you go...") opens in three places while no request was sent and no
-   email is filled in: Back on the last screen, leaving the last screen through a step, and the mouse leaving the
-   page at the top. With the pricing setting  builder_config.leave_prompt.ask_for_email = false  the prompt is
-   skipped and the customer simply goes where they clicked. Setting missing or true = the prompt as before, so
-   customer service can switch it back on in the uploader without a code change.
-   Only the prompt is skipped: nothing about the request, its fields or its checks changes. */
+/* ===== NEW BUILDER (2026-11-11, Johan): "BEFORE YOU GO..." PROMPT - A SWITCH - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
 (function(){
   function off(){ try{ var c=(typeof BUILDER!=='undefined'&&BUILDER)?BUILDER.leave_prompt:null; return !!c&&c.ask_for_email===false; }catch(e){ return false; } }
   if(typeof showExitEmailModal!=='function') return;
@@ -8679,20 +8601,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   };
   window.__V2_LEAVEPROMPT__={ off:off };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): STRIP WIDTHS WITHOUT KNOWING THE ORDER =====
-   Johan 16:17 / 16:20: "I want the Meteorite to be 4mm with 1mm Titanium edges. Make it intuitively obvious for the
-   customer how to make the edits." Before, the edges had to be made narrower first; the "+" on the inlay was greyed
-   out and nothing on the screen said why.
-   On the Inlays screen, while the new builder is on (step names in the pricing settings):
-     1. every strip row has a number box: type a width, press Enter or click elsewhere;
-     2. "+" on a strip keeps working when the band is full: an inlay takes the width from the base-metal edges
-        (both equally when they are equal); an edge takes it from the other edge, so the inlay keeps the width
-        the customer gave it (Johan 16:25: 1 / 3.5 / 1.5 must be possible) - and from the widest inlay only when
-        the other edge is at its minimum;
-     3. one plain line under the rows says so.
-   Narrower ("-" or a smaller typed width) frees width exactly as before.
-   Nothing is forced: the material minimum and maximum, the edge minimum and the page's own strip check
-   (validateProposedStrips) decide; when there is no room the customer is told why. No prices here. */
+/* ===== NEW BUILDER (2026-11-11, Johan): STRIP WIDTHS WITHOUT KNOWING THE ORDER - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
 (function(){
   function B(){ try{ return (typeof BUILDER!=='undefined')?BUILDER:null; }catch(e){ return null; } }
   function S(){ try{ return (typeof state!=='undefined')?state:null; }catch(e){ return null; } }
@@ -8845,15 +8754,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   window.__V2_TOTALBOX__={ update:update, amount:amount };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan 21:32): STAFF PRICES ON THE BASE METAL CARDS FOLLOW THE DESIGN =====
-   Signed-in staff see a price on every base metal card. The engine asks the server for those prices when it draws
-   the cards, and only for a design that has a ring size. In the new order Ring Size comes last, so the cards are
-   drawn with a dash - and the engine does not draw them again when the size (or the width) is chosen later; they
-   kept the dash until a card was clicked.
-   This part only notices that the cards on the Base Metal screen were drawn for another design than the one on
-   the page now, and asks the page to draw that screen again (the page's own function). The engine then asks the
-   server as it always does. No price, no formula, no request of its own.
-   Staff only (?staff), and only while the new builder is on (step names in the pricing settings). */
+/* ===== NEW BUILDER (2026-11-11, Johan 21:32): STAFF PRICES ON THE BASE METAL CARDS FOLLOW THE DESI… - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
 (function(){
   function builderOn(){ var c=document.body.classList; return c.contains('nb-pc')||c.contains('nb-easy'); }
   function staff(){ try{ return typeof _staffMode!=='undefined'&&!!_staffMode; }catch(e){ return false; } }
@@ -9266,6 +9167,132 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
 })();
 /* ===== NEW DESIGN BUTTON (2026-11-14) - END ===== */
+/* PRECUT CHANNELS 2026-11-15 (Johan 17:04 / 17:07) - START: each blank channel works like a small ring - notes: claude\build-2026-11-15-blank-stock-inlay-widths.md */
+(function(){
+  var E=function(){ return BUILDER.width_epsilon||0.01; }, Q='(choose)', L={}, last=-1, K=null;
+  function r2(x){ return Math.round(x*100)/100; }
+  function cp(a){ return a.map(function(x){ return { material:x.material, width:x.width }; }); }
+  function pre(){ try{ var l=BUILDER.precut_choice&&(BUILDER.rules.precut_blanks||{})[state.baseMetal]; return !!(l&&l.length); }catch(e){ return false; } }
+  // the channels of strips a laid on segments segs: [{s,e,w,sum}] or null; full = every channel filled edge to edge.
+  // A missing last metal part is allowed (g.imp): the page leaves the band's closing edge as free width.
+  function parse(a,segs,full){
+    var pos=0, g=[];
+    for(var i=0;i<segs.length;i++){ var sg=segs[i], w=Number(sg.w);
+      if(sg.t==='base'){ var x=a[pos]; if(!x&&i===segs.length-1&&i){ g.imp=w; continue; } if(!x||x.material!==state.baseMetal||Math.abs(x.width-w)>E()) return null; pos++; }
+      else { var s=pos, sum=0; while(pos<a.length&&a[pos].material!==state.baseMetal){ sum+=a[pos].width; pos++; } if(sum>w+E()||(full&&sum<w-E())) return null; g.push({ s:s, e:pos, w:w, sum:r2(sum) }); } }
+    return pos===a.length?g:null;
+  }
+  function find(a){
+    if(!pre()) return null;
+    var list=(BUILDER.rules.precut_blanks[state.baseMetal]||[]).filter(function(b){ return !b.plain&&Number(b.width)===Number(state.ringWidth)&&b.profile===state.profile&&b.segments.some(function(x){ return x.t!=='base'; }); });
+    list.sort(function(x,y){ return (y.style===state.precutStyle)-(x.style===state.precutStyle); });
+    for(var f=1;f>=0;f--) for(var i=0;i<list.length;i++){ var b=list[i], o=L[b.style]?[1,0]:[0,1];
+      for(var k=0;k<2;k++){ var segs=o[k]?b.segments.slice().reverse():b.segments, g=parse(a,segs,!!f); if(g){ if(f) L[b.style]=o[k]; return { b:b, segs:segs, g:g }; } } }
+    return null;
+  }
+  function key(){ return [state.baseMetal,state.ringWidth,state.profile,state.precutStyle].join('|'); }
+  // the last good layout of this blank is kept: a drag in the band picture changes state.strips before the check runs
+  function closed(a,c){ a=cp(a||[]); if(c&&c.g.imp) a.push({ material:state.baseMetal, width:c.g.imp }); return a; }
+  function cur(){ var c=find(state.strips); if(c&&(state.precutStyle==null||c.b.style===state.precutStyle)&&c.g.every(function(g){ return g.sum>=g.w-E(); })) K={ k:key(), c:c }; return c; }
+  function chan(c,i){ for(var k=0;k<c.g.length;k++) if(i>=c.g[k].s&&i<c.g[k].e) return c.g[k]; return null; }
+  // short channels get a "?" (into a "?" already there, else after strip "hint", else at the channel end)
+  function fill(a,c,hint){
+    var o=cp(a);
+    for(var k=c.g.length-1;k>=0;k--){ var g=c.g[k], gap=r2(g.w-g.sum); if(gap<=E()) continue;
+      var q=-1; for(var j=g.s;j<g.e;j++) if(o[j].material===Q){ q=j; break; }
+      if(q>=0) o[q].width=r2(o[q].width+gap); else o.splice(hint>=g.s&&hint<g.e?hint+1:g.e,0,{ material:Q, width:gap }); }
+    return o;
+  }
+  function stepOf(n){ var m=BUILDER.rules.width_increment_materials||{}, v=parseFloat(m[n]); return v>0?v:BUILDER.strip_width.step; }
+  function minOf(n){ var mi=(DATA.m[n]&&DATA.m[n].mi)||{}, m=parseFloat(isMetal(n)?metalStripMin(n):(mi.solid_inlay||mi.inlay_swarf||BUILDER.material_default_min_width)); return Math.max(isNaN(m)?0:m,BUILDER.strip_width.min); }
+  function maxOf(n){ var m=BUILDER.rules.max_width_materials||{}, v=parseFloat(m[n]); return v>0?v:Infinity; }
+  function plan(i,want){
+    var c=cur(); if(!c) return { error:'' }; var a=closed(state.strips,c), g=chan(c,i), n=a[i].material, st=stepOf(n), now=a[i].width;
+    want=r2(Math.round(want/st)*st); var mn=minOf(n), mx=Math.min(maxOf(n),g.w);
+    if(want<mn-E()) return { error:n+' must be at least '+mn+'mm wide.' };
+    if(want>mx+E()) return { error:mx<g.w?n+' can be '+mx+'mm wide at most.':'This channel is '+g.w+'mm wide - '+n+' can be '+g.w+'mm at most.' };
+    if(Math.abs(want-now)<E()) return { error:'' };
+    var ix=[]; for(var j=g.s;j<g.e;j++) if(j!==i) ix.push(j);
+    ix.sort(function(x,y){ return (a[y].material===Q)-(a[x].material===Q)||Math.abs(x-i)-Math.abs(y-i)||(y>i)-(x>i); });
+    if(want<now){ a[i].width=want; return { strips:fill(a,{ g:[{ s:g.s, e:g.e, w:g.w, sum:r2(g.sum-now+want) }] },i) }; }
+    var need=r2(want-now), room=0;
+    ix.forEach(function(j){ var x=a[j]; room+=x.material===Q?x.width:Math.max(0,Math.floor((x.width-minOf(x.material)+E())/stepOf(x.material))*stepOf(x.material)); });
+    if(room<need-E()) return { error:room>E()?'Widest possible here: '+r2(now+room)+'mm.':'No room left in this channel - the other inlays are at their narrowest.' };
+    a[i].width=want;
+    for(var t=0;t<ix.length&&need>E();t++){ var x=a[ix[t]];
+      if(x.material===Q){ var q=Math.min(need,x.width); x.width=r2(x.width-q); need=r2(need-q); }
+      else { var s2=stepOf(x.material), mn2=minOf(x.material); while(need>E()&&x.width-s2>=mn2-E()){ x.width=r2(x.width-s2); need=r2(need-s2); } } }
+    a=a.filter(function(x){ return x.width>E(); });
+    if(need<-E()){ var c2=find(a); return c2?{ strips:fill(a,c2,i) }:{ error:'' }; }
+    return { strips:a };
+  }
+  function say(m){ try{ if(m) showRuleToast(m); }catch(e){} }
+  function commit(a){
+    var why=validateProposedStrips(cp(a)); if(why){ say(why); return false; }
+    try{ pushUndo(); }catch(e){}
+    state.strips=a; state.selectedStrip=-1;
+    try{ clearEstimate(); }catch(e){}
+    try{ window.__V2_ROUTER__.rerenderSection('compose'); }catch(e){}
+    try{ renderRing(); updatePrice(); }catch(e){}
+    return true;
+  }
+  function setW(i,v){ var p=plan(i,v); if(p.error!==undefined){ say(p.error); return false; } return commit(p.strips); }
+  function move(i,d){ var c=cur(), g=c&&chan(c,i), j=i+d; if(!g||j<g.s||j>=g.e) return; var a=closed(state.strips,c), x=a[i]; a[i]=a[j]; a[j]=x; commit(a); }
+  function drop(i){ var a=closed(state.strips,cur()); a[i]={ material:Q, width:a[i].width }; commit(a); }
+  function rows(h){ return h.querySelectorAll('.v2-strip-rows > .v2-strip-row:not(.v2-row-ghost)'); }
+  function inlay(i){ var x=state.strips[i]; return !!(x&&x.material!==Q&&x.material!==state.baseMetal); }
+  function dress(){
+    var h=document.getElementById('acc-body-compose'); if(!h) return;
+    var c=cur(); document.body.classList.toggle('nb-pch',!!c); if(!c) return;
+    var r=rows(h), bl=h.querySelectorAll('.composer-strips > .strip-block');
+    for(var k=0;k<bl.length;k++) bl[k].classList.toggle('nb-pc-ed',inlay(k));
+    for(var i=0;i<r.length&&i<state.strips.length;i++){ var row=r[i], g=chan(c,i), x=state.strips[i], ed=inlay(i)&&!!g;
+      row.classList.toggle('nb-pc-ed',ed);
+      var mn=row.querySelector('.v2-row-min'); if(!ed&&mn&&!row.__nbpc){ row.__nbpc=1; mn.textContent=x.material===Q?x.width+'mm free':'part of the blank'; }
+      if(x.material===Q&&!mn&&!row.__nbpc){ row.__nbpc=1; var sp=document.createElement('span'); sp.className='v2-row-min'; sp.textContent=x.width+'mm free'; var nm=row.querySelector('.v2-row-name'); if(nm) nm.appendChild(sp); }
+      if(!ed) continue;
+      var b=row.querySelectorAll('.v2-row-btn'), st=stepOf(x.material);
+      for(var t=0;t<b.length;t++){ var s=b[t].textContent, off=s==='«'?i===g.s:s==='»'?i===g.e-1:s==='−'?plan(i,x.width-st).error!==undefined:s==='+'?plan(i,x.width+st).error!==undefined:false;
+        b[t].disabled=off; b[t].removeAttribute('data-nb-borrow');
+        b[t].title=s==='«'||s==='»'?(off?'Inlays stay inside their channel':'Move inside the channel'):(off?(plan(i,x.width+(s==='+'?st:-st)).error||''):(s==='+'?'Wider - from the ? first, then the next inlay':'Narrower - leaves a ? for another inlay')); }
+      var w=row.querySelector('.nb-w'); if(w){ w.min=String(minOf(x.material)); w.max=String(g.w); } }
+    var p=h.querySelector('.nb-w-hint'); if(p) p.textContent='The '+state.baseMetal+' parts come with the blank. Each inlay stays in its channel: type a width or press − / + (a wider inlay takes from the ? first, then from the next inlay), « » move it, Remove leaves a ?. Tap a ? to add an inlay.';
+  }
+  function idx(h,el){ var r=rows(h); for(var i=0;i<r.length;i++) if(r[i]===el) return i; return -1; }
+  function stop(e){ e.preventDefault(); e.stopImmediatePropagation(); }
+  function start(){
+    var h=document.getElementById('acc-body-compose'); if(!h||h.__nbpc) return; h.__nbpc=1;
+    var rc=renderComposePanel;
+    renderComposePanel=function(col){ try{ var c=find(state.strips); if(c&&c.g.some(function(g){ return g.sum<g.w-E(); })) state.strips=fill(closed(state.strips,c),c,last); }catch(e){} return rc.apply(this,arguments); };
+    var vp=validateProposedStrips;
+    validateProposedStrips=function(a){
+      var c=null; try{ c=a&&state.strips.length&&K&&K.k===key()?K.c:a&&cur(); }catch(e){}
+      if(!c) return vp.apply(this,arguments);
+      var g=parse(a,c.segs,false);
+      if(!g) return 'On a precut blank the '+state.baseMetal+' parts are fixed and each inlay stays inside its channel ('+c.g.map(function(x){ return x.w+'mm'; }).join(' / ')+').';
+      return vp.call(this,fill(closed(a,{ g:g }),{ g:g },last));
+    };
+    var oe=openEditStripModal; openEditStripModal=function(i){ last=i; return oe.apply(this,arguments); };
+    var mi=document.getElementById('addStripModalInner');
+    if(mi) new MutationObserver(function(){ if(!document.body.classList.contains('nb-pch')) return; mi.querySelectorAll('.mat-card .name').forEach(function(n){ if(n.textContent.trim().split(' (min ')[0]===state.baseMetal) n.closest('.mat-card').style.display='none'; }); }).observe(mi,{ childList:true, subtree:true });
+    h.addEventListener('click',function(e){
+      if(!document.body.classList.contains('nb-pch')||!e.target.closest) return;
+      var x=e.target.closest('.s-remove');
+      if(x){ var bl=[].slice.call(h.querySelectorAll('.composer-strips > .strip-block')), k=bl.indexOf(x.closest('.strip-block')); stop(e); if(inlay(k)) drop(k); return; }
+      var btn=e.target.closest('.v2-row-btn,.nb-row-remove'), row=btn&&btn.closest('.v2-strip-row.nb-pc-ed'); if(!row) return;
+      var i=idx(h,row), s=btn.textContent; stop(e); if(i<0) return; last=i;
+      if(btn.classList.contains('nb-row-remove')) drop(i); else if(s==='«'||s==='»') move(i,s==='«'?-1:1); else setW(i,state.strips[i].width+(s==='+'?1:-1)*stepOf(state.strips[i].material));
+    },true);
+    function box(e){ var w=e.target, row=w.classList&&w.classList.contains('nb-w')&&w.closest('.v2-strip-row.nb-pc-ed'); if(!row) return;
+      if(e.type==='keydown'&&e.key!=='Enter') return; stop(e); var i=idx(h,row), v=parseFloat(w.value); if(i<0) return; last=i;
+      if(isNaN(v)||Math.abs(v-state.strips[i].width)<E()||!setW(i,v)) w.value=String(state.strips[i]?state.strips[i].width:''); }
+    h.addEventListener('change',box,true); h.addEventListener('keydown',box,true);
+    var q=0; new MutationObserver(function(){ if(q) return; q=1; setTimeout(function(){ q=0; try{ dress(); }catch(e){ if(window.console) console.error('precut channels:',e); } },60); }).observe(h,{ childList:true, subtree:true });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+  window.__V2_CHANNELS__={ cur:cur, plan:plan };
+})();
+/* PRECUT CHANNELS 2026-11-15 - END */
 </script>
 </body>
 </html>
