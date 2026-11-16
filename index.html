@@ -1354,15 +1354,7 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
     body.nb-pc #nbStepMid .nb-step-dots i.on{width:36px}
   }
 }
-/* ===== NEW BUILDER (2026-11-12, Johan 21:45 - to-do section 3): WINDOWS 768 - 899 px WIDE - THE RING STAYS IN VIEW =====
-   Measured 2026-11-12 (768 x 1024, 820 x 1180, 899 x 700): from 768 px the step header and the Back / Next bar are
-   used, but up to 899 px the ring sits above the tools and the page scrolls, so the ring (370 - 614 px high) left the
-   screen after 350 - 600 px of scrolling. From 900 px the ring has its own column and never moves.
-   Here, for 768 - 899 px while the new builder is on (body class "nb-pc"): the ring is pinned to the top of the window,
-   lower than before (36% of the window height, 200 - 440 px) so the tools keep room; the step header sticks directly
-   under it; the tools scroll between the header and the Back / Next bar.
-   Position and size only. Under 768 px (phone part 106), from 900 px and without step names nothing here applies.
-   Must stay after parts 109c and 109i. */
+/* ===== NEW BUILDER (2026-11-12, Johan 21:45 - to-do section 3): WINDOWS 768 - 899 px WIDE - THE RING STAYS IN VIEW ===== (comment moved to claude\build-2026-11-15-blank-card-names.md, page weight 2026-11-15) */
 @media(min-width:768px) and (max-width:899px){
   body.nb-pc{--nb-ring-h:clamp(200px,36svh,440px)}
   body.nb-pc .v2-preview{position:sticky;top:0;z-index:50;height:var(--nb-ring-h);min-height:0;padding:14px 18px;box-shadow:0 6px 18px rgba(0,0,0,.32)}
@@ -1414,14 +1406,7 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
   body.nb-pc #addStripModalInner.v2-edit-strip-mode > div:last-child{margin-top:8px !important}
 }
 /* ===== END PC INLAY DIALOG ===== */
-/* === INLAY DIALOG COLOURS (2026-11-13, Johan - PC test feedback item 1) - START ===
-   "When selecting 'Add Inlay' ... it shows a very dark background color (black) which makes it difficult to read some
-   lower intensity texts. Change the background and text so they are clearly visible."
-   Cause: the Add / Edit Inlay dialog (#addStripModal) stands outside the tool column (.studio-controls), so it took the
-   page's dark ring-side colours (part 100, :root) while the tools beside it are light. Here the dialog gets the tool
-   column's colours (light; dark when the customer switched the page to dark), and its faint texts get full strength:
-   every text in the dialog is 4.5 to 1 or better against what it stands on. Colours only - no size (part 109k), no
-   price, no rule. New builder on only (nb-pc from 768 px, nb-easy under it); PC, tablet and phone. */
+/* === INLAY DIALOG COLOURS (2026-11-13, Johan - PC test feedback item 1) - START === (comment moved to claude\build-2026-11-15-blank-card-names.md, page weight 2026-11-15) */
 :is(body.nb-pc, body.nb-easy) #addStripModal{
   --bg:#f4f6fa;--bg2:#ffffff;--bg3:#edf0f6;--bg4:#e4e8f0;
   --gold:#4a59dc;--gold-light:#5f6eea;--gold-dim:#4a59dc;
@@ -1456,17 +1441,7 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
 :is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner a{color:var(--gold)}
 :is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner .mat-search::placeholder{color:var(--text-muted);opacity:1}
 /* === INLAY DIALOG COLOURS (2026-11-13) - END === */
-/* ===== PHONE INLAY GROUPS (2026-11-13, Johan - to-do section 5, line 1: proposal B) - START =====
-   "The nine rows of material-group chips in the Add Inlay dialog on a small phone." Measured 2026-11-13 (360 x 640,
-   390 x 844, 393 x 852): 24 group chips in 9 rows took 452 px (53 - 71% of the screen); 0 - 2 materials in view; the
-   materials window was a 200 px box scrolling inside a dialog that scrolled too; Add Strip 234 - 475 px below the screen.
-   Johan 16:57 chose proposal B: "All" + the first two groups and a "More Material groups (n)" button (router part 369j) that opens
-   the full list; the chosen group always stays in view. Here: the look of that button, the hidden chips, and - as on PC
-   (part 109k) - the materials window takes the room that is left, so only the materials scroll and Add Strip stays on
-   the screen. A short screen (700 px high or lower) gets less air around the fixed parts.
-   Phones only (under 768 px) while the new builder is on (body class "nb-easy"); Add and Edit dialog. Colours come from
-   part 109l. Display only - no price, no rule; the dialog's code (engine part 190, locked) is not touched; "!important"
-   only where that code sets a size on the element itself (the materials window's 200 px). */
+/* ===== PHONE INLAY GROUPS (2026-11-13, Johan - to-do section 5, line 1: proposal B) - START ===== (comment moved to claude\build-2026-11-15-blank-card-names.md, page weight 2026-11-15) */
 @media(max-width:767.98px){
   body.nb-easy #addStripModalInner.v2-add-strip-mode .mat-groups:not(.nb-groups-open) > .mat-group-btn.nb-group-folded,
   body.nb-easy #addStripModalInner.v2-edit-strip-mode .mat-groups:not(.nb-groups-open) > .mat-group-btn.nb-group-folded{display:none}
@@ -1532,6 +1507,9 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
 .nb-lay-bar i.nb-ch{background:repeating-linear-gradient(45deg,#c3c8d2 0 3px,#eef0f4 3px 6px)}
 /* PRECUT CHANNELS 2026-11-15: an inlay row of a channel keeps « » − + / Remove; the hint and the dialog's width box come back (was: all hidden - build doc) */
 body.nb-pre #acc-body-compose .width-control,body.nb-pre .composer-actions .btn-gold,body.nb-pre .composer-actions .btn-outline:not(.btn-undo),body.nb-pre .remaining-width,body.nb-pre .strip-block:not(.nb-pc-ed) .s-remove,body.nb-pre .v2-strip-row:not(.nb-pc-ed) .nb-row-remove,body.nb-pre:not(.nb-pch) .nb-w-hint,body.nb-pre .v2-strip-row:not(.nb-pc-ed) .v2-row-group,body.nb-pre .v2-grip,body.nb-pre #acc-body-compose .panel-desc,body.nb-pre:not(.nb-pch) #addStripModalInner div:has(>.width-picker){display:none!important}
+/* BLANK CARD NAMES 2026-11-15 (Johan 23:05): the size line under the layout; the Style number for signed-in staff only */
+.nb-lay-sub{font-size:13px;line-height:1.3;color:var(--text-dim);margin-top:-4px}
+.nb-lay-style{font-size:12px;line-height:1.3;color:var(--text-muted)}
 </style>
 </head>
 <body>
@@ -6907,8 +6885,9 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   }
   function v2BlankLayoutText(b){
     if(v2BlankIsPlain(b)) return 'plain band (no inlays)';
-    return v2BlankSegments(b,false).map(function(sg){ return sg.w+'mm '+(sg.t==='base'?state.baseMetal:'inlay'); }).join(' – ');
+    return v2BlankSegments(b,false).map(function(sg){ return sg.w+'mm '+(sg.t==='base'?state.baseMetal:'Inlay'); }).join(' · ');   // BLANK CARD NAMES 2026-11-15: as on the cards (was 'inlay', ' – ')
   }
+  function v2StaffStyle(b){ try{ return (typeof _staffMode!=='undefined'&&_staffMode)?' (Style '+b.style+')':''; }catch(e){ return ''; } }   // BLANK CARD NAMES 2026-11-15: only staff see the Style number
   // The layout as it will be sent: the composer closes any free width with a base-metal edge.
   function v2ClosedStrips(strips){
     var out=(strips||[]).filter(function(st){ return st&&st.width>0; }).map(function(st){ return {material:st.material,width:st.width}; });
@@ -6998,12 +6977,12 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     try{ v2ConstrainComposerWidth(col); }catch(e){}
     var base=state.baseMetal, m=v2MatchBlank(state.strips);
     var note;
-    if(m&&v2Choosing()) note=h('div',{id:'v2-precut-note',class:'v2-precut-note v2-precut-open'},['Style '+m.blank.style+': tap each ? to choose its inlay.']);   // PRECUT CHOICE 2026-11-14
+    if(m&&v2Choosing()) note=h('div',{id:'v2-precut-note',class:'v2-precut-note v2-precut-open'},['Tap each ? to choose its inlay.'+v2StaffStyle(m.blank)]);   // PRECUT CHOICE 2026-11-14 · BLANK CARD NAMES 2026-11-15: no "Style N:" for customers
     else if(m){
       var b=m.blank;
       var corner=(b.corner==='beveled')?', beveled corners':'';
       var txt=v2BlankIsPlain(b)?('✓ Plain '+b.width+'mm '+b.profile+' '+base+' band — available as a precut blank.')
-        :('✓ Matches '+base+' blank Style '+b.style+' ('+v2BlankLayoutText(b)+corner+(m.flipped?', mirrored':'')+').');
+        :('✓ Matches a '+base+' blank ('+v2BlankLayoutText(b)+', '+b.width+'mm '+b.profile+corner+(m.flipped?', mirrored':'')+')'+v2StaffStyle(b)+'.');   // BLANK CARD NAMES 2026-11-15: was 'Matches <metal> blank Style N (...)'
       note=h('div',{id:'v2-precut-note',class:'v2-precut-note v2-precut-done'},[txt]);
     } else {
       var avail=(v2PrecutBlanks()||[]).filter(function(b){ return !v2BlankIsPlain(b)&&Math.abs(Number(b.width)-state.ringWidth)<1e-9&&b.profile===state.profile; });
@@ -7011,7 +6990,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
         'Adjust the strip widths so the band matches a blank (either direction), with no width left over. '+(avail.length?(state.ringWidth+'mm '+state.profile+' blanks:'):('No '+state.ringWidth+'mm '+state.profile+' '+base+' blanks with inlays exist — change the width or profile.'))];
       if(avail.length){
         var ul=h('ul',{class:'v2-precut-list'});
-        avail.forEach(function(b){ ul.appendChild(h('li',{},['Style '+b.style+': '+v2BlankLayoutText(b)+(b.corner==='beveled'?' — beveled corners':'')])); });
+        avail.forEach(function(b){ ul.appendChild(h('li',{},[v2BlankLayoutText(b)+(b.corner==='beveled'?' — beveled corners':'')+v2StaffStyle(b)])); });   // BLANK CARD NAMES 2026-11-15: was 'Style N: ' first
         kids.push(ul);
       }
       note=h('div',{id:'v2-precut-note',class:'v2-precut-note v2-precut-open'},kids);
@@ -8229,9 +8208,11 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     return strips;
   }
   /* PRECUT CHOICE 2026-11-14 - START: precut blank cards (builder_config.precut_choice) */
+  function staff(){ try{ return typeof _staffMode!=='undefined'&&!!_staffMode; }catch(e){ return false; } }   // BLANK CARD NAMES 2026-11-15
   function pre(){ var b=builder(); return (b&&b.precut_choice&&isPrecut())?b.precut_choice:null; }
   function blanks(){ var b=builder(), s=st(); return ((b.rules.precut_blanks||{})[s.baseMetal]||[]).map(function(x,i){ return { index:'b'+i, blank:x,
-    name:(x.plain?'Plain band':'Style '+x.style)+' · '+x.width+'mm '+x.profile+(x.corner==='beveled'?', beveled corners':''),
+    name:x.plain?'Plain band · '+x.width+'mm '+x.profile:x.segments.map(function(g){ return g.w+'mm '+(g.t==='base'?s.baseMetal:'Inlay'); }).join(' · '),   // BLANK CARD NAMES 2026-11-15: the layout, not "Style N" (was the style + size line)
+    sub:x.plain?'':'= '+x.width+'mm '+x.profile+(x.corner==='beveled'?', beveled corners':''), style:x.style,   // BLANK CARD NAMES 2026-11-15
     strips:x.segments.map(function(g){ return { material:g.t==='base'?s.baseMetal:'(choose)', width:Number(g.w) }; }) }; }); }
   function applyBlank(i){
     var s=st(), item=blanks()[i]; if(!s||!item) return false;
@@ -8296,7 +8277,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     hadInlays=hasInlays;
     var open=(userToggled!=null)?userToggled:!hasInlays;
     var first=Math.max(1,Number(c.show_first)||6), showAll=moreOpen||list.length<=first;
-    var sig=[s.baseMetal,s.ringWidth,s.profile,list.map(function(i){ return i.index+':'+i.strips.map(function(x){ return x.width; }).join('/'); }).join(','),current,open?1:0,showAll?1:0,hasInlays?1:0].join('|');
+    var sig=[staff()?1:0,s.baseMetal,s.ringWidth,s.profile,list.map(function(i){ return i.index+':'+i.strips.map(function(x){ return x.width; }).join('/'); }).join(','),current,open?1:0,showAll?1:0,hasInlays?1:0].join('|');   // BLANK CARD NAMES 2026-11-15: + staff
     var anchor=host.querySelector('.width-control')||null;
     if(old&&old.getAttribute('data-sig')===sig&&old.parentNode){ return; }
     var box=el('details','nb-layouts'); box.setAttribute('data-sig',sig); if(open) box.open=true;
@@ -8312,6 +8293,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       var bar=el('span','nb-lay-bar'); bar.setAttribute('aria-hidden','true');
       item.strips.forEach(function(x){ var seg=document.createElement('i'); seg.style.flex=String(x.width)+' 1 0'; var bg=x.material==='(choose)'?'':look(x.material); if(bg) seg.style.background=bg; else seg.className='nb-ch'; bar.appendChild(seg); });   // PRECUT CHOICE 2026-11-14
       card.appendChild(bar); card.appendChild(el('span','nb-lay-name',item.name));
+      if(item.style!=null){ card.setAttribute('data-nb-style',String(item.style)); if(item.sub) card.appendChild(el('span','nb-lay-sub',item.sub)); if(staff()) card.appendChild(el('span','nb-lay-style','Style '+item.style)); }   // BLANK CARD NAMES 2026-11-15: size line; staff keep the Style number
       card.addEventListener('click',function(){ userToggled=null; apply(item.index); });
       grid.appendChild(card);
     });
