@@ -9074,7 +9074,8 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     keepSleeve(p,notes);
     if(blanks(base)&&p.strips.length&&!(s.strips||[]).length){ s.strips=p.strips.map(function(x){ return {material:x.material,width:x.width}; }); s.ringWidth=p.width; s.profile=p.profile; }
     if(blanks(base)) snapPrecut(base,notes);
-    else { fixProfile(base,notes); if(hasLayout) fixMinimums(base,notes,p); }
+    else { if((s.strips||[]).some(function(x){ return x&&x.material==='(choose)'; })){ var o=[]; s.strips.forEach(function(x){ if(!x) return; var m=x.material==='(choose)'?base:x.material, l=o[o.length-1]; if(l&&l.material===base&&m===base) l.width=r2(l.width+x.width); else o.push({material:m,width:x.width}); }); s.strips=o.some(function(x){ return x.material!==base; })?o:[]; hasLayout=s.strips.length>0; notes.push('The empty ? parts are now '+base+'.'); }   /* NO ? ON PLAIN METAL 2026-11-15 (Johan 20:38) */
+      fixProfile(base,notes); if(hasLayout) fixMinimums(base,notes,p); }
     fixFinish(base,notes);
     runSweeps(notes);
     ['width','sleeve','finish'].forEach(function(id){ try{ window.__V2_ROUTER__.rerenderSection(id); }catch(e){} });
