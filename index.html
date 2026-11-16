@@ -5491,11 +5491,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
 </script>
 <!-- ===== V2 PRECISION STUDIO ROUTER ===== -->
 <script>
-/* ===== V2 PRECISION STUDIO ROUTER (engine untouched) =====
-   One focused tool is open at a time. The seven original engine panels are unchanged.
-   No Next button, no auto-scroll, no auto-advance, no ledger, no floating submit.
-   Sections 1-6 = verbatim renderXPanel builders. Section 7 = renderSummaryPanel (submit+share).
-   Price: the Estimated Total bar is always visible to every visitor. */
+/* ===== V2 PRECISION STUDIO ROUTER (engine untouched) ===== (comment moved to claude\build-2026-11-15-blank-fill-on-next.md, page weight 2026-11-15) */
 (function(){
   'use strict';
 
@@ -5662,6 +5658,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       if(window.showRuleToast) try{ showRuleToast('Please choose a Base Metal first (Section 2) before making changes here.'); }catch(e){}
       id='metal';   // send them to Base Metal instead
     }
+    if(id && V2_PRECUT_LOCKED_STEPS.indexOf(id)>=0 && window.__V2_CHANNELS__) try{ __V2_CHANNELS__.grow(0); }catch(e){}   // BLANK FILL ON NEXT 2026-11-15: leaving the Inlays screen widens the inlay next to each ?
     // Precut blanks (Johan 2026-08-23): steps 5–7 stay closed until the Tungsten / Ceramic layout is a blank.
     if(id && typeof v2PrecutLocked==='function' && V2_PRECUT_LOCKED_STEPS.indexOf(id)>=0 && v2PrecutLocked()){
       try{ showRuleToast('Please finish the inlay layout first — '+state.baseMetal+' rings must match one of the precut blanks (see the note in Add/Remove Inlays).'); }catch(e){}
@@ -6059,10 +6056,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       inner.__v2applyingMinimum=false;
     },true);
   }
-  /* STRIP MIN-WIDTH SNAP (2026-10-09): with a material selected in the Add/Edit Inlay modal, a
-     Strip Width typed BELOW that material's minimum snaps UP to the minimum and warns (toast +
-     inline note under the width field). The engine's own change handler then runs on the
-     corrected value. No room for the minimum = warning only (the engine's clamps still apply). */
+  /* STRIP MIN-WIDTH SNAP (2026-10-09): with a material selected in the Add/Edit Inlay modal, a (comment moved to claude\build-2026-11-15-blank-fill-on-next.md, page weight 2026-11-15) */
   function v2StripModalSelectedMaterial(inner){
     var card=inner.querySelector('.mat-card.selected'); if(!card) return null;
     if(typeof DATA==='undefined' || !DATA || !DATA.m) return null;
@@ -6980,7 +6974,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   // Gate (Johan 2026-08-23): on a blank the layout must be complete before Continue / steps 5–7.
   var V2_PRECUT_LOCKED_STEPS=['sleeve','finish','summary'];
   function v2Choosing(){ return (state.strips||[]).some(function(s){ return s.material==='(choose)'; }); }   // PRECUT CHOICE 2026-11-14
-  function v2PrecutLocked(){ return v2IsPrecut() && (!v2MatchBlank(state.strips)||v2Choosing()); }
+  function v2PrecutLocked(){ return v2IsPrecut() && (!v2MatchBlank(state.strips)||(v2Choosing()&&!(window.__V2_CHANNELS__&&__V2_CHANNELS__.grow(1)))); }   // BLANK FILL ON NEXT 2026-11-15: a ? an inlay can grow over does not lock
   function v2ApplyPrecutLocks(){
     var locked=false; try{ locked=v2PrecutLocked(); }catch(e){}
     V2_PRECUT_LOCKED_STEPS.forEach(function(id){
@@ -7992,17 +7986,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
   window.__V2_SIZE__={ state:NB, chooseUnknown:chooseUnknown, chooseGroup:chooseGroup, paint:paint };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): THREE STEPS =====
-   The order of the tools and the step each tool belongs to come from the pricing settings
-   (builder_config.steps - the list order, and "group" on each entry). The engine and the router already walk
-   that list for Back / Continue. This part makes the page follow it too:
-     - the tool list and the panels are put in the list's order and renumbered,
-     - the page opens on the first tool of the list (the engine's boot opens Ring Size),
-     - the Ring Size screen gets a Back button and its own heading when it is no longer first (the welcome text
-       belonged to a first screen),
-     - the last screen waits for a ring size: opening it without one leads to the Ring Size screen,
-     - the "choose a Base Metal first" message loses its old section number.
-   With the live step list (Ring Size first, no groups) every function here does nothing. */
+/* ===== NEW BUILDER (2026-11-11, Johan): THREE STEPS ===== (comment moved to claude\build-2026-11-15-blank-fill-on-next.md, page weight 2026-11-15) */
 (function(){
   function steps(){ try{ return (typeof STEPS!=='undefined'&&STEPS&&STEPS.length)?STEPS:null; }catch(e){ return null; } }
   function st(){ try{ return (typeof state!=='undefined'&&state)?state:null; }catch(e){ return null; } }
@@ -8401,11 +8385,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
   window.__V2_LAYOUTS__={ available:available, compute:function(i){ var c=cfg(); return c?compute(c.layouts[i]):null; }, apply:apply, paint:paint };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): TAP TARGETS AND TEXT SIZE ON PHONES =====
-   1. Every strip row on the Inlays screen gets a "Remove" button (44 px). It presses that strip's own small "x"
-      in the band picture, which is hidden on phones - same action, same rules, same undo.
-   2. A safety net for text: on phones any text in the builder that would show under 12 px is raised to 12 px.
-   Phones only (under 768 px). Nothing here knows about prices or rules. */
+/* ===== NEW BUILDER (2026-11-11, Johan): TAP TARGETS AND TEXT SIZE ON PHONES ===== (comment moved to claude\build-2026-11-15-blank-fill-on-next.md, page weight 2026-11-15) */
 (function(){
   var phone=window.matchMedia?window.matchMedia('(max-width:767.98px)'):null;
   // PC LAYOUT (2026-11-11, Johan): the Remove buttons and the 12 px text rule also apply on a PC while the PC layout is on (router part 369d).
@@ -8812,15 +8792,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   window.__V2_ONETOTAL__={ update:update };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
-/* ===== PHONE INLAY GROUPS (2026-11-13, Johan - to-do section 5, line 1: proposal B) - START =====
-   "The nine rows of material-group chips in the Add Inlay dialog on a small phone." Johan 16:57: "proposal=B".
-   In the Add and the Edit Inlay dialog on a phone (under 768 px, new builder on): "All" + the first two groups stay in
-   view, the other groups fold behind a "More Material groups (n) ▾" button (wording: Johan 17:04); open, the button
-   reads "Fewer Material groups ▴". The chosen
-   group always stays in view. Choosing a group in the open list folds the list again. Each time the dialog opens it
-   starts folded. The dialog's code (engine part 190, locked) draws the chips again on every choice and keystroke; this
-   part only marks the chips (class "nb-group-folded") and adds its own button after each drawing - the chips' own clicks,
-   the filter and every rule stay the engine's. Look: CSS part 109m. Display only - no price, no rule. */
+/* ===== PHONE INLAY GROUPS (2026-11-13, Johan - to-do section 5, line 1: proposal B) - START ===== (comment moved to claude\build-2026-11-15-blank-fill-on-next.md, page weight 2026-11-15) */
 (function(){
   var phone=window.matchMedia?window.matchMedia('(max-width:767.98px)'):null;
   var SHOW=3;          // "All" + the first two groups
@@ -9237,6 +9209,15 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     try{ renderRing(); updatePrice(); }catch(e){}
     return true;
   }
+  /* BLANK FILL ON NEXT 2026-11-15 (Johan 21:48): each ? goes to the inlay before it in its channel (else after); dry = only check */
+  function grow(dry){
+    if(!state.strips.some(function(x){ return x.material===Q; })) return !!dry; var c=cur(); if(!c) return false; var a=closed(state.strips,c);
+    for(var j=0;j<a.length;j++){ if(a[j].material!==Q) continue; var cc=find(a), g=cc&&chan(cc,j); if(!g) return false;
+      var n=[j-1,j+1].filter(function(k){ return k>=g.s&&k<g.e&&a[k].material!==Q&&a[k].material!==state.baseMetal; })[0]; if(n==null) return false;
+      var m=a[n].material, st=stepOf(m), w=r2(a[n].width+a[j].width); if(w>Math.min(maxOf(m),g.w)+E()||Math.abs(Math.round(w/st)*st-w)>E()) return false;
+      a[n].width=w; a.splice(j,1); j--; }
+    return dry?!validateProposedStrips(cp(a)):commit(a);
+  }
   function setW(i,v){ var p=plan(i,v); if(p.error!==undefined){ say(p.error); return false; } return commit(p.strips); }
   function move(i,d){ var c=cur(), g=c&&chan(c,i), j=i+d; if(!g||j<g.s||j>=g.e) return; var a=closed(state.strips,c), x=a[i]; a[i]=a[j]; a[j]=x; commit(a); }
   function drop(i){ var a=closed(state.strips,cur()); a[i]={ material:Q, width:a[i].width }; commit(a); }
@@ -9291,7 +9272,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     var q=0; new MutationObserver(function(){ if(q) return; q=1; setTimeout(function(){ q=0; try{ dress(); }catch(e){ if(window.console) console.error('precut channels:',e); } },60); }).observe(h,{ childList:true, subtree:true });
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
-  window.__V2_CHANNELS__={ cur:cur, plan:plan };
+  window.__V2_CHANNELS__={ cur:cur, plan:plan, grow:grow };   // BLANK FILL ON NEXT 2026-11-15: + grow
 })();
 /* PRECUT CHANNELS 2026-11-15 - END */
 </script>
