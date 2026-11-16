@@ -8305,7 +8305,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     if(pc) host.querySelectorAll('.v2-row-name').forEach(function(n){ var f=n.firstChild; if(f&&f.nodeType===3) f.nodeValue=f.nodeValue.replace('(choose)','? - tap to choose the inlay'); });
     var list=(c&&s)?available():[];
     if(!list.length){ if(old) old.remove(); return; }
-    var hasInlays=Array.isArray(s.strips)&&s.strips.some(function(x){ return x&&x.material!==s.baseMetal; });
+    var hasInlays=Array.isArray(s.strips)&&s.strips.some(function(x){ return x&&x.material!==s.baseMetal&&!(pc&&x.material==='(choose)'); });   // BLANK BOX OPEN 2026-11-15: a ? is no inlay
     var current=-1; list.forEach(function(item){ if(pc?(item.blank.style===s.precutStyle&&Number(item.blank.width)===Number(s.ringWidth)&&item.blank.profile===s.profile):sameStrips(item.strips,s.strips)) current=item.index; });   // PRECUT CHOICE 2026-11-14
     /* FOLD IN BOTH CASES (2026-11-13, Johan - to-do section 3) - comment moved to claude\build-2026-11-14-precut-blank-choice.md (page weight, 2026-11-14) */
     if(hadInlays!==null&&hadInlays!==hasInlays) userToggled=null;
