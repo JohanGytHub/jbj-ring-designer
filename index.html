@@ -968,8 +968,7 @@ html.v2-modal-lock body{position:fixed!important;left:0;right:0;width:100%;overf
 .v2-row-w{min-width:52px;text-align:center;font-size:.78rem;color:var(--gold);font-weight:600;font-family:var(--font-display)}
 @media(max-width:840px){.v2-row-btn{width:38px;height:38px;font-size:.92rem}.v2-strip-row{padding:8px 10px;gap:6px}.v2-row-name{font-size:.82rem}.v2-row-w{min-width:46px}}
 .v2-preview #crossSectionHost #profileImg{background:#e9edf4;border-color:rgba(255,255,255,.28)}
-/* ===== NEW BUILDER (2026-11-11, Johan): form fields are never under 16px =====
-   An iPhone zooms the whole page when a field under 16px gets focus. Size only - no layout change. */
+/* ===== NEW BUILDER (2026-11-11, Johan): form fields are never under …[doc 2026-11-17] */
 .form-row input,.form-row textarea,.engraving-input,.exit-modal input,.mat-search,.eng-font-select,
 input[type="text"],input[type="email"],input[type="number"],input[type="search"],input[type="tel"],textarea,select{font-size:16px !important}
 /* ===== NEW BUILDER (2026-11-11, Johan): PHONE LAYOUT - ring always in view + bottom step bar =====
@@ -1050,7 +1049,7 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
 .nb-next{font-size:13px;line-height:1.45;color:var(--text-muted);text-align:center;margin:12px 0 10px}
 @media(max-width:767px){
   #acc-body-summary .panel-desc{display:none}
-  /* 2026-11-11 (unknown size + price range): the bottom bar already says "Summary" and the button says what the form is for */
+  /* 2026-11-11 (unknown size + price range): the bottom bar already says …[doc 2026-11-17] */
   #acc-body-summary .panel-title,#acc-body-summary .email-form > h4{display:none}
   #acc-body-summary details.nb-all{margin-top:14px}
   #acc-body-summary .email-form{margin-top:4px}
@@ -1059,9 +1058,7 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
   #acc-body-summary #quoteSubmitBtn{min-height:52px !important;font-size:16px !important}
 }
 /* ===== NEW BUILDER (2026-11-11, Johan): UNKNOWN RING SIZE + PRICE RANGE =====
-   "Unknown - Send Ring Sizer First" on the size screen; on the last step the price range the SERVER sends and,
-   for gold / platinum rings with an unknown size, the "closest size group" tap. Layout only - no price, percent
-   or size-group border lives in the page. */
+   "Unknown - Send …[doc 2026-11-17] */
 .nb-size-unknown{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;width:100%;min-height:60px;padding:10px 14px;margin:14px 0 2px;border:1px solid var(--border);border-radius:14px;background:var(--bg2);color:var(--text);font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .nb-size-unknown .nb-su-t{font-size:15px;font-weight:600;line-height:1.3}
 .nb-size-unknown .nb-su-s{font-size:13px;line-height:1.4;color:var(--text-muted)}
@@ -1260,8 +1257,7 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
   body.nb-pc .studio-controls .mat-card .name{font-size:13px}
 }
 /* ===== NEW BUILDER (2026-11-11, Johan): STRIP WIDTHS - a number box in every strip row =====
-   Only while the page body carries "nb-easy" (router part 369f; new builder on). The row's width text gives way to
-   a box that looks like the Ring Width box above it, so it reads as "type here". */
+   …[doc 2026-11-17] */
 body.nb-easy .v2-strip-row .v2-row-w{display:none !important}
 body.nb-easy .v2-strip-row .nb-w{width:66px;height:36px;padding:0 4px;border:1px solid var(--border-light,#ccd2df);border-radius:10px;background:var(--input-bg,#fff);color:var(--gold,#5362e6);font:inherit;font-size:15px;font-weight:700;text-align:center;-moz-appearance:textfield;appearance:textfield}
 body.nb-easy .v2-strip-row .nb-w::-webkit-outer-spin-button,body.nb-easy .v2-strip-row .nb-w::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
@@ -1271,10 +1267,7 @@ body.nb-easy .nb-w-hint{font-size:13px !important;line-height:1.5 !important;col
 @media(max-width:767.98px){
   body.nb-easy .v2-strip-row .nb-w{width:64px;height:44px;font-size:16px}
 }
-/* ===== NEW BUILDER (2026-11-11, Johan 17:49): THE "ESTIMATED TOTAL" BOX CLEARS THE BACK / NEXT BAR =====
-   The engine's total box (#v2-price, shown to signed-in staff; customers when prices are switched on) is fixed to
-   the bottom right corner - exactly where the new bar has its Next button. It now sits just above the bar.
-   Position only: the amount, who sees it and when are the engine's and the server's, unchanged. */
+/* ===== NEW BUILDER (2026-11-11, Johan 17:49): THE "ESTIMATED TOTAL" BOX CLEARS THE BACK / NEXT BAR …[doc 2026-11-17] */
 @media(min-width:768px){
   body.nb-pc .v2-price{bottom:88px !important}
   /* the last lines of a tool can scroll clear of the box (only while the box is shown) */
@@ -1286,8 +1279,7 @@ body.nb-easy .nb-w-hint{font-size:13px !important;line-height:1.5 !important;col
 }
 /* PRICE POINT IN DETAILS (2026-11-11, Johan 17:49): the Comfortable Price Point inside "Show all details" */
 details.nb-all > .nb-inner > #quoteBudgetBox.nb-pp{margin:8px 0 16px !important}
-/* TOTAL ABOVE ZERO (2026-11-11, Johan 18:58): signed-in staff see the box only while it holds an amount above 0
-   (router part 369g marks the box; the engine sets display inline, hence !important) */
+/* TOTAL ABOVE ZERO (2026-11-11, Johan 18:58): signed-in staff see the box only while it holds an …[doc 2026-11-17] */
 body.staff-mode #v2-price.nb-total-empty{display:none !important}
 @media(min-width:768px){ body.nb-pc.staff-mode:has(#v2-price.nb-total-empty) .acc-stack{padding-bottom:44px !important} }
 /* ===== NEW BUILDER (2026-11-11, Johan 21:32): THE "ESTIMATED TOTAL" NO LONGER COVERS A CONTROL (PC) =====
@@ -1308,8 +1300,7 @@ body.staff-mode #v2-price.nb-total-empty{display:none !important}
   }
   body.nb-pc .acc-stack > #v2-price .v2-price-label{font-size:12px;letter-spacing:.12em}
   body.nb-pc .acc-stack > #v2-price .v2-price-amount{font-size:1.2rem;line-height:1.1}
-  /* a plain band behind the line, as wide as the column and down to the bar: what scrolls past does not show
-     through above, beside or under the line - it reads as part of the bar */
+  /* a plain band behind the line, as wide as the column and down to the …[doc 2026-11-17] */
   body.nb-pc .acc-stack > #v2-price::after{content:'';position:absolute;z-index:-1;top:-8px;bottom:-9px;left:-36px;right:-36px;
     background:var(--bg);border-top:1px solid var(--border)}
   /* a little air between the last line of a tool and the total line */
@@ -1321,17 +1312,16 @@ body.staff-mode #v2-price.nb-total-empty{display:none !important}
   /* staff with no amount yet: no line (part 369g marks it), the tools keep their usual room at the end */
   body.nb-pc.staff-mode:has(#v2-price.nb-total-empty) .acc-stack{padding-bottom:44px !important}
 }
-/* ===== NEW BUILDER (2026-11-11, Johan 22:26): ONE "ESTIMATED TOTAL" ON THE LAST SCREEN · STAFF PRI… - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
+/* ===== NEW BUILDER (2026-11-11, Johan 22:26): ONE "ESTIMATED TOTAL" ON THE LAST SCREEN · STAFF PRI… …[doc 2026-11-17] */
 body.nb-easy #v2-price.nb-total-twice{display:none !important}
 @media(min-width:768px){ body.nb-pc:has(#v2-price.nb-total-twice) .acc-stack{padding-bottom:44px !important} }
 body.nb-easy.staff-mode .mat-card:has(> .staff-price){display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:10px;row-gap:1px}
 body.nb-easy.staff-mode .mat-card:has(> .staff-price) > .swatch{grid-row:1 / span 2}
 body.nb-easy.staff-mode .mat-card:has(> .staff-price) > .name{grid-column:2;align-self:end;min-width:0}
 body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;justify-self:start;margin-left:0;padding-left:0;font-size:12px;line-height:1.25;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-/* ===== NEW BUILDER (2026-11-12, Johan 19:36 - to-do section 3): PHONES - THE "ESTIMATED TOTAL" NO … - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
+/* ===== NEW BUILDER (2026-11-12, Johan 19:36 - to-do section 3): PHONES - THE "ESTIMATED TOTAL" NO … …[doc 2026-11-17] */
 @media(max-width:767px){
-  /* SAME COLOURS AS THE BAR (2026-11-12, Johan 20:35): the bar hangs on the page body (dark), the total sits inside the tool
-     column (light) - the body's own colours are handed down under their own names so the line can wear them */
+  /* SAME COLOURS AS THE BAR (2026-11-12, Johan 20:35): the bar hangs on the page body (dark), the …[doc 2026-11-17] */
   body.nb-easy{--nb-bar-bg:var(--bg2,#fff);--nb-bar-text:var(--text,#1c1f2b);--nb-bar-muted:var(--text-muted,#6b7080);--nb-bar-border:var(--border,#d8dbe6)}
   body.nb-easy #v2-price{
     left:0 !important;right:0 !important;bottom:calc(65px + env(safe-area-inset-bottom,0px)) !important;z-index:95;
@@ -1344,7 +1334,7 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
   /* the bar's own shadow would fall on the line: the line carries it instead while it is shown */
   body.nb-easy:has(#v2-price:not(.nb-total-empty):not(.nb-total-twice)):not(.v2-hide-prices) #nbStepBar{box-shadow:none}
 }
-/* ===== NEW BUILDER (2026-11-12, Johan 21:01 - to-do section 3): PC - THE BAR'S STEP NAME IS NO LON… - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
+/* ===== NEW BUILDER (2026-11-12, Johan 21:01 - to-do section 3): PC - THE BAR'S STEP NAME IS NO LON… …[doc 2026-11-17] */
 @media(min-width:768px){
   @container studio (max-width:540px){
     body.nb-pc #nbStepBar{padding:12px 16px;gap:8px}
@@ -1354,7 +1344,7 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
     body.nb-pc #nbStepMid .nb-step-dots i.on{width:36px}
   }
 }
-/* ===== NEW BUILDER (2026-11-12, Johan 21:45 - to-do section 3): WINDOWS 768 - 899 px WIDE - THE RING STAYS IN VIEW ===== (comment moved to claude\build-2026-11-15-blank-card-names.md, page weight 2026-11-15) */
+/* ===== NEW BUILDER (2026-11-12, Johan 21:45 - to-do section 3): WINDOWS 768 - 899 px WIDE - THE …[doc 2026-11-17] */
 @media(min-width:768px) and (max-width:899px){
   body.nb-pc{--nb-ring-h:clamp(200px,36svh,440px)}
   body.nb-pc .v2-preview{position:sticky;top:0;z-index:50;height:var(--nb-ring-h);min-height:0;padding:14px 18px;box-shadow:0 6px 18px rgba(0,0,0,.32)}
@@ -1366,15 +1356,13 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
   body.nb-pc .stage-label{display:none}
   body.nb-pc .studio-controls{margin-top:0;border-radius:0;min-height:calc(100svh - var(--nb-ring-h))}
   body.nb-pc .nb-pc-steps{top:var(--nb-ring-h)}
-  /* what the page scrolls to (a panel, the size buttons, the price range, a control a click needs) lands in the room
-     between the step header and the Back / Next bar - not under the ring, the header (129 px) or the bar (73 px) */
+  /* what the page scrolls to (a panel, the size buttons, the price range, a control a click needs) …[doc 2026-11-17] */
   html:has(body.nb-pc){scroll-padding-top:calc(clamp(200px,36svh,440px) + 132px);scroll-padding-bottom:76px}
   body.nb-pc .acc-panel{scroll-margin-top:16px !important}
-  /* signed-in staff: the engine keeps 64 px free under the page for its floating total box; here the total is a line
-     above the bar (part 109f), and those 64 px lifted the bar off the window's bottom edge at the end of a screen */
+  /* signed-in staff: the engine keeps 64 px free under the page for its floating total box; here the …[doc 2026-11-17] */
   body.nb-pc.staff-mode{padding-bottom:0}
 }
-/* ===== NEW BUILDER (2026-11-12, Johan 22:59 - to-do section 3): PC - THE ADD / EDIT INLAY DIALOG U… - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
+/* ===== NEW BUILDER (2026-11-12, Johan 22:59 - to-do section 3): PC - THE ADD / EDIT INLAY DIALOG U… …[doc 2026-11-17] */
 @media(min-width:900px){
   body.nb-pc #addStripModal .v2-modal-frame:has(> #addStripModalInner.v2-add-strip-mode),
   body.nb-pc #addStripModal .v2-modal-frame:has(> #addStripModalInner.v2-edit-strip-mode){max-width:min(1080px,calc(100vw - 72px))}
@@ -1387,8 +1375,7 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
   body.nb-pc #addStripModalInner.v2-add-strip-mode > .mat-groups,
   body.nb-pc #addStripModalInner.v2-edit-strip-mode > .mat-groups{gap:6px}
 }
-/* a low window (a 768 px high laptop screen): less air around the fixed parts, and "Strip Width" stands on one line with
-   its box, so the materials window gets about a row more. */
+/* a low window (a 768 px high laptop screen): less air around the fixed …[doc 2026-11-17] */
 @media(min-width:900px) and (max-height:860px){
   body.nb-pc #addStripModalInner.v2-add-strip-mode,
   body.nb-pc #addStripModalInner.v2-edit-strip-mode{height:calc(100vh - 40px);padding:20px 24px 18px}
@@ -1454,8 +1441,7 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
   body.nb-easy #addStripModalInner.v2-add-strip-mode > .mat-grid,
   body.nb-easy #addStripModalInner.v2-edit-strip-mode > .mat-grid{flex:1 1 0;min-height:150px;max-height:none !important;align-content:start}
 }
-/* a short phone screen (360 x 640 and the like): the dialog a little higher (96% of the screen),
-   less air around the fixed parts, a smaller lowest height for the materials window */
+/* a short phone screen (360 x 640 and the like): the dialog a little …[doc 2026-11-17] */
 @media(max-width:767.98px) and (max-height:700px){
   body.nb-easy #addStripModalInner.v2-add-strip-mode,
   body.nb-easy #addStripModalInner.v2-edit-strip-mode{height:96vh;height:96dvh;padding-top:16px;padding-bottom:max(12px,env(safe-area-inset-bottom))}
@@ -1505,7 +1491,7 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
 /* ===== NEW DESIGN + METAL CHANGE (2026-11-14) - END ===== */
 /* PRECUT CHOICE 2026-11-14 (Johan 23:12): blank cards on Tungsten / Black Ceramic */
 .nb-lay-bar i.nb-ch{background:repeating-linear-gradient(45deg,#c3c8d2 0 3px,#eef0f4 3px 6px)}
-/* PRECUT CHANNELS 2026-11-15: an inlay row of a channel keeps « » − + / Remove; the hint and the dialog's width box come back (was: all hidden - build doc) */
+/* PRECUT CHANNELS 2026-11-15: an inlay row of a channel keeps « » − + / …[doc 2026-11-17] */
 body.nb-pre #acc-body-compose .width-control,body.nb-pre .composer-actions .btn-gold,body.nb-pre .composer-actions .btn-outline:not(.btn-undo),body.nb-pre .remaining-width,body.nb-pre .strip-block:not(.nb-pc-ed) .s-remove,body.nb-pre .v2-strip-row:not(.nb-pc-ed) .nb-row-remove,body.nb-pre:not(.nb-pch) .nb-w-hint,body.nb-pre .v2-strip-row:not(.nb-pc-ed) .v2-row-group,body.nb-pre .v2-grip,body.nb-pre #acc-body-compose .panel-desc,body.nb-pre:not(.nb-pch) #addStripModalInner div:has(>.width-picker){display:none!important}
 /* BLANK CARD NAMES 2026-11-15 (Johan 23:05): the size line under the layout; the Style number for signed-in staff only */
 .nb-lay-sub{font-size:13px;line-height:1.3;color:var(--text-dim);margin-top:-4px}
@@ -6952,8 +6938,14 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   }
   // Gate (Johan 2026-08-23): on a blank the layout must be complete before Continue / steps 5–7.
   var V2_PRECUT_LOCKED_STEPS=['sleeve','finish','summary'];
+  /* PRECUT RIM RULE 2026-11-17 - START (claude\build-2026-11-17-precut-rim-rule.md) */
+  function v2RimListed(n){ var l=BUILDER.precut_rim_blocked_materials; return Array.isArray(l)&&l.indexOf(n)>=0; }
+  function v2RimName(strips){ if(!v2IsPrecut()) return null; var a=v2ClosedStrips(strips||state.strips); if(!a.length) return null; return v2RimListed(a[0].material)?a[0].material:(v2RimListed(a[a.length-1].material)?a[a.length-1].material:null); }
+  function v2RimMessage(n){ return '"'+n+'" cannot be the outside edge of a '+state.baseMetal+' ring. Choose another material for the outside edge.'; }
+  window.__V2_RIM__={ listed:v2RimListed, name:v2RimName, message:v2RimMessage };
+  /* PRECUT RIM RULE 2026-11-17 - END */
   function v2Choosing(){ return (state.strips||[]).some(function(s){ return s.material==='(choose)'; }); }   // PRECUT CHOICE 2026-11-14
-  function v2PrecutLocked(){ return v2IsPrecut() && (!v2MatchBlank(state.strips)||(v2Choosing()&&!(window.__V2_CHANNELS__&&__V2_CHANNELS__.grow(1)))); }   // BLANK FILL ON NEXT 2026-11-15: a ? an inlay can grow over does not lock
+  function v2PrecutLocked(){ return v2IsPrecut() && (!v2MatchBlank(state.strips)||!!v2RimName()||(v2Choosing()&&!(window.__V2_CHANNELS__&&__V2_CHANNELS__.grow(1)))); }   /* PRECUT RIM RULE 2026-11-17 */   // BLANK FILL ON NEXT 2026-11-15: a ? an inlay can grow over does not lock
   function v2ApplyPrecutLocks(){
     var locked=false; try{ locked=v2PrecutLocked(); }catch(e){}
     V2_PRECUT_LOCKED_STEPS.forEach(function(id){
@@ -6964,7 +6956,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     if(col){
       col.querySelectorAll('.nav-buttons .btn-next').forEach(function(btn){
         btn.disabled=locked;
-        btn.title=locked?('Finish the inlay layout first — '+state.baseMetal+' rings must match one of the precut blanks.'):'';
+        btn.title=locked?(v2RimName()?v2RimMessage(v2RimName()):('Finish the inlay layout first — '+state.baseMetal+' rings must match one of the precut blanks.')):'';   /* PRECUT RIM RULE 2026-11-17 */
         btn.classList.toggle('v2-locked',locked);
       });
     }
@@ -6976,8 +6968,9 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     if(!v2IsPrecut()) return;
     try{ v2ConstrainComposerWidth(col); }catch(e){}
     var base=state.baseMetal, m=v2MatchBlank(state.strips);
-    var note;
-    if(m&&v2Choosing()) note=h('div',{id:'v2-precut-note',class:'v2-precut-note v2-precut-open'},['Tap each ? to choose its inlay.'+v2StaffStyle(m.blank)]);   // PRECUT CHOICE 2026-11-14 · BLANK CARD NAMES 2026-11-15: no "Style N:" for customers
+    var note, rim=v2RimName();   /* PRECUT RIM RULE 2026-11-17 */
+    if(rim) note=h('div',{id:'v2-precut-note',class:'v2-precut-note v2-precut-open'},[h('strong',{},['⚠ '+v2RimMessage(rim)]),' Tap it in the list below to change it.']);
+    else if(m&&v2Choosing()) note=h('div',{id:'v2-precut-note',class:'v2-precut-note v2-precut-open'},['Tap each ? to choose its inlay.'+v2StaffStyle(m.blank)]);   // PRECUT CHOICE 2026-11-14 · BLANK CARD NAMES 2026-11-15: no "Style N:" for customers
     else if(m){
       var b=m.blank;
       var corner=(b.corner==='beveled')?', beveled corners':'';
@@ -7713,8 +7706,8 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     if(!cfg()){ NB.unknown=false; NB.group=null; NB.groupNeeded=false; return; }
     var size=standInSize(); if(size!=null&&s.ringSize!==size) s.ringSize=size;
   }
-  // STAFF CARD PRICES WITH UNKNOWN SIZE (2026-11-14, Johan 18:50): the engine keeps staff card prices per design, and "Unknown" / the group
-  // are not part of that design - so they are dropped whenever Unknown or the group changes, and the cards ask the server again.
+  // STAFF CARD PRICES WITH UNKNOWN SIZE (2026-11-14, Johan 18:50): the …[doc 2026-11-17]
+  // are not part of that design - so they are dropped whenever Unknown or …[doc 2026-11-17]
   function forgetCardPrices(){ try{ if(typeof staffPriceCache!=='undefined'&&staffPriceCache&&typeof staffPriceCache.clear==='function') staffPriceCache.clear(); }catch(e){} }
   function refreshEstimate(){
     forgetCardPrices();   // STAFF CARD PRICES WITH UNKNOWN SIZE (2026-11-14)
@@ -7741,8 +7734,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     window.fetch=function(input,init){
       var sv=services(), url=(typeof input==='string')?input:((input&&input.url)||'');
       var isEstimate=!!(sv&&url&&url===sv.estimate_url), isQuote=!!(sv&&url&&url===sv.quote_url);
-      /* STAFF CARD PRICES WITH UNKNOWN SIZE (2026-11-14, Johan 18:50): the staff card prices are told "size unknown" (+ the group) too;
-         the server decides what it prices. */
+      /* STAFF CARD PRICES WITH UNKNOWN SIZE (2026-11-14, Johan 18:50): the …[doc 2026-11-17] */
       var isCards=!!(sv&&url&&url===sv.staff_components_url);
       if(isCards&&init&&typeof init.body==='string'){
         try{
@@ -7807,8 +7799,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   /* ===== SHARE LINK CARRIES "SIZE UNKNOWN" - END ===== */
   function applyEstimate(json){
     var ok=!!(json&&json.ok), r=ok?json.priceRange:null, u=ok?json.unknownSize:null;
-    /* PRICE RANGE RULES (2026-11-13, Johan 19:56 / 20:30 / 20:41): { low, high } or { low, from:true } ("From $X"). Was:
-       NB.range=(r&&isFinite(r.low)&&isFinite(r.high))?{ low:Number(r.low), high:Number(r.high) }:null; */
+    /* PRICE RANGE RULES (2026-11-13, Johan 19:56 / 20:30 / 20:41): { low, …[doc 2026-11-17] */
     NB.range=(r&&isFinite(r.low)&&(r.from===true||isFinite(r.high)))?{ low:Number(r.low), high:r.from===true?null:Number(r.high), from:r.from===true }:null;
     if(ok) NB.basis=(NB.range&&typeof json.priceRangeBasis==='string'&&json.priceRangeBasis)?json.priceRangeBasis:null;   // staff only
     if(NB.range) NB.rangeSeen=true;
@@ -7907,7 +7898,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
           row.appendChild(b);
         });
         gw.appendChild(row);
-        // SIZE WORDING (2026-11-11, Johan 20:16): was "Smaller sizes cost less. We send a ring sizer first and confirm your exact price."
+        // SIZE WORDING (2026-11-11, Johan 20:16): was "Smaller sizes cost less. …[doc 2026-11-17]
         gw.appendChild(el('span','nb-range-n','Price may vary depending on the ring size.'));
         box.appendChild(gw);
       }
@@ -7965,7 +7956,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
   window.__V2_SIZE__={ state:NB, chooseUnknown:chooseUnknown, chooseGroup:chooseGroup, paint:paint };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): THREE STEPS ===== (comment moved to claude\build-2026-11-15-blank-fill-on-next.md, page weight 2026-11-15) */
+/* ===== NEW BUILDER (2026-11-11, Johan): THREE STEPS ===== (comment …[doc 2026-11-17] */
 (function(){
   function steps(){ try{ return (typeof STEPS!=='undefined'&&STEPS&&STEPS.length)?STEPS:null; }catch(e){ return null; } }
   function st(){ try{ return (typeof state!=='undefined'&&state)?state:null; }catch(e){ return null; } }
@@ -8101,7 +8092,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
   window.__V2_THREESTEPS__={ applyOrder:applyOrder, grouped:grouped, reordered:reordered };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): READY-MADE LAYOUTS ===== - comment moved to claude\build-2026-11-14-precut-blank-choice.md (page weight, 2026-11-14) */
+/* ===== NEW BUILDER (2026-11-11, Johan): READY-MADE LAYOUTS ===== - …[doc 2026-11-17] */
 (function(){
   function builder(){ try{ return (typeof BUILDER!=='undefined'&&BUILDER)?BUILDER:null; }catch(e){ return null; } }
   function st(){ try{ return (typeof state!=='undefined'&&state)?state:null; }catch(e){ return null; } }
@@ -8272,7 +8263,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     if(!list.length){ if(old) old.remove(); return; }
     var hasInlays=Array.isArray(s.strips)&&s.strips.some(function(x){ return x&&x.material!==s.baseMetal&&!(pc&&x.material==='(choose)'); });   // BLANK BOX OPEN 2026-11-15: a ? is no inlay
     var current=-1; list.forEach(function(item){ if(pc?(item.blank.style===s.precutStyle&&Number(item.blank.width)===Number(s.ringWidth)&&item.blank.profile===s.profile):sameStrips(item.strips,s.strips)) current=item.index; });   // PRECUT CHOICE 2026-11-14
-    /* FOLD IN BOTH CASES (2026-11-13, Johan - to-do section 3) - comment moved to claude\build-2026-11-14-precut-blank-choice.md (page weight, 2026-11-14) */
+    /* FOLD IN BOTH CASES (2026-11-13, Johan - to-do section 3) - comment …[doc 2026-11-17] */
     if(hadInlays!==null&&hadInlays!==hasInlays) userToggled=null;
     hadInlays=hasInlays;
     var open=(userToggled!=null)?userToggled:!hasInlays;
@@ -8308,7 +8299,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     var parent=anchor?anchor.parentNode:host.firstElementChild||host;
     if(anchor) parent.insertBefore(box,anchor); else parent.appendChild(box);
   }
-  /* ===== KEEP THE COMPOSER IN PLACE (2026-11-12, Johan) - START ===== (comment moved to claude\build-2026-11-14-precut-blank-choice.md, page weight 2026-11-14) */
+  /* ===== KEEP THE COMPOSER IN PLACE (2026-11-12, Johan) - START ===== …[doc 2026-11-17] */
   var ownAction=false, wrapped=null, inside=0, pendingShift=0, lockWatch=null;
   function newBuilderOn(){ var b=document.body; return !!(b&&(b.classList.contains('nb-pc')||b.classList.contains('nb-easy'))); }
   function pageLocked(){ return document.documentElement.classList.contains('v2-modal-lock'); }
@@ -8370,7 +8361,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
 /* ===== NEW BUILDER (2026-11-11, Johan): TAP TARGETS AND TEXT SIZE ON PHONES ===== (comment moved to claude\build-2026-11-15-blank-fill-on-next.md, page weight 2026-11-15) */
 (function(){
   var phone=window.matchMedia?window.matchMedia('(max-width:767.98px)'):null;
-  // PC LAYOUT (2026-11-11, Johan): the Remove buttons and the 12 px text rule also apply on a PC while the PC layout is on (router part 369d).
+  // PC LAYOUT (2026-11-11, Johan): the Remove buttons and the 12 px text …[doc 2026-11-17]
   function isPhone(){ if(phone&&phone.matches) return true; try{ return !!(window.__V2_PC__&&window.__V2_PC__.on()); }catch(e){ return false; } }
   function addRemoveButtons(){
     var host=document.getElementById('acc-body-compose'); if(!host) return;
@@ -8419,7 +8410,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
   window.__V2_TOUCH__={ run:run };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): PAGE WEIGHT - LATE PICTURES - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
+/* ===== NEW BUILDER (2026-11-11, Johan): PAGE WEIGHT - LATE PICTURES - …[doc 2026-11-17] */
 (function(){
   if(typeof NB_LATE_PICTURES==='undefined'||!NB_LATE_PICTURES||!NB_LATE_PICTURES.length) return;
   var maps={}; try{ maps.MATERIAL_IMAGES=MATERIAL_IMAGES; }catch(e){} try{ maps.PROFILE_IMAGES=PROFILE_IMAGES; }catch(e){}
@@ -8470,7 +8461,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='complete') start(); else { window.addEventListener('load',start); setTimeout(start,2500); }
   window.__V2_PICTURES__={ done:done, failed:failed, list:NB_LATE_PICTURES, refresh:function(){ try{ showProfilePicture(); showMaterialPictures(); }catch(e){} } };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): PC LAYOUT - "completely build and finish the PC version" - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
+/* ===== NEW BUILDER (2026-11-11, Johan): PC LAYOUT - "completely build and finish the PC version" - …[doc 2026-11-17] */
 (function(){
   var MQ=window.matchMedia?window.matchMedia('(min-width:768px)'):null;
   function wide(){ return !!(MQ&&MQ.matches); }
@@ -8501,7 +8492,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     var curIndex=names.indexOf(curGroup);
     names.forEach(function(g,gi){
       var mine=list.filter(function(t){ return groupOf(t)===g; });
-      // a step is ticked when the customer is past it (the page only lets them pass when it is complete) or every tool in it was used
+      // a step is ticked when the customer is past it (the page only lets them …[doc 2026-11-17]
       var here=(g===curGroup), done=mine.length>0&&(gi<curIndex||mine.every(function(t){ return t.classList.contains('filled'); }));
       var b=el('button','nb-pc-step'+(here?' on':'')+(done&&!here?' done':'')); b.type='button';
       b.setAttribute('aria-label','Step '+(gi+1)+' of '+names.length+': '+g+(done?' (done)':'')); if(here) b.setAttribute('aria-current','step');
@@ -8552,7 +8543,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   window.__V2_PC__={ on:isOn, refresh:update };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): "BEFORE YOU GO..." PROMPT - A SWITCH - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
+/* ===== NEW BUILDER (2026-11-11, Johan): "BEFORE YOU GO..." PROMPT - A …[doc 2026-11-17] */
 (function(){
   function off(){ try{ var c=(typeof BUILDER!=='undefined'&&BUILDER)?BUILDER.leave_prompt:null; return !!c&&c.ask_for_email===false; }catch(e){ return false; } }
   if(typeof showExitEmailModal!=='function') return;
@@ -8563,7 +8554,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   };
   window.__V2_LEAVEPROMPT__={ off:off };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): STRIP WIDTHS WITHOUT KNOWING THE ORDER - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
+/* ===== NEW BUILDER (2026-11-11, Johan): STRIP WIDTHS WITHOUT KNOWING …[doc 2026-11-17] */
 (function(){
   function B(){ try{ return (typeof BUILDER!=='undefined')?BUILDER:null; }catch(e){ return null; } }
   function S(){ try{ return (typeof state!=='undefined')?state:null; }catch(e){ return null; } }
@@ -8716,7 +8707,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   window.__V2_TOTALBOX__={ update:update, amount:amount };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan 21:32): STAFF PRICES ON THE BASE METAL CARDS FOLLOW THE DESI… - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
+/* ===== NEW BUILDER (2026-11-11, Johan 21:32): STAFF PRICES ON THE BASE METAL CARDS FOLLOW THE DESI… …[doc 2026-11-17] */
 (function(){
   function builderOn(){ var c=document.body.classList; return c.contains('nb-pc')||c.contains('nb-easy'); }
   function staff(){ try{ return typeof _staffMode!=='undefined'&&!!_staffMode; }catch(e){ return false; } }
@@ -9122,9 +9113,9 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
 })();
 /* ===== NEW DESIGN BUTTON (2026-11-14) - END ===== */
-/* PRECUT CHANNELS 2026-11-15 (Johan 17:04 / 17:07) - START: each blank channel works like a small ring - notes: claude\build-2026-11-15-blank-stock-inlay-widths.md */
+/* PRECUT CHANNELS 2026-11-15 (Johan 17:04 / 17:07) - START: each blank …[doc 2026-11-17] */
 (function(){
-  var E=function(){ return BUILDER.width_epsilon||0.01; }, Q='(choose)', L={}, last=-1, K=null;
+  var E=function(){ return BUILDER.width_epsilon||0.01; }, Q='(choose)', L={}, last=-1, K=null, ed=-1;   /* PRECUT RIM RULE 2026-11-17 */
   function r2(x){ return Math.round(x*100)/100; }
   function cp(a){ return a.map(function(x){ return { material:x.material, width:x.width }; }); }
   function pre(){ try{ var l=BUILDER.precut_choice&&(BUILDER.rules.precut_blanks||{})[state.baseMetal]; return !!(l&&l.length); }catch(e){ return false; } }
@@ -9191,7 +9182,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     try{ renderRing(); updatePrice(); }catch(e){}
     return true;
   }
-  /* BLANK FILL ON NEXT 2026-11-15 (Johan 21:48): each ? goes to the inlay before it in its channel (else after); dry = only check */
+  /* BLANK FILL ON NEXT 2026-11-15 (Johan 21:48): each ? goes to the inlay …[doc 2026-11-17] */
   function grow(dry){
     if(!state.strips.some(function(x){ return x.material===Q; })) return !!dry; var c=cur(); if(!c) return false; var a=closed(state.strips,c);
     for(var j=0;j<a.length;j++){ if(a[j].material!==Q) continue; var cc=find(a), g=cc&&chan(cc,j); if(!g) return false;
@@ -9234,11 +9225,19 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       if(!c) return vp.apply(this,arguments);
       var g=parse(a,c.segs,false);
       if(!g) return 'On a precut blank the '+state.baseMetal+' parts are fixed and each inlay stays inside its channel ('+c.g.map(function(x){ return x.w+'mm'; }).join(' / ')+').';
-      return vp.call(this,fill(closed(a,{ g:g }),{ g:g },last));
+      var f=fill(closed(a,{ g:g }),{ g:g },last), rn=window.__V2_RIM__?__V2_RIM__.name(f):null;   /* PRECUT RIM RULE 2026-11-17 */
+      if(rn) return __V2_RIM__.message(rn);
+      return vp.call(this,f);
     };
-    var oe=openEditStripModal; openEditStripModal=function(i){ last=i; return oe.apply(this,arguments); };
+    var oe=openEditStripModal; openEditStripModal=function(i){ last=i; ed=i; return oe.apply(this,arguments); };
+    var oa=openAddStripModal; openAddStripModal=function(){ ed=-1; return oa.apply(this,arguments); };   /* PRECUT RIM RULE 2026-11-17 */
     var mi=document.getElementById('addStripModalInner');
-    if(mi) new MutationObserver(function(){ if(!document.body.classList.contains('nb-pch')) return; mi.querySelectorAll('.mat-card .name').forEach(function(n){ if(n.textContent.trim().split(' (min ')[0]===state.baseMetal) n.closest('.mat-card').style.display='none'; }); }).observe(mi,{ childList:true, subtree:true });
+    if(mi) new MutationObserver(function(){ if(!document.body.classList.contains('nb-pch')) return; mi.querySelectorAll('.mat-card .name').forEach(function(n){ if(n.textContent.trim().split(' (min ')[0]===state.baseMetal) n.closest('.mat-card').style.display='none'; }); rimCards(mi); }).observe(mi,{ childList:true, subtree:true });
+    /* PRECUT RIM RULE 2026-11-17 - START */
+    function rimSlot(){ return !!window.__V2_RIM__&&ed>=0&&(ed===0||ed===state.strips.length-1); }
+    function rimCards(m){ if(!rimSlot()) return; m.querySelectorAll('.mat-card:not(.nb-rim-off)').forEach(function(c){ var n=c.querySelector('.name'); if(!n) return; var nm=n.textContent.trim(), k=nm.lastIndexOf(' ('); if(!__V2_RIM__.listed(nm)&&k>0) nm=nm.slice(0,k); if(!__V2_RIM__.listed(nm)) return; c.classList.add('nb-rim-off','disabled'); c.classList.remove('selected'); c.setAttribute('data-nb-rim',nm); n.textContent=nm+' (not on the outside edge)'; }); }
+    if(mi) mi.addEventListener('click',function(e){ var c=e.target.closest&&e.target.closest('.mat-card.nb-rim-off'); if(!c) return; stop(e); say(__V2_RIM__.message(c.getAttribute('data-nb-rim'))); },true);
+    /* PRECUT RIM RULE 2026-11-17 - END */
     h.addEventListener('click',function(e){
       if(!document.body.classList.contains('nb-pch')||!e.target.closest) return;
       var x=e.target.closest('.s-remove');
