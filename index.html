@@ -968,14 +968,8 @@ html.v2-modal-lock body{position:fixed!important;left:0;right:0;width:100%;overf
 .v2-row-w{min-width:52px;text-align:center;font-size:.78rem;color:var(--gold);font-weight:600;font-family:var(--font-display)}
 @media(max-width:840px){.v2-row-btn{width:38px;height:38px;font-size:.92rem}.v2-strip-row{padding:8px 10px;gap:6px}.v2-row-name{font-size:.82rem}.v2-row-w{min-width:46px}}
 .v2-preview #crossSectionHost #profileImg{background:#e9edf4;border-color:rgba(255,255,255,.28)}
-/* ===== NEW BUILDER (2026-11-11, Johan): form fields are never under …[doc 2026-11-17] */
 .form-row input,.form-row textarea,.engraving-input,.exit-modal input,.mat-search,.eng-font-select,
 input[type="text"],input[type="email"],input[type="number"],input[type="search"],input[type="tel"],textarea,select{font-size:16px !important}
-/* ===== NEW BUILDER (2026-11-11, Johan): PHONE LAYOUT - ring always in view + bottom step bar =====
-   Phones only (under 768px). Layout only: no price, rule or payload is touched.
-   1. The ring preview is pinned to the top of the screen (compact) while the tools scroll under it.
-   2. The sideways-scrolling tool rail is replaced by a fixed bottom bar: Back - step - Next.
-      (The rail itself opens as a list from the middle of the bar, so every tool stays one tap away.) */
 @media(max-width:767px){
   .v2-header{position:static !important;width:auto !important;height:52px !important;padding:4px 10px !important;display:flex !important;align-items:center;gap:8px}
   .v2-header .studio-brand-mark{display:none}
@@ -994,12 +988,9 @@ input[type="text"],input[type="email"],input[type="number"],input[type="search"]
   .v2-preview #dragCaption .reset-image-btn::before{content:'\27F3';font-size:17px;line-height:1}
   .v2-preview #crossSectionHost .cs-label{display:none !important}
   .v2-preview #crossSectionHost #profileName{font-size:11px !important}
-  /* the intro text pushed the first control off the first screen */
   .studio-intro{display:none !important}
-  /* the sideways tool rail and the in-panel Back / Continue row are replaced by the bottom bar (the bar presses them) */
   .tool-rail{display:none !important}
   .nav-buttons{display:none !important}
-  /* Width & Profile and Inlays tools were wider than a 360px phone (546px / 383px), which made the whole page zoom out */
   .width-control{max-width:100% !important;min-width:0 !important;gap:6px !important}
   .width-control input[type="range"]{min-width:0 !important;flex:1 1 0 !important;width:auto !important}
   .width-control input[type="number"]{width:62px !important;min-width:0 !important;padding-left:6px !important;padding-right:6px !important}
@@ -1029,10 +1020,6 @@ input[type="text"],input[type="email"],input[type="number"],input[type="search"]
   #nbStepNext[hidden]{display:none}
 }
 @media(min-width:768px){ #nbStepBar,#nbStepScrim{display:none !important} }
-/* ===== NEW BUILDER (2026-11-11, Johan): LAST STEP AS A RECEIPT (phones) =====
-   The Summary's long tables are folded behind "Show all details"; a short receipt with Edit links comes first;
-   optional parts (engraving, note, price point) are folded; one line under the form says what happens next.
-   Layout only: the fields, their checks and what is sent are the engine's own, unchanged. */
 .nb-receipt{border:1px solid var(--border);border-radius:14px;background:var(--bg2);margin:10px 0 12px;overflow:hidden}
 .nb-receipt-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px;padding:4px 4px 4px 14px;min-height:52px;border-top:1px solid var(--border)}
 .nb-receipt-row:first-child{border-top:0}
@@ -1049,16 +1036,12 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
 .nb-next{font-size:13px;line-height:1.45;color:var(--text-muted);text-align:center;margin:12px 0 10px}
 @media(max-width:767px){
   #acc-body-summary .panel-desc{display:none}
-  /* 2026-11-11 (unknown size + price range): the bottom bar already says …[doc 2026-11-17] */
   #acc-body-summary .panel-title,#acc-body-summary .email-form > h4{display:none}
   #acc-body-summary details.nb-all{margin-top:14px}
   #acc-body-summary .email-form{margin-top:4px}
-  /* first + last name side by side (browsers without :has keep them stacked) */
   #acc-body-summary .email-form > div:has(> .form-row #quoteFirstName){display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
   #acc-body-summary #quoteSubmitBtn{min-height:52px !important;font-size:16px !important}
 }
-/* ===== NEW BUILDER (2026-11-11, Johan): UNKNOWN RING SIZE + PRICE RANGE =====
-   "Unknown - Send …[doc 2026-11-17] */
 .nb-size-unknown{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;width:100%;min-height:60px;padding:10px 14px;margin:14px 0 2px;border:1px solid var(--border);border-radius:14px;background:var(--bg2);color:var(--text);font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .nb-size-unknown .nb-su-t{font-size:15px;font-weight:600;line-height:1.3}
 .nb-size-unknown .nb-su-s{font-size:13px;line-height:1.4;color:var(--text-muted)}
@@ -1075,13 +1058,9 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
 .nb-range .nb-group.selected{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold);background:linear-gradient(135deg,var(--gold-wash),transparent 70%),var(--bg2)}
 .nb-range.nb-nudge{border-color:#c0392b;box-shadow:0 0 0 1px #c0392b}
 .nb-range.nb-nudge .nb-groups .nb-k{color:#c0392b;font-weight:700}
-/* PRICE RANGE RULES (2026-11-13, Johan 20:30): staff only - "Customer sees: ..." under the Estimated Total + small print. Layout only. */
 .nb-cust-sees{display:flex;flex-direction:column;gap:2px;margin:6px 0 8px;padding:8px 12px;border:1px dashed var(--border);border-radius:10px;background:var(--bg2)}
 .nb-cust-sees .nb-cs-v{font-size:14px;line-height:1.35;font-weight:700;color:var(--text)}
 .nb-cust-sees .nb-cs-n{font-size:12px;line-height:1.4;color:var(--text-muted)}
-/* ===== NEW BUILDER (2026-11-11, Johan): THREE STEPS =====
-   The tools are grouped into the steps named in the pricing settings (builder_config.steps[].group):
-   Your band / Make it yours / Get my quote. Layout only. Without groups in the settings nothing here applies. */
 .acc-panel[data-nb-first="1"] .nav-buttons .btn-prev{visibility:hidden}
 .nb-size-nudge{outline:2px solid #c0392b;outline-offset:2px;border-radius:14px}
 #acc-body-size .nb-hide{display:none !important}
@@ -1094,9 +1073,6 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
   #nbStepNext.nb-wide{max-width:48vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #nbStepNext.nb-wait{opacity:.55}
 }
-/* ===== NEW BUILDER (2026-11-11, Johan): READY-MADE LAYOUTS =====
-   Cards at the top of the Inlays screen. The list comes from the pricing settings (builder_config.ready_layouts).
-   Layout only. */
 .nb-layouts{margin:0 0 16px;border:1px solid var(--border);border-radius:14px;background:var(--bg2);padding:10px 12px}
 .nb-layouts > summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;font-size:15px;font-weight:600;color:var(--text);-webkit-tap-highlight-color:transparent}
 .nb-layouts > summary::-webkit-details-marker{display:none}
@@ -1114,24 +1090,17 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
 .nb-lay-name{font-size:13px;line-height:1.3;font-weight:600}
 .nb-lay-more{margin-top:8px;width:100%;min-height:44px;border:1px dashed var(--border);border-radius:12px;background:transparent;color:var(--text);font:inherit;font-size:14px;font-weight:600;cursor:pointer}
 .nb-layouts .nb-lay-plain{font-size:13px;line-height:1.4;color:var(--text-muted);margin:10px 0 2px}
-/* ===== NEW BUILDER (2026-11-11, Johan): TAP TARGETS AND TEXT SIZE ON PHONES =====
-   Acceptance: every tap target at least 44 x 44 px, no text under 12 px (hand-over section 5.4). Phones only.
-   Layout only - no control is removed; the small "x" on each strip in the band picture is replaced by a
-   "Remove" button in that strip's row (same action). */
+.nb-layouts.nb-lay-below{margin:16px 0 0}
 @media(max-width:767.98px){
-  /* metal / sleeve / material lists */
   .mat-group-btn{min-height:44px !important;font-size:12px !important}
   .mat-group-btn .mat-group-name{font-size:12.5px !important}
   .mat-group-btn .mat-group-sub{font-size:12px !important}
   .swatch-zoom-btn{width:44px !important;height:44px !important;right:-20px !important;bottom:-20px !important;border:0 !important;box-shadow:none !important;border-radius:50% !important;font-size:12px !important;line-height:44px !important;
     background:radial-gradient(circle at center,var(--bg2,#fff) 0 9.5px,var(--swatch-border,#c9cddb) 9.5px 10.5px,transparent 11px) !important}
-  /* ring width slider and number box */
   .width-control input[type=range],#controlsCol input[type=range],.acc-body input[type=range]{box-sizing:content-box !important;height:6px !important;padding:19px 0 !important;background-clip:content-box !important;min-width:44px}
   .width-control input[type=number]{min-height:44px !important;min-width:62px}
-  /* ring sizes */
   .size-btn{height:44px !important;min-height:44px !important;font-size:13px !important}
   .size-btn.quarter{font-size:12px !important}
-  /* inlay rows: two lines per strip - name (tap to change) + Remove, then move and width */
   .v2-strip-row{display:flex !important;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:8px 10px !important}
   .v2-strip-row > .v2-row-dot{order:1;flex:0 0 auto}
   .v2-strip-row > .v2-row-name{order:2;flex:1 1 calc(100% - 130px);min-width:44px !important;min-height:44px !important;text-align:left;display:flex !important;flex-direction:column;justify-content:center;align-items:flex-start;font-size:14px !important;white-space:normal;overflow-wrap:anywhere}
@@ -1142,21 +1111,14 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
   .v2-row-btn{min-width:44px !important;min-height:44px !important;width:44px !important;height:44px !important;font-size:16px !important}
   .v2-row-w{font-size:13px !important}
   .nb-row-remove{min-width:44px;min-height:44px;padding:0 10px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--danger,#c0392b);font:inherit;font-size:13px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
-  /* dialogs and text links */
   .v2-modal-x{min-width:44px !important;min-height:44px !important;width:44px !important;height:44px !important;top:6px !important;right:6px !important}
   .acc-body p a,.acc-body div > a,#addStripModal a{display:inline-block;padding:15px 0;margin:-15px 0;min-width:44px}
   .acc-body button{min-height:44px}
-  /* the band picture: the tiny labels and the tiny "x" give way to the rows underneath */
   .composer-strips .strip-block .s-remove{display:none !important}
   .composer-strips .s-name,.composer-strips .s-width,.composer-strips > div:not(.strip-block) > div{visibility:hidden !important}
   .composer-strips .v2-grip{font-size:12px !important}
   .composer-strips .strip-block{min-width:28px}
 }
-/* ===== NEW BUILDER (2026-11-11, Johan): PC LAYOUT =====
-   From 768 px wide, only while the page body carries the class "nb-pc" (set by router part 369d when the pricing settings have the
-   step names). Layout only: no control is removed, no price, rule or payload is touched.
-   Step header at the top of the right column - Back / step / Next bar at its bottom - short receipt on the last
-   screen - no text under 12 px. */
 .nb-pc-steps{display:none}
 @media(min-width:768px){
   body.nb-pc .studio-intro{display:none !important}
@@ -1165,7 +1127,6 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
   body.nb-pc .studio-controls{display:flex;flex-direction:column}
   body.nb-pc .acc-stack{flex:1 0 auto;padding:26px 36px 44px !important;min-height:0}
   body.nb-pc .acc-panel{scroll-margin-top:150px !important}
-  /* 1. step header */
   body.nb-pc .nb-pc-steps{display:block;position:sticky;top:0;z-index:45;padding:14px 30px 0;border-bottom:1px solid var(--border);background:var(--glass);-webkit-backdrop-filter:blur(22px) saturate(1.3);backdrop-filter:blur(22px) saturate(1.3)}
   .nb-pc-row1{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px}
   .nb-pc-step{display:flex;align-items:center;gap:10px;min-width:0;min-height:52px;padding:7px 12px;border:1px solid var(--border);border-radius:14px;background:transparent;color:var(--text-muted);font:inherit;text-align:left;cursor:pointer;transition:border-color .2s ease,background .2s ease,color .2s ease}
@@ -1186,7 +1147,6 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
   .nb-pc-l::after{content:'';display:inline-block;width:7px;height:7px;margin-left:7px;border-radius:50%;vertical-align:middle;background:transparent}
   .nb-pc-tool.filled .nb-pc-l::after{background:#1fa98b}
   .nb-pc-v{display:block;font-size:12px;line-height:1.3;color:var(--gold);max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  /* a narrow right column (small windows): the step names stay whole */
   @container studio (max-width:540px){
     body.nb-pc .nb-pc-steps{padding:12px 16px 0}
     .nb-pc-row1{gap:6px}
@@ -1204,7 +1164,6 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
     body.nb-pc #nbStepNext{min-width:128px;padding:0 14px;font-size:15px}
     body.nb-pc #nbStepMid .nb-step-dots i{width:22px}
     body.nb-pc #nbStepMid .nb-step-dots i.on{width:36px}
-    /* strip rows on two lines, as on phones: the name stays whole */
     body.nb-pc .v2-strip-row{display:flex !important;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:8px 10px !important}
     body.nb-pc .v2-strip-row > .v2-row-dot{order:1;flex:0 0 auto}
     body.nb-pc .v2-strip-row > .v2-row-name{order:2;flex:1 1 calc(100% - 130px);min-width:44px;text-align:left;white-space:normal;overflow-wrap:anywhere}
@@ -1212,7 +1171,6 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
     body.nb-pc .v2-strip-row > .v2-row-group{order:4;flex:0 0 auto;display:inline-flex;align-items:center;gap:6px}
     body.nb-pc .v2-strip-row > .v2-row-group ~ .v2-row-group{order:5;margin-left:auto}
   }
-  /* 2. Back - step - Next, at the bottom of the right column */
   body.nb-pc #nbStepBar{display:grid !important;position:sticky;bottom:0;z-index:46;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;margin-top:auto;padding:12px 30px;background:var(--glass);border-top:1px solid var(--border);-webkit-backdrop-filter:blur(22px) saturate(1.3);backdrop-filter:blur(22px) saturate(1.3);box-shadow:0 -8px 24px rgba(20,24,40,.08)}
   body.nb-pc #nbStepBar button{font:inherit;cursor:pointer}
   body.nb-pc #nbStepBack{height:48px;min-width:104px;padding:0 18px;border-radius:12px;border:1px solid var(--border-light);background:var(--bg2);color:var(--text);font-size:15px;font-weight:600;line-height:1}
@@ -1229,7 +1187,6 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
   body.nb-pc #nbStepNext:hover{background:var(--gold-grad-hover)}
   body.nb-pc #nbStepNext[hidden]{display:block !important;visibility:hidden}
   #nbStepList,#nbStepScrim{display:none !important}
-  /* 3. last screen: the receipt and a short form (the long tables are behind "Show all details") */
   body.nb-pc #acc-body-summary .panel-desc{display:none}
   body.nb-pc #acc-body-summary .email-form > h4{display:none}
   body.nb-pc #acc-body-summary .nb-receipt,body.nb-pc #acc-body-summary details.nb-details,body.nb-pc #acc-body-summary .email-form,body.nb-pc #acc-body-summary .nb-range{max-width:640px}
@@ -1237,7 +1194,6 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
   body.nb-pc #acc-body-summary .email-form > div:has(> .form-row #quoteFirstName){display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
   body.nb-pc #acc-body-summary #quoteSubmitBtn{min-height:54px !important;width:100%;font-size:16px !important}
   body.nb-pc #acc-body-summary details.nb-all{margin-top:16px}
-  /* the four receipt rows sit two by two when the column is wide enough - Submit comes up by about 100 px */
   @container studio (min-width:560px){
     body.nb-pc #acc-body-summary .nb-receipt{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
     body.nb-pc #acc-body-summary .nb-receipt-row{border-top:0;border-bottom:1px solid var(--border)}
@@ -1245,19 +1201,14 @@ details.nb-details>.nb-inner>.summary-section:last-child{margin-bottom:0}
     body.nb-pc #acc-body-summary .nb-receipt-row:nth-last-child(-n+2){border-bottom:0}
   }
   body.nb-pc #acc-body-summary input[type="text"],body.nb-pc #acc-body-summary input[type="email"],body.nb-pc #acc-body-summary textarea{font-size:16px !important;min-height:46px}
-  /* 4. strip rows: an own Remove button, as on phones */
   body.nb-pc .nb-row-remove{min-height:30px;padding:0 10px;margin-left:6px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--danger,#c0392b);font:inherit;font-size:12px;font-weight:600;cursor:pointer}
   body.nb-pc .nb-row-remove:hover{background:rgba(192,57,43,.08)}
-  /* the brand mark over the ring */
   body.nb-pc .v2-header .studio-eyebrow{font-size:12px;letter-spacing:.18em}
   body.nb-pc .v2-header .studio-brand-mark{font-size:12px}
-  /* 5. readable sizes on the tools */
   body.nb-pc .studio-controls .mat-group-btn{font-size:13px;padding:9px 14px}
   body.nb-pc .acc-body .panel-desc{font-size:14px}
   body.nb-pc .studio-controls .mat-card .name{font-size:13px}
 }
-/* ===== NEW BUILDER (2026-11-11, Johan): STRIP WIDTHS - a number box in every strip row =====
-   …[doc 2026-11-17] */
 body.nb-easy .v2-strip-row .v2-row-w{display:none !important}
 body.nb-easy .v2-strip-row .nb-w{width:66px;height:36px;padding:0 4px;border:1px solid var(--border-light,#ccd2df);border-radius:10px;background:var(--input-bg,#fff);color:var(--gold,#5362e6);font:inherit;font-size:15px;font-weight:700;text-align:center;-moz-appearance:textfield;appearance:textfield}
 body.nb-easy .v2-strip-row .nb-w::-webkit-outer-spin-button,body.nb-easy .v2-strip-row .nb-w::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
@@ -1267,28 +1218,16 @@ body.nb-easy .nb-w-hint{font-size:13px !important;line-height:1.5 !important;col
 @media(max-width:767.98px){
   body.nb-easy .v2-strip-row .nb-w{width:64px;height:44px;font-size:16px}
 }
-/* ===== NEW BUILDER (2026-11-11, Johan 17:49): THE "ESTIMATED TOTAL" BOX CLEARS THE BACK / NEXT BAR …[doc 2026-11-17] */
 @media(min-width:768px){
   body.nb-pc .v2-price{bottom:88px !important}
-  /* the last lines of a tool can scroll clear of the box (only while the box is shown) */
   body.nb-pc:not(.v2-hide-prices) .acc-stack{padding-bottom:124px !important}
 }
 @media(max-width:767px){
-  /* phones: only while the new builder is on (the class nb-easy comes with the step names, like nb-pc) */
   body.nb-easy .v2-price{bottom:calc(76px + env(safe-area-inset-bottom,0px)) !important}
 }
-/* PRICE POINT IN DETAILS (2026-11-11, Johan 17:49): the Comfortable Price Point inside "Show all details" */
 details.nb-all > .nb-inner > #quoteBudgetBox.nb-pp{margin:8px 0 16px !important}
-/* TOTAL ABOVE ZERO (2026-11-11, Johan 18:58): signed-in staff see the box only while it holds an …[doc 2026-11-17] */
 body.staff-mode #v2-price.nb-total-empty{display:none !important}
 @media(min-width:768px){ body.nb-pc.staff-mode:has(#v2-price.nb-total-empty) .acc-stack{padding-bottom:44px !important} }
-/* ===== NEW BUILDER (2026-11-11, Johan 21:32): THE "ESTIMATED TOTAL" NO LONGER COVERS A CONTROL (PC) =====
-   Seen on the hosted test page at a 608 px high window: the floating total box lay over the size-group button
-   "13.25 and larger" on the last screen. A floating box always lies over something.
-   From 768 px, while the new builder is on (nb-pc): the box is a slim line across the column, directly above the
-   Back / Next bar - in the flow of the tools, so it has its own room and nothing is underneath it at the end of
-   a screen. Position and shape only: the amount, who sees it and when are the engine's and the server's.
-   Phones (under 768 px) and the page without step names: unchanged. */
 @media(min-width:768px){
   body.nb-pc:not(.v2-hide-prices) .acc-stack{display:flex !important;flex-direction:column;padding-bottom:12px !important}
   body.nb-pc:not(.v2-hide-prices) .acc-stack > *{flex:0 0 auto}
@@ -1300,28 +1239,21 @@ body.staff-mode #v2-price.nb-total-empty{display:none !important}
   }
   body.nb-pc .acc-stack > #v2-price .v2-price-label{font-size:12px;letter-spacing:.12em}
   body.nb-pc .acc-stack > #v2-price .v2-price-amount{font-size:1.2rem;line-height:1.1}
-  /* a plain band behind the line, as wide as the column and down to the …[doc 2026-11-17] */
   body.nb-pc .acc-stack > #v2-price::after{content:'';position:absolute;z-index:-1;top:-8px;bottom:-9px;left:-36px;right:-36px;
     background:var(--bg);border-top:1px solid var(--border)}
-  /* a little air between the last line of a tool and the total line */
   body.nb-pc:not(.v2-hide-prices) .acc-stack > section:last-of-type{margin-bottom:24px}
-  /* narrow column (same switch as part 109c): the column has 20 px at the sides */
   @container studio (max-width:540px){
     body.nb-pc .acc-stack > #v2-price::after{left:-20px;right:-20px}
   }
-  /* staff with no amount yet: no line (part 369g marks it), the tools keep their usual room at the end */
   body.nb-pc.staff-mode:has(#v2-price.nb-total-empty) .acc-stack{padding-bottom:44px !important}
 }
-/* ===== NEW BUILDER (2026-11-11, Johan 22:26): ONE "ESTIMATED TOTAL" ON THE LAST SCREEN · STAFF PRI… …[doc 2026-11-17] */
 body.nb-easy #v2-price.nb-total-twice{display:none !important}
 @media(min-width:768px){ body.nb-pc:has(#v2-price.nb-total-twice) .acc-stack{padding-bottom:44px !important} }
 body.nb-easy.staff-mode .mat-card:has(> .staff-price){display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:10px;row-gap:1px}
 body.nb-easy.staff-mode .mat-card:has(> .staff-price) > .swatch{grid-row:1 / span 2}
 body.nb-easy.staff-mode .mat-card:has(> .staff-price) > .name{grid-column:2;align-self:end;min-width:0}
 body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;justify-self:start;margin-left:0;padding-left:0;font-size:12px;line-height:1.25;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-/* ===== NEW BUILDER (2026-11-12, Johan 19:36 - to-do section 3): PHONES - THE "ESTIMATED TOTAL" NO … …[doc 2026-11-17] */
 @media(max-width:767px){
-  /* SAME COLOURS AS THE BAR (2026-11-12, Johan 20:35): the bar hangs on the page body (dark), the …[doc 2026-11-17] */
   body.nb-easy{--nb-bar-bg:var(--bg2,#fff);--nb-bar-text:var(--text,#1c1f2b);--nb-bar-muted:var(--text-muted,#6b7080);--nb-bar-border:var(--border,#d8dbe6)}
   body.nb-easy #v2-price{
     left:0 !important;right:0 !important;bottom:calc(65px + env(safe-area-inset-bottom,0px)) !important;z-index:95;
@@ -1331,10 +1263,8 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
   }
   body.nb-easy #v2-price .v2-price-label{font-size:12px;letter-spacing:.12em;color:var(--nb-bar-muted)}
   body.nb-easy #v2-price .v2-price-amount{font-size:1.15rem;line-height:1.1;color:var(--nb-bar-text)}
-  /* the bar's own shadow would fall on the line: the line carries it instead while it is shown */
   body.nb-easy:has(#v2-price:not(.nb-total-empty):not(.nb-total-twice)):not(.v2-hide-prices) #nbStepBar{box-shadow:none}
 }
-/* ===== NEW BUILDER (2026-11-12, Johan 21:01 - to-do section 3): PC - THE BAR'S STEP NAME IS NO LON… …[doc 2026-11-17] */
 @media(min-width:768px){
   @container studio (max-width:540px){
     body.nb-pc #nbStepBar{padding:12px 16px;gap:8px}
@@ -1344,7 +1274,6 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
     body.nb-pc #nbStepMid .nb-step-dots i.on{width:36px}
   }
 }
-/* ===== NEW BUILDER (2026-11-12, Johan 21:45 - to-do section 3): WINDOWS 768 - 899 px WIDE - THE …[doc 2026-11-17] */
 @media(min-width:768px) and (max-width:899px){
   body.nb-pc{--nb-ring-h:clamp(200px,36svh,440px)}
   body.nb-pc .v2-preview{position:sticky;top:0;z-index:50;height:var(--nb-ring-h);min-height:0;padding:14px 18px;box-shadow:0 6px 18px rgba(0,0,0,.32)}
@@ -1356,13 +1285,10 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
   body.nb-pc .stage-label{display:none}
   body.nb-pc .studio-controls{margin-top:0;border-radius:0;min-height:calc(100svh - var(--nb-ring-h))}
   body.nb-pc .nb-pc-steps{top:var(--nb-ring-h)}
-  /* what the page scrolls to (a panel, the size buttons, the price range, a control a click needs) …[doc 2026-11-17] */
   html:has(body.nb-pc){scroll-padding-top:calc(clamp(200px,36svh,440px) + 132px);scroll-padding-bottom:76px}
   body.nb-pc .acc-panel{scroll-margin-top:16px !important}
-  /* signed-in staff: the engine keeps 64 px free under the page for its floating total box; here the …[doc 2026-11-17] */
   body.nb-pc.staff-mode{padding-bottom:0}
 }
-/* ===== NEW BUILDER (2026-11-12, Johan 22:59 - to-do section 3): PC - THE ADD / EDIT INLAY DIALOG U… …[doc 2026-11-17] */
 @media(min-width:900px){
   body.nb-pc #addStripModal .v2-modal-frame:has(> #addStripModalInner.v2-add-strip-mode),
   body.nb-pc #addStripModal .v2-modal-frame:has(> #addStripModalInner.v2-edit-strip-mode){max-width:min(1080px,calc(100vw - 72px))}
@@ -1375,7 +1301,6 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
   body.nb-pc #addStripModalInner.v2-add-strip-mode > .mat-groups,
   body.nb-pc #addStripModalInner.v2-edit-strip-mode > .mat-groups{gap:6px}
 }
-/* a low window (a 768 px high laptop screen): less air around the fixed …[doc 2026-11-17] */
 @media(min-width:900px) and (max-height:860px){
   body.nb-pc #addStripModalInner.v2-add-strip-mode,
   body.nb-pc #addStripModalInner.v2-edit-strip-mode{height:calc(100vh - 40px);padding:20px 24px 18px}
@@ -1392,8 +1317,6 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
   body.nb-pc #addStripModalInner.v2-add-strip-mode > div:last-child,
   body.nb-pc #addStripModalInner.v2-edit-strip-mode > div:last-child{margin-top:8px !important}
 }
-/* ===== END PC INLAY DIALOG ===== */
-/* === INLAY DIALOG COLOURS (2026-11-13, Johan - PC test feedback item 1) - START === (comment moved to claude\build-2026-11-15-blank-card-names.md, page weight 2026-11-15) */
 :is(body.nb-pc, body.nb-easy) #addStripModal{
   --bg:#f4f6fa;--bg2:#ffffff;--bg3:#edf0f6;--bg4:#e4e8f0;
   --gold:#4a59dc;--gold-light:#5f6eea;--gold-dim:#4a59dc;
@@ -1415,20 +1338,14 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
   --val-info-bg:#16261d;--val-info-border:#2f5a40;--val-info-text:#8fd3a5;
   --nb-dlg-off-bg:#1d222d;--nb-dlg-off-text:#aeb6c6;--nb-dlg-off-btn:#272d39;
 }
-/* material names: full strength */
 :is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner .mat-card .name{color:var(--text)}
-/* a material that does not fit the strip width: was the whole card at 62% - now a grey card with readable text */
 :is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner .mat-card.disabled{opacity:1;background:var(--nb-dlg-off-bg);box-shadow:none}
 :is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner .mat-card.disabled .name{color:var(--nb-dlg-off-text)}
 :is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner .mat-card.disabled .swatch{filter:saturate(.35)}
-/* the button before a material is chosen: was 40% see-through - now a grey button with readable text */
 :is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner .btn-gold:disabled{opacity:1;background:var(--nb-dlg-off-btn);color:var(--nb-dlg-off-text);border:1px solid var(--border-light);box-shadow:none}
-/* the small zoom mark on a photo, the link, the hint in the search box */
 :is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner .swatch-zoom-btn{color:var(--text);background:var(--bg2)}
 :is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner a{color:var(--gold)}
 :is(body.nb-pc, body.nb-easy) #addStripModal #addStripModalInner .mat-search::placeholder{color:var(--text-muted);opacity:1}
-/* === INLAY DIALOG COLOURS (2026-11-13) - END === */
-/* ===== PHONE INLAY GROUPS (2026-11-13, Johan - to-do section 5, line 1: proposal B) - START ===== (comment moved to claude\build-2026-11-15-blank-card-names.md, page weight 2026-11-15) */
 @media(max-width:767.98px){
   body.nb-easy #addStripModalInner.v2-add-strip-mode .mat-groups:not(.nb-groups-open) > .mat-group-btn.nb-group-folded,
   body.nb-easy #addStripModalInner.v2-edit-strip-mode .mat-groups:not(.nb-groups-open) > .mat-group-btn.nb-group-folded{display:none}
@@ -1441,7 +1358,6 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
   body.nb-easy #addStripModalInner.v2-add-strip-mode > .mat-grid,
   body.nb-easy #addStripModalInner.v2-edit-strip-mode > .mat-grid{flex:1 1 0;min-height:150px;max-height:none !important;align-content:start}
 }
-/* a short phone screen (360 x 640 and the like): the dialog a little …[doc 2026-11-17] */
 @media(max-width:767.98px) and (max-height:700px){
   body.nb-easy #addStripModalInner.v2-add-strip-mode,
   body.nb-easy #addStripModalInner.v2-edit-strip-mode{height:96vh;height:96dvh;padding-top:16px;padding-bottom:max(12px,env(safe-area-inset-bottom))}
@@ -1462,9 +1378,6 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
   body.nb-easy #addStripModalInner.v2-add-strip-mode > div:last-child,
   body.nb-easy #addStripModalInner.v2-edit-strip-mode > div:last-child{margin-top:8px !important}
 }
-/* ===== PHONE INLAY GROUPS (2026-11-13) - END ===== */
-/* ===== NEW DESIGN + METAL CHANGE (2026-11-14, Johan - to-do section 9) - START =====
-   The "New design" button + question, the step-list item, the Base Metal note. Layout only. */
 .nb-new-btn{
   pointer-events:auto;position:absolute;top:26px;height:40px;padding:0 14px;z-index:5;
   display:inline-flex;align-items:center;gap:7px;white-space:nowrap;cursor:pointer;
@@ -1488,12 +1401,8 @@ body.nb-easy.staff-mode .mat-card > .staff-price{grid-column:2;align-self:start;
 #nb-metal-change-note strong{display:block;margin-bottom:4px}
 #nb-metal-change-note ul{margin:0;padding-left:18px}
 @media(max-width:767px){ #nb-metal-change-note{font-size:13px} }
-/* ===== NEW DESIGN + METAL CHANGE (2026-11-14) - END ===== */
-/* PRECUT CHOICE 2026-11-14 (Johan 23:12): blank cards on Tungsten / Black Ceramic */
 .nb-lay-bar i.nb-ch{background:repeating-linear-gradient(45deg,#c3c8d2 0 3px,#eef0f4 3px 6px)}
-/* PRECUT CHANNELS 2026-11-15: an inlay row of a channel keeps « » − + / …[doc 2026-11-17] */
 body.nb-pre #acc-body-compose .width-control,body.nb-pre .composer-actions .btn-gold,body.nb-pre .composer-actions .btn-outline:not(.btn-undo),body.nb-pre .remaining-width,body.nb-pre .strip-block:not(.nb-pc-ed) .s-remove,body.nb-pre .v2-strip-row:not(.nb-pc-ed) .nb-row-remove,body.nb-pre:not(.nb-pch) .nb-w-hint,body.nb-pre .v2-strip-row:not(.nb-pc-ed) .v2-row-group,body.nb-pre .v2-grip,body.nb-pre #acc-body-compose .panel-desc,body.nb-pre:not(.nb-pch) #addStripModalInner div:has(>.width-picker){display:none!important}
-/* BLANK CARD NAMES 2026-11-15 (Johan 23:05): the size line under the layout; the Style number for signed-in staff only */
 .nb-lay-sub{font-size:13px;line-height:1.3;color:var(--text-dim);margin-top:-4px}
 .nb-lay-style{font-size:12px;line-height:1.3;color:var(--text-muted)}
 </style>
@@ -1710,18 +1619,6 @@ const state = {
 const RING_AUDIT_VISITOR_KEY = 'jbjtest-ring-audit-visitor-v2';
 const RING_AUDIT_FALLBACK_KEY = 'jbjtest-ring-audit-outbox-v2';
 
-// ===== NEW BUILDER (2026-11-11, Johan): AUDIT RECORDER LEFT OUT - START =====
-// The old page recorded every click, key, touch, scroll and form change into a browser database and posted it to the
-// audit worker, whose own database was deleted on 2026-10-02 (hand-over 3.3). That recorder is NOT in this page.
-// What stays is the small hub the rest of the page talks to - same names, so no caller changes:
-//   ringAudit.record(type, name, payload)   the engine still reports its events here. The live funnel beacon
-//                                           (router part 360) listens to exactly these calls. Nothing is stored
-//                                           and nothing is sent from here.
-//   ringAudit.visitorId / .sessionId        the same ids as before (same storage name); they go out with the quote
-//                                           (auditVisitorId / auditSessionId) and with the funnel beacon.
-//   ringAudit.configure / .flush / .snapshot kept so nothing breaks; no address is kept, nothing is posted.
-// The frozen engine-01 stays in src/common/120-engine-01.js (not joined into the pages); src/engine.lock.json and
-// tests/build-parts.mjs prove part-1 + the left-out recorder block + part-2 = that file, byte for byte.
 const ringAudit = (() => {
   function id() { return crypto.randomUUID().replaceAll('-', ''); }
   const sessionId = id();
@@ -1739,7 +1636,6 @@ const ringAudit = (() => {
   }
   return { record, flush, configure, snapshot, get visitorId() { return visitorId; }, get sessionId() { return sessionId; } };
 })();
-// ===== NEW BUILDER (2026-11-11, Johan): AUDIT RECORDER LEFT OUT - END =====
 
 // Unicode-safe base64 helpers (btoa/atob crash on non-Latin-1 chars like accented names or emoji)
 function utoa(str){return btoa(unescape(encodeURIComponent(str)));}
@@ -7406,11 +7302,9 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   window.__V2_FUNNEL__={ snapshot:snap, flush:function(){ clearTimeout(timer); send(false); },
     forgetTool:function(id){ delete seenTools[id]; } };   // NEW BUILDER TRACKER FIELDS (2026-11-14, Johan 13:48): + forgetTool
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): RING PICTURE THAT ALWAYS FITS + FORM FIELD HELP - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
 (function(){
   var MAX_PICTURE_WIDTH=900, SHRINK_STEP=0.8, MAX_TRIES=7;
   function pictureLimit(){
-    // BUILDER = builder_config from /designer-config (engine global). The limit is the server's own number.
     try{ var n=(typeof BUILDER!=='undefined')&&BUILDER&&BUILDER.limits&&BUILDER.limits.ring_image_max_characters; return (typeof n==='number'&&n>0)?n:null; }catch(e){ return null; }
   }
   var lastPicture={ w:0, h:0, len:0, tries:0, sent:false }, lastFailReason='';
@@ -7439,7 +7333,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   window._getCanvasImage=capture;
   window.__V2_PICTURE__={ last:function(){ return lastPicture; }, limit:pictureLimit, lastFailReason:function(){ return lastFailReason; } };
 
-  // 2. safety net: one resend without the picture
   var nativeFetch=window.fetch;
   window.fetch=function(input,init){
     try{
@@ -7466,7 +7359,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     return nativeFetch.apply(this,arguments);
   };
 
-  // 3. staff only: show the server's reason under the button   4. field hints
   function isStaff(){ try{ return typeof _staffToken!=='undefined'&&!!_staffToken; }catch(e){ return false; } }
   function tidy(){
     try{
@@ -7479,7 +7371,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
         if(el.getAttribute('spellcheck')!=='false') el.setAttribute('spellcheck','false');
       }
       if(lastFailReason&&isStaff()){
-        // the engine's status line has no id: it is the leaf element that starts with its fixed failure sentence
         var d=document.querySelectorAll('div');
         for(var n=0;n<d.length;n++){ var el2=d[n];
           if(el2.childElementCount===0&&/^Something went wrong\./.test(el2.textContent||'')&&el2.textContent.indexOf('[Staff: ')===-1) el2.textContent=el2.textContent+' [Staff: '+lastFailReason+']';
@@ -7492,21 +7383,14 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   try{ new MutationObserver(schedule).observe(document.documentElement,{ childList:true, subtree:true, characterData:true }); }catch(e){}
   schedule();
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): PHONE BOTTOM STEP BAR =====
-   Back - current step (tap for the list of all steps) - Next.
-   Back / Next press the panel's own (now hidden) Back / Continue buttons, and the list presses the existing tool
-   tabs - so every existing rule, message and step logic still decides what happens. Phones only (CSS hides it from 768px up). */
 (function(){
   function tabs(){ return Array.prototype.slice.call(document.querySelectorAll('#studio-tool-rail .tool-tab[data-sec]')); }
   function activeIndex(list){ for(var i=0;i<list.length;i++){ if(list[i].classList.contains('active')||list[i].getAttribute('aria-selected')==='true') return i; } return -1; }
   function label(tab){ var l=tab&&tab.querySelector('.tool-label'); return l?String(l.textContent||'').trim():''; }
-  // THREE STEPS (2026-11-11, Johan) - START: when the tools carry a step name (data-nb-group, set from the pricing settings by
-  // the three-steps part) the bar counts the STEPS (1 of 3), not the tools. Without step names: as before.
   function groupOf(tab){ return (tab&&tab.getAttribute('data-nb-group'))||''; }
   function shown(){ return tabs().filter(function(t){ return !t.hidden; }); }
   function grouped(){ return tabs().some(function(t){ return !!groupOf(t); }); }
   function groupNames(list){ var out=[]; list.forEach(function(t){ var g=groupOf(t); if(g&&out.indexOf(g)<0) out.push(g); }); return out; }
-  // THREE STEPS (2026-11-11, Johan) - END
   var bar, back, mid, name, dots, next, scrim, listEl;
   function panelOf(tab){ var id=tab&&tab.getAttribute('aria-controls'); return id?document.getElementById(id):null; }
   function panelBtn(tab,cls){ var p=panelOf(tab); return p?p.querySelector('.nav-buttons .'+cls):null; }
@@ -7529,9 +7413,9 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     scrim.addEventListener('click',closeList);
   }
   function openList(){
-    var list=grouped()?shown():tabs(), i=activeIndex(list), lastGroup=null; listEl.textContent='';   // THREE STEPS (2026-11-11, Johan)
+    var list=grouped()?shown():tabs(), i=activeIndex(list), lastGroup=null; listEl.textContent='';
     list.forEach(function(t,k){
-      var g=groupOf(t);   // THREE STEPS (2026-11-11, Johan): a heading where a new step begins
+      var g=groupOf(t);
       if(g&&g!==lastGroup){ var hd=document.createElement('div'); hd.className='nb-g'; hd.textContent=(groupNames(list).indexOf(g)+1)+'. '+g; listEl.appendChild(hd); }
       lastGroup=g;
       var b=document.createElement('button'); b.type='button'; b.setAttribute('role','menuitem'); if(k===i) b.className='on';
@@ -7547,19 +7431,18 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   function closeList(){ document.body.classList.remove('nb-steps-open'); }
   function go(delta){
     closeList();
-    var list=grouped()?shown():tabs(), i=activeIndex(list); if(i<0) i=0;   // THREE STEPS (2026-11-11, Johan)
+    var list=grouped()?shown():tabs(), i=activeIndex(list); if(i<0) i=0;
     var own=panelBtn(list[i], delta>0?'btn-next':'btn-prev');
     if(own){ own.click(); return; }
     var t=list[i+delta]; if(t) t.click();
   }
   function refresh(){
     if(!bar) return;
-    // THREE STEPS (2026-11-11, Johan) - START
     if(grouped()){
       var vis=shown(), a=activeIndex(vis); if(a<0) a=0;
       var names=groupNames(vis), g=groupOf(vis[a]), gi=Math.max(0,names.indexOf(g));
       var inGroup=vis.filter(function(t){ return groupOf(t)===g; }), pos=inGroup.indexOf(vis[a])+1;
-      name.textContent=g;   // the three bars underneath show "step 1 of 3"; the full wording is in the aria-label
+      name.textContent=g;
       mid.setAttribute('aria-label','Step '+(gi+1)+' of '+names.length+': '+g+', '+label(vis[a])+'. Show all steps');
       dots.className='nb-step-dots nb-groups';
       if(dots.childNodes.length!==names.length||!dots.firstChild||dots.firstChild.tagName!=='I'){ dots.textContent=''; for(var q=0;q<names.length;q++) dots.appendChild(document.createElement('i')); }
@@ -7577,7 +7460,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       return;
     }
     dots.className='nb-step-dots'; next.classList.remove('nb-wide');
-    // THREE STEPS (2026-11-11, Johan) - END
     var list=tabs(), i=activeIndex(list); if(i<0) i=0;
     name.textContent=(i+1)+' of '+list.length+' · '+label(list[i]);
     if(dots.childNodes.length!==list.length){ dots.textContent=''; for(var k=0;k<list.length;k++) dots.appendChild(document.createElement('i')); }
@@ -7594,13 +7476,8 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
   window.__V2_STEPBAR__={ refresh:refresh };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): LAST STEP AS A RECEIPT (phones) =====
-   Runs after the engine has drawn the Summary. It only MOVES the engine's own elements (so their checks, values
-   and what is sent stay exactly as they are) and adds: a short receipt with Edit links, fold-away blocks, and one
-   line saying what happens next. Phones only (under 768px). Re-applied each time the Summary is drawn again. */
 (function(){
   var MQ=window.matchMedia?window.matchMedia('(max-width:767px)'):null;
-  // PC LAYOUT (2026-11-11, Johan): the receipt also applies on a PC while the PC layout is on (router part 369d).
   function phone(){ if(!MQ||MQ.matches) return true; try{ return !!(window.__V2_PC__&&window.__V2_PC__.on()); }catch(e){ return false; } }
   function el(tag,cls,text){ var e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
   function sectionByTitle(h,title){ var s=h.querySelectorAll('.summary-section'); for(var i=0;i<s.length;i++){ var t=s[i].querySelector('h4'); if(t&&String(t.textContent||'').trim().indexOf(title)===0) return s[i]; } return null; }
@@ -7613,8 +7490,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     b.addEventListener('click',function(){ try{ window.__V2_ROUTER__.openSection(sec); }catch(e){} });
     row.appendChild(b); return row;
   }
-  // PRICE POINT IN DETAILS (2026-11-11, Johan 17:49): "Show all details" now also holds the Comfortable Price Point.
-  // The Summary is drawn again from time to time; the box must not snap shut while the customer is using it.
   var allOpen=false;
   function apply(){
     var h=document.getElementById('acc-body-summary');
@@ -7623,7 +7498,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     var band=sectionByTitle(h,'Band Composition');
     var c=rows(cfg), b=rows(band);
     var base=valueOf(c,'Base Metal');
-    // 1. receipt
     var rec=el('div','nb-receipt');
     rec.appendChild(receiptRow('Your band',[base,valueOf(c,'Ring Width'),valueOf(c,'Profile'),valueOf(c,'Finish')].filter(Boolean).join(' · '),'metal'));
     var inl=[]; for(var i=0;i<b.length;i++){ var m=/^Strip\s+\d+:\s*(.+)$/.exec(b[i].label); if(m&&m[1]!==base) inl.push(m[1]+' '+b[i].value); }
@@ -7631,12 +7505,10 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     var sl=valueOf(c,'Sleeve'); rec.appendChild(receiptRow('Sleeve',sl||'None','sleeve'));
     rec.appendChild(receiptRow('Ring size',valueOf(c,'Ring Size')||'Not chosen yet','size'));
     cfg.parentNode.insertBefore(rec,cfg);
-    // 2. the long tables fold away
     var all=fold('Show all details','nb-all',allOpen); rec.parentNode.insertBefore(all,rec.nextSibling);
     all.addEventListener('toggle',function(){ allOpen=!!all.open; });
     all._inner.appendChild(cfg); if(band) all._inner.appendChild(band);
     for(var k=0;k<h.children.length;k++){ var kid=h.children[k]; if(kid.tagName==='P'&&/Not seeing what/.test(kid.textContent||'')){ all._inner.appendChild(kid); break; } }
-    // 3. engraving is optional: folded unless something is already typed
     var eng=sectionByTitle(h,'Inside Laser Engraving'), font=h.querySelector('.eng-font-wrap');
     if(eng){
       var hasEng=false; try{ hasEng=!!(state&&state.engraving); }catch(e){}
@@ -7644,9 +7516,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       if(font&&font.parentNode===fe.parentNode) fe._inner.appendChild(font);
       fe._inner.appendChild(eng);
     }
-    // 4. the note is optional: folded unless already used
-    // PRICE POINT IN DETAILS (2026-11-11, Johan 17:49): the Comfortable Price Point (the engine's own box, moved, not
-    // rebuilt - same six choices, still optional, still sent as `budget`) is the first thing inside "Show all details".
     var form=h.querySelector('.email-form');
     if(form){
       var ta=form.querySelector('textarea'), notes=ta?ta.closest('.form-row'):null, budget=form.querySelector('#quoteBudgetBox');
@@ -7656,10 +7525,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
         fo._inner.appendChild(notes);
       }
       if(budget&&budget.parentNode===form){ budget.classList.add('nb-pp'); all._inner.insertBefore(budget,all._inner.firstChild); }
-      // 2026-11-11 (unknown size + price range): the folded details go BELOW the form, so the price range and the
-      // size groups fit above Submit on a small phone. Nothing is removed.
       if(all.parentNode===form.parentNode) form.parentNode.insertBefore(all,form.nextSibling);
-      // 5. what happens next, right at the button
       var btn=form.querySelector('#quoteSubmitBtn');
       if(btn&&!form.querySelector('.nb-next')){
         var days=null; try{ days=(typeof BUSINESS!=='undefined'&&BUSINESS)?Number(BUSINESS.quote_turnaround_business_days):null; }catch(e){}
@@ -7678,9 +7544,8 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
   window.__V2_QUOTESTEP__={ apply:apply };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): UNKNOWN RING SIZE + PRICE RANGE - comment moved to claude\build-2026-11-15-blank-stock-inlay-widths.md (page weight, 2026-11-15) */
 (function(){
-  var NB={ unknown:false, group:null, groupNeeded:false, range:null, rangeSeen:false, pending:false, seq:0, nudge:false, basis:null, totalNeedsGroup:false };   // basis: PRICE RANGE RULES (2026-11-13, Johan 19:56 / 20:30 / 20:41) · totalNeedsGroup: NO TOTAL BEFORE THE SIZE GROUP (2026-11-14)
+  var NB={ unknown:false, group:null, groupNeeded:false, range:null, rangeSeen:false, pending:false, seq:0, nudge:false, basis:null, totalNeedsGroup:false };
   function builder(){ try{ return (typeof BUILDER!=='undefined'&&BUILDER)?BUILDER:null; }catch(e){ return null; } }
   function cfg(){ var b=builder(); var u=b&&b.unknown_size; return (u&&typeof u.label==='string'&&u.label&&Array.isArray(u.groups)&&u.groups.length)?u:null; }
   function services(){ try{ return (typeof SERVICES!=='undefined'&&SERVICES)?SERVICES:null; }catch(e){ return null; } }
@@ -7688,13 +7553,11 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   function el(tag,cls,text){ var e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
   function money(n){ return '$'+Math.round(Number(n)).toLocaleString('en-US'); }
 
-  // A design link sent with a quote remembers "size unknown" (&su=1, &sg=group).
   try{
     var q=new URLSearchParams(window.location.search);
     if(q.get('design')&&q.get('su')==='1'){ NB.unknown=true; var g0=parseInt(q.get('sg'),10); if(g0>=1&&g0<=9) NB.group=g0; }
   }catch(e){}
 
-  // The stand-in size the engine keeps while the size is unknown (never used for the price - the server decides).
   function standInSize(){
     var b=builder(), s=st(); if(!b||!b.ring_size) return null;
     var allowed=b.ring_size;
@@ -7706,11 +7569,9 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     if(!cfg()){ NB.unknown=false; NB.group=null; NB.groupNeeded=false; return; }
     var size=standInSize(); if(size!=null&&s.ringSize!==size) s.ringSize=size;
   }
-  // STAFF CARD PRICES WITH UNKNOWN SIZE (2026-11-14, Johan 18:50): the …[doc 2026-11-17]
-  // are not part of that design - so they are dropped whenever Unknown or …[doc 2026-11-17]
   function forgetCardPrices(){ try{ if(typeof staffPriceCache!=='undefined'&&staffPriceCache&&typeof staffPriceCache.clear==='function') staffPriceCache.clear(); }catch(e){} }
   function refreshEstimate(){
-    forgetCardPrices();   // STAFF CARD PRICES WITH UNKNOWN SIZE (2026-11-14)
+    forgetCardPrices();
     NB.pending=true;
     try{ if(typeof clearEstimate==='function') clearEstimate(); }catch(e){}
     try{ if(typeof updatePrice==='function') updatePrice(); }catch(e){}
@@ -7728,13 +7589,11 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     NB.group=index; NB.nudge=false; refreshEstimate();
   }
 
-  // ---- what goes to the server, what comes back ----
   var nativeFetch=window.fetch;
   if(typeof nativeFetch==='function'){
     window.fetch=function(input,init){
       var sv=services(), url=(typeof input==='string')?input:((input&&input.url)||'');
       var isEstimate=!!(sv&&url&&url===sv.estimate_url), isQuote=!!(sv&&url&&url===sv.quote_url);
-      /* STAFF CARD PRICES WITH UNKNOWN SIZE (2026-11-14, Johan 18:50): the …[doc 2026-11-17] */
       var isCards=!!(sv&&url&&url===sv.staff_components_url);
       if(isCards&&init&&typeof init.body==='string'){
         try{
@@ -7770,12 +7629,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       return nativeFetch.apply(this,arguments);
     };
   }
-  /* ===== SHARE LINK CARRIES "SIZE UNKNOWN" (2026-11-13, Johan - to-do section 3) - START =====
-     The engine's "Copy Share Link" button builds its own link (locked part 220) without "size unknown", so a shared
-     design opened as a normal size 10. The link is completed here on its way to the clipboard (and in the engine's
-     "Copy this share link:" box when the clipboard refuses): &su=1, and &sg=<group> when a size group was tapped -
-     the same two marks the link sent with a quote carries. Opening such a link is handled at the top of this part.
-     No price, no size border: the server decides what it prices, as before. */
   function linkWithUnknown(url){
     try{
       if(typeof url!=='string'||!NB.unknown||!cfg()) return url;
@@ -7796,24 +7649,17 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       window.prompt=function(message,value){ return (arguments.length>1)?nativePrompt.call(window,message,linkWithUnknown(value)):nativePrompt.call(window,message); };
     }
   }catch(e){}
-  /* ===== SHARE LINK CARRIES "SIZE UNKNOWN" - END ===== */
   function applyEstimate(json){
     var ok=!!(json&&json.ok), r=ok?json.priceRange:null, u=ok?json.unknownSize:null;
-    /* PRICE RANGE RULES (2026-11-13, Johan 19:56 / 20:30 / 20:41): { low, …[doc 2026-11-17] */
     NB.range=(r&&isFinite(r.low)&&(r.from===true||isFinite(r.high)))?{ low:Number(r.low), high:r.from===true?null:Number(r.high), from:r.from===true }:null;
-    if(ok) NB.basis=(NB.range&&typeof json.priceRangeBasis==='string'&&json.priceRangeBasis)?json.priceRangeBasis:null;   // staff only
+    if(ok) NB.basis=(NB.range&&typeof json.priceRangeBasis==='string'&&json.priceRangeBasis)?json.priceRangeBasis:null;
     if(NB.range) NB.rangeSeen=true;
-    /* RANGE ONLY WITH UNKNOWN SIZE (2026-11-13, Johan): the server sends a customer the range only when the size is
-       Unknown (staff: always). An answer without a range = no "Calculating..." line while the next estimate runs. */
     else if(ok) NB.rangeSeen=false;
     if(ok) NB.groupNeeded=!!(NB.unknown&&u&&u.groupNeeded);
-    // NO TOTAL BEFORE THE SIZE GROUP (2026-11-14, Johan - to-do section 8 line 1): the server sends no total until the group is
-    // tapped (gold / platinum with Unknown); the engine shows a dash. This only changes the staff prompt's wording.
     if(ok) NB.totalNeedsGroup=!!(NB.unknown&&u&&u.totalNeedsGroup===true);
     schedule();
   }
 
-  // ---- size screen ----
   function paintSize(){
     var host=document.getElementById('acc-body-size'); if(!host) return;
     var grid=host.querySelector('.size-grid'), btn=host.querySelector('.nb-size-unknown'), c=cfg();
@@ -7829,17 +7675,15 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     if(btn.classList.contains('selected')!==NB.unknown){ btn.classList.toggle('selected',NB.unknown); btn.setAttribute('aria-pressed',NB.unknown?'true':'false'); }
     if(NB.unknown){ var sel=grid.querySelectorAll('.size-btn.selected'); for(var i=0;i<sel.length;i++) sel[i].classList.remove('selected'); }
   }
-  // a real size tapped -> the size is known again (runs before the engine's own handler)
   document.addEventListener('click',function(ev){
     var t=ev.target&&ev.target.closest?ev.target.closest('.size-btn'):null;
     if(t&&NB.unknown&&t.closest('#acc-body-size')){
-      NB.unknown=false; NB.group=null; NB.groupNeeded=false; NB.nudge=false; NB.range=null; NB.totalNeedsGroup=false;   // totalNeedsGroup: 2026-11-14
-      forgetCardPrices();   // STAFF CARD PRICES WITH UNKNOWN SIZE (2026-11-14)
+      NB.unknown=false; NB.group=null; NB.groupNeeded=false; NB.nudge=false; NB.range=null; NB.totalNeedsGroup=false;
+      forgetCardPrices();
       try{ if(typeof clearEstimate==='function') clearEstimate(); }catch(e){}
       schedule();
       return;
     }
-    // Submit waits for the closest size group when the server asked for one
     var s=ev.target&&ev.target.closest?ev.target.closest('#quoteSubmitBtn'):null;
     if(s&&NB.unknown&&NB.groupNeeded&&NB.group==null){
       ev.preventDefault(); ev.stopImmediatePropagation();
@@ -7848,21 +7692,18 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     }
   },true);
 
-  // ---- the two small "Size 10" labels in the tool list ----
   function paintHeaders(){
     var c=cfg(), s=st(); if(!c||!s) return;
     ['acc-sum-size','tool-sum-size'].forEach(function(id){
       var e=document.getElementById(id); if(!e) return;
       if(NB.unknown){ if(e.textContent&&e.textContent!=='Size unknown') e.textContent='Size unknown'; }
-      else if(e.textContent==='Size unknown') e.textContent=(s.ringSize!=null)?('Size '+s.ringSize):'';   // a real size was tapped again
+      else if(e.textContent==='Size unknown') e.textContent=(s.ringSize!=null)?('Size '+s.ringSize):'';
     });
   }
 
-  // ---- last step ----
   function paintSummary(){
     var h=document.getElementById('acc-body-summary'); if(!h) return;
     var c=cfg(), box=h.querySelector('.nb-range');
-    // the size shown in the receipt and in the details table
     if(c&&NB.unknown){
       var rows=h.querySelectorAll('.summary-row');
       for(var i=0;i<rows.length;i++){ var l=rows[i].querySelector('.label'), v=rows[i].querySelector('.value'); if(l&&v&&String(l.textContent||'').trim()==='Ring Size'&&v.textContent!==c.label) v.textContent=c.label; }
@@ -7870,13 +7711,12 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       if(text&&text.textContent!==c.label) text.textContent=c.label;
     }
     var showGroups=!!(c&&NB.unknown&&NB.groupNeeded);
-    paintStaffLine(h);   // PRICE RANGE RULES (2026-11-13, Johan 19:56 / 20:30 / 20:41)
-    var staffLine=!!NB.basis;   // staff: the range is the "Customer sees" line, not the box
+    paintStaffLine(h);
+    var staffLine=!!NB.basis;
     var showRange=!staffLine&&!!(NB.range||(NB.rangeSeen&&NB.pending)||(showGroups&&NB.group==null));
     var s=st(), ready=!!(s&&s.baseMetal&&s.ringSize!=null);
     if(!ready||(!showGroups&&!showRange)){ if(box) box.remove(); return; }
-    var staffTotalWait=!!(NB.totalNeedsGroup&&isStaff());   // NO TOTAL BEFORE THE SIZE GROUP (2026-11-14)
-    // Was: var sig=[showGroups?1:0,NB.group,NB.range?rangeText(NB.range):'',NB.pending?1:0,NB.nudge?1:0,c?c.groups.length:0,staffLine?1:0].join('|');
+    var staffTotalWait=!!(NB.totalNeedsGroup&&isStaff());
     var sig=[showGroups?1:0,NB.group,NB.range?rangeText(NB.range):'',NB.pending?1:0,NB.nudge?1:0,c?c.groups.length:0,staffLine?1:0,staffTotalWait?1:0].join('|');
     if(!box){ box=el('div','nb-range'); }
     if(box.getAttribute('data-sig')!==sig){
@@ -7884,11 +7724,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       box.classList.toggle('nb-nudge',!!(NB.nudge&&showGroups&&NB.group==null));
       if(showGroups){
         var gw=el('div','nb-groups'); gw.setAttribute('role','group'); gw.setAttribute('aria-label','Closest ring size');
-        /* PRICE RANGE RULES (2026-11-13): with SHOW_PRICES "off" no range comes (price_display from the designer config),
-           so the prompt does not promise one. Was always: 'Size unknown: tap the closest size to see your price range' */
         var noRange=!!(builderCfgDisplay()==='off'&&!NB.basis);
-        /* NO TOTAL BEFORE THE SIZE GROUP (2026-11-14, Johan - to-do section 8 line 1): staff, no total yet -> "... to see the total". Was:
-           gw.appendChild(el('span','nb-k',NB.group==null?(noRange?'Size unknown: tap the closest size':'Size unknown: tap the closest size to see your price range'):'Closest ring size')); */
         gw.appendChild(el('span','nb-k',NB.group==null?(staffTotalWait?'Size unknown: tap the closest size to see the total':(noRange?'Size unknown: tap the closest size':'Size unknown: tap the closest size to see your price range')):'Closest ring size'));
         var row=el('div','nb-group-row');
         c.groups.forEach(function(gr){
@@ -7898,20 +7734,17 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
           row.appendChild(b);
         });
         gw.appendChild(row);
-        // SIZE WORDING (2026-11-11, Johan 20:16): was "Smaller sizes cost less. …[doc 2026-11-17]
         gw.appendChild(el('span','nb-range-n','Price may vary depending on the ring size.'));
         box.appendChild(gw);
       }
       if(!staffLine&&(NB.range||(NB.rangeSeen&&NB.pending&&!(showGroups&&NB.group==null)))){
         var main=el('div','nb-range-main');
         main.appendChild(el('span','nb-k','Estimated price range'));
-        main.appendChild(el('span','nb-range-v',NB.range?rangeText(NB.range):'Calculating…'));   // PRICE RANGE RULES (2026-11-13, Johan 19:56 / 20:30 / 20:41): was money(low)+' – '+money(high)
-        // RANGE NOTE (2026-11-11, Johan 22:26): was "Your exact price comes with our reply."
+        main.appendChild(el('span','nb-range-v',NB.range?rangeText(NB.range):'Calculating…'));
         if(!showGroups) main.appendChild(el('span','nb-range-n','Price may vary depending on the ring size.'));
         box.appendChild(main);
       }
     }
-    // place: right under the receipt (phones) or above the details (desktop)
     var rec=h.querySelector('.nb-receipt'), anchor=null, parent=null;
     if(rec){ parent=rec.parentNode; anchor=rec.nextSibling; }
     else{
@@ -7923,12 +7756,8 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     if(box.parentNode!==parent||box.nextSibling!==anchor) parent.insertBefore(box,anchor);
   }
 
-  /* ===== PRICE RANGE RULES (2026-11-13, Johan 19:56 / 20:30 / 20:41) - START =====
-     "From $X" or "$low – $high", exactly as the server sent it. Staff (the answer carries priceRangeBasis): one line
-     "Customer sees: ..." directly under the Estimated Total + the server's small print of what it is built from.
-     Their total, breakdown and card prices are not touched. Nothing is computed here. */
-  function isStaff(){ try{ return typeof _staffMode!=='undefined'&&!!_staffMode; }catch(e){ return false; } }   // NO TOTAL BEFORE THE SIZE GROUP (2026-11-14)
-  function builderCfgDisplay(){ var b=builder(); return (b&&typeof b.price_display==='string')?b.price_display:''; }   // 'off' / 'on' / 'range' from the worker
+  function isStaff(){ try{ return typeof _staffMode!=='undefined'&&!!_staffMode; }catch(e){ return false; } }
+  function builderCfgDisplay(){ var b=builder(); return (b&&typeof b.price_display==='string')?b.price_display:''; }
   function rangeText(r){ return r.from?('From '+money(r.low)):(money(r.low)+' – '+money(r.high)); }
   function paintStaffLine(h){
     var line=h.querySelector('.nb-cust-sees'), tot=h.querySelector('.summary-total');
@@ -7942,7 +7771,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     }
     if(line.previousSibling!==tot||line.parentNode!==tot.parentNode) tot.parentNode.insertBefore(line,tot.nextSibling);
   }
-  /* ===== PRICE RANGE RULES (2026-11-13, Johan 19:56 / 20:30 / 20:41) - END ===== */
   function paint(){ try{ sync(); paintSize(); paintHeaders(); paintSummary(); }catch(e){ if(window.console) console.error('size and range:',e); } }
   var queued=false;
   function schedule(){ if(queued) return; queued=true; setTimeout(function(){ queued=false; paint(); },40); }
@@ -7956,7 +7784,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
   window.__V2_SIZE__={ state:NB, chooseUnknown:chooseUnknown, chooseGroup:chooseGroup, paint:paint };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): THREE STEPS ===== (comment …[doc 2026-11-17] */
 (function(){
   function steps(){ try{ return (typeof STEPS!=='undefined'&&STEPS&&STEPS.length)?STEPS:null; }catch(e){ return null; } }
   function st(){ try{ return (typeof state!=='undefined'&&state)?state:null; }catch(e){ return null; } }
@@ -7988,7 +7815,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     });
   }
 
-  // Ring Size is no longer the first screen: give it a Back button and a heading that does not say "Start by".
   function fixSizePanel(){
     if(!reordered()) return;
     var host=document.getElementById('acc-body-size'); if(!host) return;
@@ -8007,21 +7833,18 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     }
   }
 
-  // "Please choose a Base Metal first (Section 2) ..." - the section number is no longer true.
   function wrapToast(){
     if(typeof window.showRuleToast!=='function'||window.showRuleToast.__nbThreeSteps) return;
     var original=window.showRuleToast;
     var wrapped=function(message){
       var args=Array.prototype.slice.call(arguments);
       if(reordered()&&typeof message==='string') args[0]=message.replace('Please choose a Base Metal first (Section 2) before making changes here.','Please choose a Base Metal first.');
-      // SIZE WORDING (2026-11-11, Johan 20:16): "...choose your ring size again (Section 1)." - Ring Size is no longer section 1.
       if(reordered()&&typeof args[0]==='string') args[0]=args[0].replace(/(choose your ring size again) \(Section 1\)\./,'$1.');
       return original.apply(this,args);
     };
     wrapped.__nbThreeSteps=true; window.showRuleToast=wrapped;
   }
 
-  // The last screen needs a ring size (the price depends on it). Opening it without one leads to Ring Size.
   function sizeMissing(){ var s=st(); return !!(reordered()&&s&&s.ringSize==null); }
   function askForSize(){
     var unknown=false; try{ unknown=!!(typeof BUILDER!=='undefined'&&BUILDER&&BUILDER.unknown_size&&BUILDER.unknown_size.label); }catch(e){}
@@ -8047,8 +7870,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     };
     wrapped.__nbThreeSteps=true; window.goToStep=wrapped;
   }
-  // phone bar: the Next button looks "not yet" on the Ring Size screen until a size is chosen
-  // a message that has been answered (metal chosen / size chosen) does not stay on the next screens
   function clearAnsweredToast(){
     var s=st(), toast=document.querySelector('.rule-toast'); if(!s||!toast||!reordered()) return;
     var text=String(toast.textContent||'');
@@ -8059,7 +7880,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     var next=document.getElementById('nbStepNext'), s=st(); if(!next||!s) return;
     next.classList.toggle('nb-wait',!!(reordered()&&s._openSection==='size'&&s.ringSize==null));
   }
-  // a summary opened by another route (a design link without a size): say "not chosen yet", never "null"
   function fixSummarySize(){
     if(!sizeMissing()) return;
     var h=document.getElementById('acc-body-summary'); if(!h) return;
@@ -8078,10 +7898,9 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     try{ new MutationObserver(function(){ fixSizePanel(); paintNext(); }).observe(document.getElementById('acc-body-size'),{ childList:true, subtree:true }); }catch(e){}
     try{ new MutationObserver(fixSummarySize).observe(document.getElementById('acc-body-summary'),{ childList:true, subtree:true, characterData:true }); }catch(e){}
     try{ new MutationObserver(paintNext).observe(document.getElementById('studio-tool-rail'),{ attributes:true, subtree:true, attributeFilter:['class','aria-selected'] }); }catch(e){}
-    // the engine's boot opened Ring Size; with a new first tool, open that one instead
     if(reordered()&&stt._openSection==='size'){
       if(stt._touched) delete stt._touched.size;
-      try{ if(window.__V2_FUNNEL__&&window.__V2_FUNNEL__.forgetTool) window.__V2_FUNNEL__.forgetTool('size'); }catch(e){}   // NEW BUILDER TRACKER FIELDS (2026-11-14, Johan 13:48): the boot moment is not "reached"
+      try{ if(window.__V2_FUNNEL__&&window.__V2_FUNNEL__.forgetTool) window.__V2_FUNNEL__.forgetTool('size'); }catch(e){}
       stt._skipNextStudioScroll=true;
       try{ window.__V2_ROUTER__.openSection(s[0].id); }catch(e){}
       try{ window.scrollTo(0,0); }catch(e){}
@@ -8092,7 +7911,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
   window.__V2_THREESTEPS__={ applyOrder:applyOrder, grouped:grouped, reordered:reordered };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): READY-MADE LAYOUTS ===== - …[doc 2026-11-17] */
 (function(){
   function builder(){ try{ return (typeof BUILDER!=='undefined'&&BUILDER)?BUILDER:null; }catch(e){ return null; } }
   function st(){ try{ return (typeof state!=='undefined'&&state)?state:null; }catch(e){ return null; } }
@@ -8114,7 +7932,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   }
   function maxFor(name){ var b=builder(); var m=b.rules&&b.rules.max_width_materials; return (m&&Number(m[name])>0)?Number(m[name]):Infinity; }
 
-  // The layout for the ring as it is now, or null when it cannot be made (then the card is not shown).
   function compute(layout){
     var c=cfg(), b=builder(), s=st(), d=data();
     if(!c||!b||!s||!d||!layout||!Array.isArray(layout.strips)||layout.strips.length<3) return null;
@@ -8125,11 +7942,11 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     for(var i=0;i<n;i++){
       var raw=layout.strips[i]; if(!raw||typeof raw.material!=='string'||!(Number(raw.width)>0)) return null;
       var isBase=(raw.material==='base'), name=isBase?s.baseMetal:raw.material;
-      if(!d.m[name]) return null;                                   // hidden or unknown material
-      if(!isBase&&name===s.baseMetal) return null;                  // would melt into the base metal
+      if(!d.m[name]) return null;
+      if(!isBase&&name===s.baseMetal) return null;
       parts.push({ material:name, ref:Number(raw.width), base:isBase, fixed:!!raw.fixed, edge:(isBase&&(i===0||i===n-1)), width:0 });
     }
-    if(!parts[0].edge||!parts[n-1].edge) return null;               // every layout has a base-metal edge on both sides
+    if(!parts[0].edge||!parts[n-1].edge) return null;
     for(var k=0;k<n;k++){ if(!parts[k].base){ try{ if(typeof stripRuleBlock==='function'&&stripRuleBlock(parts[k].material)) return null; }catch(e){ return null; } } }
     var fixedSum=0, flexRef=0, edgeRef=0;
     parts.forEach(function(p){ if(p.edge) edgeRef+=p.ref; else if(p.fixed) fixedSum+=p.ref; else flexRef+=p.ref; });
@@ -8141,12 +7958,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     var edgeMin=minFor(s.baseMetal,true); if(edgeMin==null) return null;
     function innerSum(){ return inner.reduce(function(a,p){ return a+p.width; },0); }
     function edgeTotal(){ return Math.round((W-fixedSum-innerSum())*1000)/1000; }
-    // every inlay at least as wide as its material allows
     for(var q=0;q<inner.length;q++){ var mn=snap(minFor(inner[q].material,false),step,'ceil'); if(inner[q].width<mn) inner[q].width=mn; if(inner[q].width>maxFor(inner[q].material)) return null; }
-    // BALANCED LAYOUT (2026-11-11, Johan) - START: "offer a balanced inlay layout automatically so the customer does not
-    // start with a lopsided layout". A layout whose widths are written as a mirror image (all of them are) always comes
-    // out as one: both edges equal, the inlays left and right of the centre equal - also when they are two different
-    // materials (the pair takes the width both allow). Width only moves in mirrored pairs, or in the centre strip.
     function r3(x){ return Math.round(x*1000)/1000; }
     function low(p){ var m=minFor(p.material,p.base); return snap(m==null?step:m,step,'ceil'); }
     function edgesNow(){ var used=0; parts.forEach(function(p){ if(!p.edge) used+=p.width; }); return r3(W-used); }
@@ -8161,7 +7973,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
         if(pw>Math.min(maxFor(pr0[0].material),maxFor(pr0[1].material))+1e-9) return null;
         pr0[0].width=pr0[1].width=pw;
       }
-      // room for both edges: the widest inlay gives width back - a pair on both sides at once, the centre strip alone
       while(edgesNow()<2*edgeMin-1e-9&&guard++<200){
         var best=null;
         if(mid&&!mid.fixed&&mid.width-step>=low(mid)-1e-9) best={ w:mid.width, mid:true };
@@ -8169,7 +7980,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
         if(!best) return null;
         if(best.mid) mid.width=r3(mid.width-step); else { best.pair[0].width=r3(best.pair[0].width-step); best.pair[1].width=best.pair[0].width; }
       }
-      // equal edges need an even number of steps: the centre strip gives one step, or takes one
       if(Math.round(edgesNow()/step)%2!==0){
         if(!mid) return null;
         if(mid.width-step>=low(mid)-1e-9) mid.width=r3(mid.width-step);
@@ -8179,7 +7989,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       total=edgesNow(); if(total<2*edgeMin-1e-9||Math.round(total/step)%2!==0) return null;
       left=right=r3(total/2);
     } else {
-      // a layout that is written off-centre on purpose keeps the first rule: width comes back from the widest inlay
       while(edgeTotal()<2*edgeMin-1e-9&&guard++<200){
         var widest=null; inner.forEach(function(p){ var mn=snap(minFor(p.material,false),step,'ceil'); if(p.width-step>=mn-1e-9&&(!widest||p.width>widest.width)) widest=p; });
         if(!widest) return null;
@@ -8188,7 +7997,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       total=edgeTotal(); if(total<2*edgeMin-1e-9) return null;
       left=snap(total/2,step,'floor'); right=Math.round((total-left)*1000)/1000;
     }
-    // BALANCED LAYOUT (2026-11-11, Johan) - END
     if(left<edgeMin-1e-9||right<edgeMin-1e-9) return null;
     parts[0].width=left; parts[n-1].width=right;
     var strips=parts.map(function(p){ return { material:p.material, width:p.width }; });
@@ -8198,12 +8006,11 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     try{ if(typeof validateProposedStrips==='function'&&validateProposedStrips(strips)) return null; }catch(e){ return null; }
     return strips;
   }
-  /* PRECUT CHOICE 2026-11-14 - START: precut blank cards (builder_config.precut_choice) */
-  function staff(){ try{ return typeof _staffMode!=='undefined'&&!!_staffMode; }catch(e){ return false; } }   // BLANK CARD NAMES 2026-11-15
+  function staff(){ try{ return typeof _staffMode!=='undefined'&&!!_staffMode; }catch(e){ return false; } }
   function pre(){ var b=builder(); return (b&&b.precut_choice&&isPrecut())?b.precut_choice:null; }
   function blanks(){ var b=builder(), s=st(); return ((b.rules.precut_blanks||{})[s.baseMetal]||[]).map(function(x,i){ return { index:'b'+i, blank:x,
-    name:x.plain?'Plain band · '+x.width+'mm '+x.profile:x.segments.map(function(g){ return g.w+'mm '+(g.t==='base'?s.baseMetal:'Inlay'); }).join(' · '),   // BLANK CARD NAMES 2026-11-15: the layout, not "Style N" (was the style + size line)
-    sub:x.plain?'':'= '+x.width+'mm '+x.profile+(x.corner==='beveled'?', beveled corners':''), style:x.style,   // BLANK CARD NAMES 2026-11-15
+    name:x.plain?'Plain band · '+x.width+'mm '+x.profile:x.segments.map(function(g){ return g.w+'mm '+(g.t==='base'?s.baseMetal:'Inlay'); }).join(' · '),
+    sub:x.plain?'':'= '+x.width+'mm '+x.profile+(x.corner==='beveled'?', beveled corners':''), style:x.style,
     strips:x.segments.map(function(g){ return { material:g.t==='base'?s.baseMetal:'(choose)', width:Number(g.w) }; }) }; }); }
   function applyBlank(i){
     var s=st(), item=blanks()[i]; if(!s||!item) return false;
@@ -8219,11 +8026,10 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     if(k>=0) setTimeout(function(){ try{ openEditStripModal(k); }catch(e){} },80);
     return true;
   }
-  /* PRECUT CHOICE 2026-11-14 - END */
   function available(){ if(pre()) return blanks(); var c=cfg(); if(!c) return []; var out=[]; c.layouts.forEach(function(l,i){ var strips=compute(l); if(strips) out.push({ index:i, name:String(l.name||''), strips:strips }); }); return out; }
   function sameStrips(a,b){ if(!a||!b||a.length!==b.length) return false; for(var i=0;i<a.length;i++){ if(a[i].material!==b[i].material||Math.abs(a[i].width-b[i].width)>1e-6) return false; } return true; }
   function apply(index){
-    if(String(index).charAt(0)==='b') return applyBlank(Number(String(index).slice(1)));   // PRECUT CHOICE 2026-11-14
+    if(String(index).charAt(0)==='b') return applyBlank(Number(String(index).slice(1)));
     var c=cfg(), s=st(); if(!c||!s) return false;
     var strips=compute(c.layouts[index]); if(!strips) return false;
     try{ if(typeof pushUndo==='function') pushUndo(); }catch(e){}
@@ -8231,7 +8037,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     s.selectedStrip=-1; s.wantsInlays=true;
     s._touched=s._touched||{}; s._touched.compose=true;
     moreOpen=false;
-    ownAction=true; /* KEEP THE COMPOSER IN PLACE (2026-11-12, Johan): a card was pressed - the box folds under the finger, no correction */
+    ownAction=true;
     try{ window.__V2_ROUTER__.rerenderSection('compose'); }catch(e){}
     ownAction=false;
     try{ if(typeof renderRing==='function') renderRing(); }catch(e){}
@@ -8240,9 +8046,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     return true;
   }
 
-  // ---- the cards ----
-  // How one band of the little drawing looks - the same sources the ring drawing uses: the metal's own texture,
-  // the material's texture file, the metal's shade colours, else the material colour.
   function look(name){
     try{
       if(typeof METAL_TEXTURES!=='undefined'&&METAL_TEXTURES[name]) return 'center / cover url(data:image/jpeg;base64,'+METAL_TEXTURES[name]+')';
@@ -8253,28 +8056,29 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     }catch(e){}
     return '';
   }
-  var moreOpen=false, userToggled=null, hadInlays=null; /* FOLD IN BOTH CASES (2026-11-13, Johan): hadInlays */
+  var moreOpen=false, userToggled=null, hadInlays=null;
+  function phone(){ try{ return document.body.classList.contains('nb-easy')&&!!window.matchMedia&&window.matchMedia('(max-width:767px)').matches; }catch(e){ return false; } }
+  function boxBelow(){ var h=document.getElementById('acc-body-compose'), b=h&&h.querySelector('.nb-layouts'); return !!(b&&b.classList.contains('nb-lay-below')); }
   function paint(){
     var host=document.getElementById('acc-body-compose'); if(!host) return;
-    var pc=pre(), c=pc||cfg(), s=st(), old=host.querySelector('.nb-layouts');   // PRECUT CHOICE 2026-11-14
+    var pc=pre(), c=pc||cfg(), s=st(), old=host.querySelector('.nb-layouts');
     document.body.classList.toggle('nb-pre',!!pc);
     if(pc) host.querySelectorAll('.v2-row-name').forEach(function(n){ var f=n.firstChild; if(f&&f.nodeType===3) f.nodeValue=f.nodeValue.replace('(choose)','? - tap to choose the inlay'); });
     var list=(c&&s)?available():[];
     if(!list.length){ if(old) old.remove(); return; }
-    var hasInlays=Array.isArray(s.strips)&&s.strips.some(function(x){ return x&&x.material!==s.baseMetal&&!(pc&&x.material==='(choose)'); });   // BLANK BOX OPEN 2026-11-15: a ? is no inlay
-    var current=-1; list.forEach(function(item){ if(pc?(item.blank.style===s.precutStyle&&Number(item.blank.width)===Number(s.ringWidth)&&item.blank.profile===s.profile):sameStrips(item.strips,s.strips)) current=item.index; });   // PRECUT CHOICE 2026-11-14
-    /* FOLD IN BOTH CASES (2026-11-13, Johan - to-do section 3) - comment …[doc 2026-11-17] */
+    var hasInlays=Array.isArray(s.strips)&&s.strips.some(function(x){ return x&&x.material!==s.baseMetal&&!(pc&&x.material==='(choose)'); });
+    var current=-1; list.forEach(function(item){ if(pc?(item.blank.style===s.precutStyle&&Number(item.blank.width)===Number(s.ringWidth)&&item.blank.profile===s.profile):sameStrips(item.strips,s.strips)) current=item.index; });
     if(hadInlays!==null&&hadInlays!==hasInlays) userToggled=null;
     hadInlays=hasInlays;
     var open=(userToggled!=null)?userToggled:!hasInlays;
     var first=Math.max(1,Number(c.show_first)||6), showAll=moreOpen||list.length<=first;
-    var sig=[staff()?1:0,s.baseMetal,s.ringWidth,s.profile,list.map(function(i){ return i.index+':'+i.strips.map(function(x){ return x.width; }).join('/'); }).join(','),current,open?1:0,showAll?1:0,hasInlays?1:0].join('|');   // BLANK CARD NAMES 2026-11-15: + staff
-    var anchor=host.querySelector('.width-control')||null;
-    if(old&&old.getAttribute('data-sig')===sig&&old.parentNode){ return; }
-    var box=el('details','nb-layouts'); box.setAttribute('data-sig',sig); if(open) box.open=true;
-    var sum=el('summary',null,(hasInlays&&!pc)?'Popular designs':String(c.title||'Start from a popular design'));   // PRECUT CHOICE 2026-11-14
+    var sig=[staff()?1:0,s.baseMetal,s.ringWidth,s.profile,list.map(function(i){ return i.index+':'+i.strips.map(function(x){ return x.width; }).join('/'); }).join(','),current,open?1:0,showAll?1:0,hasInlays?1:0].join('|');
+    var below=!pc&&phone(); sig+='|'+(below?1:0);
+    var anchor=below?(host.querySelector('.nav-buttons')||null):(host.querySelector('.width-control')||null);
+    if(old&&old.getAttribute('data-sig')===sig&&old.parentNode&&(!below||old.nextElementSibling===anchor)){ return; }
+    var box=el('details','nb-layouts'+(below?' nb-lay-below':'')); box.setAttribute('data-sig',sig); if(open) box.open=true;
+    var sum=el('summary',null,(hasInlays&&!pc)?'Popular designs':String(c.title||'Start from a popular design'));
     box.appendChild(sum);
-    /* FOLD IN BOTH CASES (2026-11-13, Johan) - comment moved to claude\build-2026-11-14-precut-blank-choice.md (page weight, 2026-11-14) */
     box.addEventListener('toggle',function(){ if(box.open!==open) userToggled=box.open; });
     if(c.note) box.appendChild(el('p','nb-lay-note',String(c.note)));
     var grid=el('div','nb-lay-grid');
@@ -8282,24 +8086,23 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       var card=el('button','nb-lay-card'+(item.index===current?' selected':'')); card.type='button';
       card.setAttribute('data-nb-layout',String(item.index)); card.setAttribute('aria-pressed',item.index===current?'true':'false');
       var bar=el('span','nb-lay-bar'); bar.setAttribute('aria-hidden','true');
-      item.strips.forEach(function(x){ var seg=document.createElement('i'); seg.style.flex=String(x.width)+' 1 0'; var bg=x.material==='(choose)'?'':look(x.material); if(bg) seg.style.background=bg; else seg.className='nb-ch'; bar.appendChild(seg); });   // PRECUT CHOICE 2026-11-14
+      item.strips.forEach(function(x){ var seg=document.createElement('i'); seg.style.flex=String(x.width)+' 1 0'; var bg=x.material==='(choose)'?'':look(x.material); if(bg) seg.style.background=bg; else seg.className='nb-ch'; bar.appendChild(seg); });
       card.appendChild(bar); card.appendChild(el('span','nb-lay-name',item.name));
-      if(item.style!=null){ card.setAttribute('data-nb-style',String(item.style)); if(item.sub) card.appendChild(el('span','nb-lay-sub',item.sub)); if(staff()) card.appendChild(el('span','nb-lay-style','Style '+item.style)); }   // BLANK CARD NAMES 2026-11-15: size line; staff keep the Style number
+      if(item.style!=null){ card.setAttribute('data-nb-style',String(item.style)); if(item.sub) card.appendChild(el('span','nb-lay-sub',item.sub)); if(staff()) card.appendChild(el('span','nb-lay-style','Style '+item.style)); }
       card.addEventListener('click',function(){ userToggled=null; apply(item.index); });
       grid.appendChild(card);
     });
     box.appendChild(grid);
     if(!showAll){
-      var more=el('button','nb-lay-more',(pc?'More blanks (':'More designs (')+(list.length-first)+')'); more.type='button';   // PRECUT CHOICE 2026-11-14
+      var more=el('button','nb-lay-more',(pc?'More blanks (':'More designs (')+(list.length-first)+')'); more.type='button';
       more.addEventListener('click',function(){ moreOpen=true; schedule(); });
       box.appendChild(more);
     }
-    if(!hasInlays&&!pc) box.appendChild(el('p','nb-lay-plain','Or build your own below - or keep the band plain and continue.'));   // PRECUT CHOICE 2026-11-14
+    if(!hasInlays&&!pc) box.appendChild(el('p','nb-lay-plain',below?'Or build your own above - or keep the band plain and continue.':'Or build your own below - or keep the band plain and continue.'));
     if(old) old.remove();
     var parent=anchor?anchor.parentNode:host.firstElementChild||host;
     if(anchor) parent.insertBefore(box,anchor); else parent.appendChild(box);
   }
-  /* ===== KEEP THE COMPOSER IN PLACE (2026-11-12, Johan) - START ===== …[doc 2026-11-17] */
   var ownAction=false, wrapped=null, inside=0, pendingShift=0, lockWatch=null;
   function newBuilderOn(){ var b=document.body; return !!(b&&(b.classList.contains('nb-pc')||b.classList.contains('nb-easy'))); }
   function pageLocked(){ return document.documentElement.classList.contains('v2-modal-lock'); }
@@ -8310,7 +8113,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       var oy=''; try{ oy=getComputedStyle(e).overflowY; }catch(x){}
       if((oy==='auto'||oy==='scroll')&&e.scrollHeight>e.clientHeight+1) return e;
     }
-    return null; /* the page itself scrolls */
+    return null;
   }
   function getY(sc){ return sc?sc.scrollTop:(window.scrollY||window.pageYOffset||0); }
   function setY(sc,y){ if(y<0) y=0; if(sc) sc.scrollTop=y; else if(Math.abs(getY(null)-y)>=1) window.scrollTo(0,y); }
@@ -8320,7 +8123,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     try{ var sc=scroller(); setY(sc,getY(sc)+d); }catch(e){}
   }
   function keepInPlace(inner,self,args){
-    if(inside||!newBuilderOn()||!(cfg()||pre())) return inner.apply(self,args);   // PRECUT CHOICE 2026-11-14
+    if(inside||!newBuilderOn()||!(cfg()||pre())) return inner.apply(self,args);
     inside++;
     var sc=null,y0=0,h0=0,locked=false,own=ownAction,result;
     try{ sc=scroller(); locked=!sc&&pageLocked(); y0=getY(sc); h0=boxHeight(); }catch(e){}
@@ -8329,7 +8132,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       inside--;
       try{
         paint();
-        var h1=boxHeight(), shift=(!own&&h0>0)?Math.round(h1-h0):0;
+        var h1=boxHeight(), shift=(!own&&h0>0&&!boxBelow())?Math.round(h1-h0):0;
         if(locked){ pendingShift+=shift; }
         else setY(sc,y0+shift);
       }catch(e){ if(window.console) console.error('ready layouts (keep in place):',e); }
@@ -8345,23 +8148,21 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       if(!lockWatch){ lockWatch=new MutationObserver(applyPending); lockWatch.observe(document.documentElement,{ attributes:true, attributeFilter:['class'] }); }
     }catch(e){}
   }
-  /* ===== KEEP THE COMPOSER IN PLACE (2026-11-12, Johan) - END ===== */
   var queued=false;
   function schedule(){ wrapRender(); if(queued) return; queued=true; setTimeout(function(){ queued=false; try{ paint(); }catch(e){ if(window.console) console.error('ready layouts:',e); } },40); }
   function start(){
     var host=document.getElementById('acc-body-compose'); if(!host) return;
     try{ new MutationObserver(schedule).observe(host,{ childList:true, subtree:true }); }catch(e){}
-    host.addEventListener('click',function(e){ var n=pre()&&e.target.closest&&e.target.closest('.v2-row-name'), s=st(), i=n?parseInt(n.textContent,10)-1:-1;   // PRECUT CHOICE 2026-11-14
+    try{ var mq=window.matchMedia('(max-width:767px)'); if(mq.addEventListener) mq.addEventListener('change',schedule); else mq.addListener(schedule); }catch(e){}
+    host.addEventListener('click',function(e){ var n=pre()&&e.target.closest&&e.target.closest('.v2-row-name'), s=st(), i=n?parseInt(n.textContent,10)-1:-1;
       if(s&&s.strips[i]&&s.strips[i].material!==s.baseMetal){ e.preventDefault(); e.stopPropagation(); try{ openEditStripModal(i); }catch(x){} } },true);
     schedule();
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
   window.__V2_LAYOUTS__={ available:available, compute:function(i){ var c=cfg(); return c?compute(c.layouts[i]):null; }, apply:apply, paint:paint };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): TAP TARGETS AND TEXT SIZE ON PHONES ===== (comment moved to claude\build-2026-11-15-blank-fill-on-next.md, page weight 2026-11-15) */
 (function(){
   var phone=window.matchMedia?window.matchMedia('(max-width:767.98px)'):null;
-  // PC LAYOUT (2026-11-11, Johan): the Remove buttons and the 12 px text …[doc 2026-11-17]
   function isPhone(){ if(phone&&phone.matches) return true; try{ return !!(window.__V2_PC__&&window.__V2_PC__.on()); }catch(e){ return false; } }
   function addRemoveButtons(){
     var host=document.getElementById('acc-body-compose'); if(!host) return;
@@ -8410,7 +8211,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
   window.__V2_TOUCH__={ run:run };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): PAGE WEIGHT - LATE PICTURES - …[doc 2026-11-17] */
 (function(){
   if(typeof NB_LATE_PICTURES==='undefined'||!NB_LATE_PICTURES||!NB_LATE_PICTURES.length) return;
   var maps={}; try{ maps.MATERIAL_IMAGES=MATERIAL_IMAGES; }catch(e){} try{ maps.PROFILE_IMAGES=PROFILE_IMAGES; }catch(e){}
@@ -8422,7 +8222,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     done[name]=true; try{ delete box[name]; }catch(e){}
     return true;
   }
-  // the name on a card can carry a note: "Koa (min 1mm)", "Titanium (same as base metal)"
   function nameOn(text){
     text=String(text||'').trim(); if(!text) return null;
     if(MATERIAL_IMAGES[text]) return text;
@@ -8461,7 +8260,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='complete') start(); else { window.addEventListener('load',start); setTimeout(start,2500); }
   window.__V2_PICTURES__={ done:done, failed:failed, list:NB_LATE_PICTURES, refresh:function(){ try{ showProfilePicture(); showMaterialPictures(); }catch(e){} } };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): PC LAYOUT - "completely build and finish the PC version" - …[doc 2026-11-17] */
 (function(){
   var MQ=window.matchMedia?window.matchMedia('(min-width:768px)'):null;
   function wide(){ return !!(MQ&&MQ.matches); }
@@ -8492,7 +8290,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     var curIndex=names.indexOf(curGroup);
     names.forEach(function(g,gi){
       var mine=list.filter(function(t){ return groupOf(t)===g; });
-      // a step is ticked when the customer is past it (the page only lets them …[doc 2026-11-17]
       var here=(g===curGroup), done=mine.length>0&&(gi<curIndex||mine.every(function(t){ return t.classList.contains('filled'); }));
       var b=el('button','nb-pc-step'+(here?' on':'')+(done&&!here?' done':'')); b.type='button';
       b.setAttribute('aria-label','Step '+(gi+1)+' of '+names.length+': '+g+(done?' (done)':'')); if(here) b.setAttribute('aria-current','step');
@@ -8510,7 +8307,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       row2.appendChild(b);
     });
   }
-  // the bar is a child of the page body on phones; on PC it sits at the bottom of the right column (it then follows the light / dark theme of that column)
   function placeBar(){
     var bar=document.getElementById('nbStepBar'), col=document.querySelector('.studio-controls'); if(!bar||!col) return;
     if(on){ if(bar.parentNode!==col) col.appendChild(bar); }
@@ -8543,7 +8339,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   window.__V2_PC__={ on:isOn, refresh:update };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): "BEFORE YOU GO..." PROMPT - A …[doc 2026-11-17] */
 (function(){
   function off(){ try{ var c=(typeof BUILDER!=='undefined'&&BUILDER)?BUILDER.leave_prompt:null; return !!c&&c.ask_for_email===false; }catch(e){ return false; } }
   if(typeof showExitEmailModal!=='function') return;
@@ -8554,7 +8349,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   };
   window.__V2_LEAVEPROMPT__={ off:off };
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan): STRIP WIDTHS WITHOUT KNOWING …[doc 2026-11-17] */
 (function(){
   function B(){ try{ return (typeof BUILDER!=='undefined')?BUILDER:null; }catch(e){ return null; } }
   function S(){ try{ return (typeof state!=='undefined')?state:null; }catch(e){ return null; } }
@@ -8575,8 +8369,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   }
   function maxOf(name){ var b=B(), m=b.rules&&b.rules.max_width_materials, v=m?parseFloat(m[name]):NaN; return v>0?v:Infinity; }
   function free(strips){ var s=S(), used=0; strips.forEach(function(x){ used+=x.width; }); return r3(Number(s.ringWidth)-used); }
-  // who gives when strip i gets wider, in order of asking: an inlay asks the two base-metal edges;
-  // an edge asks the other edge first, then the inlays
   function tiers(i){
     var s=S(), n=s.strips.length, edges=[], inlays=[];
     if(isEdge(0)&&i!==0) edges.push(0); if(n>1&&isEdge(n-1)&&i!==n-1) edges.push(n-1);
@@ -8585,7 +8377,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     return [edges,inlays];
   }
   function partners(i){ var t=tiers(i), out=[]; t.forEach(function(x){ out=out.concat(x); }); return out; }
-  // the strips after strip i is set to "want" mm, or { error }.
   function plan(i,want){
     var s=S(); if(!s||!s.strips||!s.strips[i]) return { error:'' };
     var name=s.strips[i].material, st=stepOf(name), cur=s.strips[i].width;
@@ -8629,7 +8420,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     if(p.capped) say('Widest possible here: '+p.got+'mm.');
     return true;
   }
-  // "+" on a full band: one press. With two equal edges an inlay takes one step from each (the band stays balanced).
   function plusWant(i){
     var s=S(), cur=s.strips[i].width, st=stepOf(s.strips[i].material), who=partners(i);
     if(!isEdge(i)&&who.length===2&&Math.abs(s.strips[who[0]].width-s.strips[who[1]].width)<eps()&&free(s.strips)<eps()){
@@ -8656,7 +8446,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       box.addEventListener('click',function(e){ e.stopPropagation(); });
       box.addEventListener('keydown',function(e){ e.stopPropagation(); if(e.key==='Enter'){ e.preventDefault(); commit(); } else if(e.key==='Escape'){ box.value=String(parseFloat(s.strips[i].width)); box.blur(); } });
       box.addEventListener('change',commit);
-      // the page's own "+" is switched off when the band is full; here it borrows instead
       var btns=row.querySelectorAll('.v2-row-group:last-of-type .v2-row-btn'), plus=label.parentNode.querySelector('.v2-row-btn:last-child');
       if(plus&&plus.disabled){
         var p=plan(i,plusWant(i));
@@ -8667,7 +8456,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
         }
       }
     })(rows[i],i); }
-    // one plain line instead of the small hint
     var ps=host.querySelectorAll('p');
     for(var k=0;k<ps.length;k++){ if(/Tap a strip to edit/.test(ps[k].textContent||'')){ ps[k].textContent='To change a width, type it in the box or press − / +. A wider inlay takes its width from the '+s.baseMetal+' edges; a wider edge takes it from the other edge. « » move a strip.'; ps[k].classList.add('nb-w-hint'); } }
   }
@@ -8681,12 +8469,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   window.__V2_WIDTHS__={ on:on, plan:plan, apply:apply, plusWant:plusWant };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan 18:58): STAFF SEE THE "ESTIMATED TOTAL" BOX ONLY WHEN IT IS ABOVE 0 =====
-   "If '/?staff' = true, Show the 'Estimate Total' button only when it is > 0."
-   The engine always shows the box to signed-in staff - with a dash while there is no estimate yet. This part only
-   reads the text the engine wrote into the box and marks the box "empty" when that text holds no amount above 0;
-   the CSS part 109e then hides it for staff. It computes nothing and knows no price.
-   Only while the new builder is on (step names in the pricing settings). */
 (function(){
   function builderOn(){ var c=document.body.classList; return c.contains('nb-pc')||c.contains('nb-easy'); }
   function amount(txt){ var m=String(txt||'').replace(/,/g,'').match(/\d+(?:\.\d+)?/g); if(!m) return 0; var best=0; for(var i=0;i<m.length;i++){ var n=parseFloat(m[i]); if(n>best) best=n; } return best; }
@@ -8707,18 +8489,17 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   window.__V2_TOTALBOX__={ update:update, amount:amount };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan 21:32): STAFF PRICES ON THE BASE METAL CARDS FOLLOW THE DESI… …[doc 2026-11-17] */
 (function(){
   function builderOn(){ var c=document.body.classList; return c.contains('nb-pc')||c.contains('nb-easy'); }
   function staff(){ try{ return typeof _staffMode!=='undefined'&&!!_staffMode; }catch(e){ return false; } }
   function check(){
     if(!staff()||!builderOn()) return;
-    if(typeof designReady!=='function'||!designReady()) return;            // no size yet: the dash is right
+    if(typeof designReady!=='function'||!designReady()) return;
     if(typeof staffDesignDigestLite!=='function') return;
     var host=document.getElementById('acc-body-metal'); if(!host) return;
     var el=host.querySelector('.mat-card .staff-price'); if(!el) return;
     var key=el.__staffKey_text, now=staffDesignDigestLite();
-    if(typeof key==='string'&&key.slice(key.lastIndexOf('|')+1)===now) return;   // drawn for this design
+    if(typeof key==='string'&&key.slice(key.lastIndexOf('|')+1)===now) return;
     if(!window.__V2_ROUTER__||typeof window.__V2_ROUTER__.rerenderSection!=='function') return;
     window.__V2_ROUTER__.rerenderSection('metal');
   }
@@ -8737,15 +8518,9 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   window.__V2_STAFFPRICES__={ check:check };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
-/* ===== NEW BUILDER (2026-11-11, Johan 22:26): ONE "ESTIMATED TOTAL" ON THE LAST SCREEN =====
-   "The Summary page shows Estimated Total twice, remove the bottom fixed one."
-   The last screen has its own Estimated Total (in the Price Breakdown). While that screen is open and that total
-   is on the page, this part marks the bottom total (#v2-price) "nb-total-twice"; CSS part 109g hides a marked one.
-   It reads nothing but "is the last screen open, and is its own total shown". No price, no amount.
-   Only while the new builder is on (step names in the pricing settings). */
 (function(){
   function builderOn(){ var c=document.body.classList; return c.contains('nb-pc')||c.contains('nb-easy'); }
-  function shown(e){ return !!(e&&e.getClientRects().length); }   // not in a closed fold, not display:none
+  function shown(e){ return !!(e&&e.getClientRects().length); }
   function update(){
     var box=document.getElementById('v2-price'); if(!box) return;
     var panel=document.getElementById('acc-panel-summary'), own=panel?panel.querySelector('#acc-body-summary .summary-total'):null;
@@ -8759,17 +8534,16 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     try{ if(panel) new MutationObserver(schedule).observe(panel,{ attributes:true, attributeFilter:['class'] }); }catch(e){}
     try{ if(body) new MutationObserver(schedule).observe(body,{ childList:true, subtree:true }); }catch(e){}
     try{ new MutationObserver(schedule).observe(document.body,{ attributes:true, attributeFilter:['class'] }); }catch(e){}
-    document.addEventListener('toggle',schedule,true);   // "Show all details" opened or closed
+    document.addEventListener('toggle',schedule,true);
     schedule();
   }
   window.__V2_ONETOTAL__={ update:update };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
 })();
-/* ===== PHONE INLAY GROUPS (2026-11-13, Johan - to-do section 5, line 1: proposal B) - START ===== (comment moved to claude\build-2026-11-15-blank-fill-on-next.md, page weight 2026-11-15) */
 (function(){
   var phone=window.matchMedia?window.matchMedia('(max-width:767.98px)'):null;
-  var SHOW=3;          // "All" + the first two groups
-  var open=false;      // the fold, for the dialog that is open now
+  var SHOW=3;
+  var open=false;
   function on(){ return !!(phone&&phone.matches&&document.body&&document.body.classList.contains('nb-easy')); }
   function inMode(inner){ return inner.classList.contains('v2-add-strip-mode')||inner.classList.contains('v2-edit-strip-mode'); }
   function decorate(){
@@ -8777,7 +8551,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     var groups=inner.querySelector('.mat-groups'); if(!groups) return;
     var chips=groups.querySelectorAll('.mat-group-btn'), btn=groups.querySelector('.nb-more-groups');
     if(!on()||!inMode(inner)||chips.length<=SHOW+1){
-      // only write what changes: a class written again makes the watcher below run again (endless on PC otherwise)
       if(btn) btn.remove(); if(groups.classList.contains('nb-groups-open')) groups.classList.remove('nb-groups-open');
       for(var k=0;k<chips.length;k++) if(chips[k].classList.contains('nb-group-folded')) chips[k].classList.remove('nb-group-folded');
       return;
@@ -8788,7 +8561,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       chips[i].classList.toggle('nb-group-folded',hide); if(hide) folded++;
     }
     groups.classList.toggle('nb-groups-open',open);
-    if(!groups.__nbFoldClick){   // a chip chosen in the open list: fold before the engine draws the chips again
+    if(!groups.__nbFoldClick){
       groups.__nbFoldClick=true;
       groups.addEventListener('click',function(ev){ if(ev.target.closest&&ev.target.closest('.mat-group-btn')) open=false; },true);
     }
@@ -8797,14 +8570,14 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       btn.addEventListener('click',function(ev){ ev.preventDefault(); ev.stopPropagation(); open=!open; decorate(); });
       groups.appendChild(btn);
     }
-    var label=open?'Fewer Material groups \u25B4':'More Material groups ('+folded+') \u25BE';   /* wording: Johan 17:04 */
+    var label=open?'Fewer Material groups \u25B4':'More Material groups ('+folded+') \u25BE';
     if(btn.textContent!==label) btn.textContent=label;
     btn.setAttribute('aria-expanded',open?'true':'false');
   }
   function start(){
     var overlay=document.getElementById('addStripModal'), inner=document.getElementById('addStripModalInner');
     if(!overlay||!inner) return;
-    try{   // created first, so it runs before the drawing watcher: a dialog that opens starts folded
+    try{
       new MutationObserver(function(list){
         for(var i=0;i<list.length;i++){ var was=String(list[i].oldValue||''); if(!/\bopen\b/.test(was)&&overlay.classList.contains('open')) open=false; }
       }).observe(overlay,{ attributes:true, attributeFilter:['class'], attributeOldValue:true });
@@ -8816,11 +8589,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
   window.__V2_INLAY_GROUPS__={ run:decorate, isOpen:function(){ return open; } };
 })();
-/* ===== PHONE INLAY GROUPS (2026-11-13) - END ===== */
-/* ===== METAL CHANGE KEEPS THE DESIGN (2026-11-14, Johan - to-do section 9, line 2) - START =====
-   Back from Summary + a new Base Metal: the layout is kept, the old metal's strips follow the new metal, every rule runs
-   again (precut blanks, widths, sleeve, profile, finish, size, the page's own sweeps), then a new server estimate.
-   Rules and widths from the pricing data only; no price or formula. Details: claude\build-2026-11-14-new-design-metal-change.md */
 (function(){
   function st(){ return state; }
   function B(){ return BUILDER; }
@@ -9019,7 +8787,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     keepSleeve(p,notes);
     if(blanks(base)&&p.strips.length&&!(s.strips||[]).length){ s.strips=p.strips.map(function(x){ return {material:x.material,width:x.width}; }); s.ringWidth=p.width; s.profile=p.profile; }
     if(blanks(base)) snapPrecut(base,notes);
-    else { if((s.strips||[]).some(function(x){ return x&&x.material==='(choose)'; })){ var o=[]; s.strips.forEach(function(x){ if(!x) return; var m=x.material==='(choose)'?base:x.material, l=o[o.length-1]; if(l&&l.material===base&&m===base) l.width=r2(l.width+x.width); else o.push({material:m,width:x.width}); }); s.strips=o.some(function(x){ return x.material!==base; })?o:[]; hasLayout=s.strips.length>0; notes.push('The empty ? parts are now '+base+'.'); }   /* NO ? ON PLAIN METAL 2026-11-15 (Johan 20:38) */
+    else { if((s.strips||[]).some(function(x){ return x&&x.material==='(choose)'; })){ var o=[]; s.strips.forEach(function(x){ if(!x) return; var m=x.material==='(choose)'?base:x.material, l=o[o.length-1]; if(l&&l.material===base&&m===base) l.width=r2(l.width+x.width); else o.push({material:m,width:x.width}); }); s.strips=o.some(function(x){ return x.material!==base; })?o:[]; hasLayout=s.strips.length>0; notes.push('The empty ? parts are now '+base+'.'); }
       fixProfile(base,notes); if(hasLayout) fixMinimums(base,notes,p); }
     fixFinish(base,notes);
     runSweeps(notes);
@@ -9038,10 +8806,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   }
   window.__V2_METAL_CHANGE__={ last:null };
 })();
-/* ===== METAL CHANGE KEEPS THE DESIGN (2026-11-14) - END ===== */
-/* ===== NEW DESIGN BUTTON (2026-11-14, Johan - to-do section 9, line 1) - START =====
-   "New design" in the header (+ the phone's step list): asks first, then opens the page again without the share-link
-   marks (design, su, sg) = clean first screen, new funnel session; ?staff and other marks kept. Details: claude\build-2026-11-14-new-design-metal-change.md */
 (function(){
   var DESIGN_MARKS=['design','su','sg'];
   function st(){ try{ return (typeof state!=='undefined'&&state)?state:null; }catch(e){ return null; } }
@@ -9112,15 +8876,11 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   window.__V2_NEW_DESIGN__={ ask:ask, freshUrl:freshUrl, leaving:false, go:function(u){ window.location.replace(u); } };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
 })();
-/* ===== NEW DESIGN BUTTON (2026-11-14) - END ===== */
-/* PRECUT CHANNELS 2026-11-15 (Johan 17:04 / 17:07) - START: each blank …[doc 2026-11-17] */
 (function(){
-  var E=function(){ return BUILDER.width_epsilon||0.01; }, Q='(choose)', L={}, last=-1, K=null, ed=-1;   /* PRECUT RIM RULE 2026-11-17 */
+  var E=function(){ return BUILDER.width_epsilon||0.01; }, Q='(choose)', L={}, last=-1, K=null, ed=-1;
   function r2(x){ return Math.round(x*100)/100; }
   function cp(a){ return a.map(function(x){ return { material:x.material, width:x.width }; }); }
   function pre(){ try{ var l=BUILDER.precut_choice&&(BUILDER.rules.precut_blanks||{})[state.baseMetal]; return !!(l&&l.length); }catch(e){ return false; } }
-  // the channels of strips a laid on segments segs: [{s,e,w,sum}] or null; full = every channel filled edge to edge.
-  // A missing last metal part is allowed (g.imp): the page leaves the band's closing edge as free width.
   function parse(a,segs,full){
     var pos=0, g=[];
     for(var i=0;i<segs.length;i++){ var sg=segs[i], w=Number(sg.w);
@@ -9137,11 +8897,9 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     return null;
   }
   function key(){ return [state.baseMetal,state.ringWidth,state.profile,state.precutStyle].join('|'); }
-  // the last good layout of this blank is kept: a drag in the band picture changes state.strips before the check runs
   function closed(a,c){ a=cp(a||[]); if(c&&c.g.imp) a.push({ material:state.baseMetal, width:c.g.imp }); return a; }
   function cur(){ var c=find(state.strips); if(c&&(state.precutStyle==null||c.b.style===state.precutStyle)&&c.g.every(function(g){ return g.sum>=g.w-E(); })) K={ k:key(), c:c }; return c; }
   function chan(c,i){ for(var k=0;k<c.g.length;k++) if(i>=c.g[k].s&&i<c.g[k].e) return c.g[k]; return null; }
-  // short channels get a "?" (into a "?" already there, else after strip "hint", else at the channel end)
   function fill(a,c,hint){
     var o=cp(a);
     for(var k=c.g.length-1;k>=0;k--){ var g=c.g[k], gap=r2(g.w-g.sum); if(gap<=E()) continue;
@@ -9182,7 +8940,6 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     try{ renderRing(); updatePrice(); }catch(e){}
     return true;
   }
-  /* BLANK FILL ON NEXT 2026-11-15 (Johan 21:48): each ? goes to the inlay …[doc 2026-11-17] */
   function grow(dry){
     if(!state.strips.some(function(x){ return x.material===Q; })) return !!dry; var c=cur(); if(!c) return false; var a=closed(state.strips,c);
     for(var j=0;j<a.length;j++){ if(a[j].material!==Q) continue; var cc=find(a), g=cc&&chan(cc,j); if(!g) return false;
@@ -9225,19 +8982,17 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       if(!c) return vp.apply(this,arguments);
       var g=parse(a,c.segs,false);
       if(!g) return 'On a precut blank the '+state.baseMetal+' parts are fixed and each inlay stays inside its channel ('+c.g.map(function(x){ return x.w+'mm'; }).join(' / ')+').';
-      var f=fill(closed(a,{ g:g }),{ g:g },last), rn=window.__V2_RIM__?__V2_RIM__.name(f):null;   /* PRECUT RIM RULE 2026-11-17 */
+      var f=fill(closed(a,{ g:g }),{ g:g },last), rn=window.__V2_RIM__?__V2_RIM__.name(f):null;
       if(rn) return __V2_RIM__.message(rn);
       return vp.call(this,f);
     };
     var oe=openEditStripModal; openEditStripModal=function(i){ last=i; ed=i; return oe.apply(this,arguments); };
-    var oa=openAddStripModal; openAddStripModal=function(){ ed=-1; return oa.apply(this,arguments); };   /* PRECUT RIM RULE 2026-11-17 */
+    var oa=openAddStripModal; openAddStripModal=function(){ ed=-1; return oa.apply(this,arguments); };
     var mi=document.getElementById('addStripModalInner');
     if(mi) new MutationObserver(function(){ if(!document.body.classList.contains('nb-pch')) return; mi.querySelectorAll('.mat-card .name').forEach(function(n){ if(n.textContent.trim().split(' (min ')[0]===state.baseMetal) n.closest('.mat-card').style.display='none'; }); rimCards(mi); }).observe(mi,{ childList:true, subtree:true });
-    /* PRECUT RIM RULE 2026-11-17 - START */
     function rimSlot(){ return !!window.__V2_RIM__&&ed>=0&&(ed===0||ed===state.strips.length-1); }
     function rimCards(m){ if(!rimSlot()) return; m.querySelectorAll('.mat-card:not(.nb-rim-off)').forEach(function(c){ var n=c.querySelector('.name'); if(!n) return; var nm=n.textContent.trim(), k=nm.lastIndexOf(' ('); if(!__V2_RIM__.listed(nm)&&k>0) nm=nm.slice(0,k); if(!__V2_RIM__.listed(nm)) return; c.classList.add('nb-rim-off','disabled'); c.classList.remove('selected'); c.setAttribute('data-nb-rim',nm); n.textContent=nm+' (not on the outside edge)'; }); }
     if(mi) mi.addEventListener('click',function(e){ var c=e.target.closest&&e.target.closest('.mat-card.nb-rim-off'); if(!c) return; stop(e); say(__V2_RIM__.message(c.getAttribute('data-nb-rim'))); },true);
-    /* PRECUT RIM RULE 2026-11-17 - END */
     h.addEventListener('click',function(e){
       if(!document.body.classList.contains('nb-pch')||!e.target.closest) return;
       var x=e.target.closest('.s-remove');
@@ -9253,9 +9008,8 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     var q=0; new MutationObserver(function(){ if(q) return; q=1; setTimeout(function(){ q=0; try{ dress(); }catch(e){ if(window.console) console.error('precut channels:',e); } },60); }).observe(h,{ childList:true, subtree:true });
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
-  window.__V2_CHANNELS__={ cur:cur, plan:plan, grow:grow };   // BLANK FILL ON NEXT 2026-11-15: + grow
+  window.__V2_CHANNELS__={ cur:cur, plan:plan, grow:grow };
 })();
-/* PRECUT CHANNELS 2026-11-15 - END */
 </script>
 </body>
 </html>
