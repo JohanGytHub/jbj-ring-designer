@@ -8701,6 +8701,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
             body.solidBandLookupId=r.lookupId;
             body.solidBandFinishCode=r.finishValue;
             body.solidBandFontCode=hasEng?r.fontValue:'';
+            if(isQuote&&r.srvMiss) body.solidBandMiss=r.srvMiss;
             init=Object.assign({},init,{ body:JSON.stringify(body) });
             sent=true;
           } else if(SB.miss){
@@ -8713,6 +8714,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       if(!sent||!out||typeof out.then!=='function') return out;
       var self=this;
       return out.then(function(response){
+        if(response&&response.ok&&!isQuote) try{ response.clone().json().then(estimateAnswer,function(){}); }catch(e){}
         if(!response||response.status!==409) return response;
         return response.clone().json().then(function(j){
           if(!j||j.error!=='solid_band_off') return response;
@@ -8721,6 +8723,15 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
         },function(){ return response; });
       });
     };
+  }
+  function estimateAnswer(j){
+    var r=SB.result; if(!r||!j||!active()) return;
+    r.srvMiss=(typeof j.solidBandMiss==='string'&&/^[a-z_]{1,40}$/.test(j.solidBandMiss))?j.solidBandMiss:null;
+    var id=j.solidBandLookupId;
+    if(typeof id!=='string'||!/^[0-9a-f]{32}$/.test(id)||id===r.lookupId) return;
+    r.lookupId=id;
+    r.images=r.images.map(function(m){ return { path:m.path.replace(/^\/ring-images\/[0-9a-f]{32}\//,'/ring-images/'+id+'/'), label:m.label }; });
+    paintSummary();
   }
   function retryQuote(input,orig){
     var s=st(), sv=services(), body=JSON.parse(orig.body), d=designPayload();
