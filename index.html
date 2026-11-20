@@ -8992,9 +8992,9 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     SB.msgAt=focus?at:null; if(at==='weight'&&V.weight) V.weight.wrap.hidden=false;
     if(!focus) return;
     var sub=String(path).split('.')[1], k=V[at], t=null, m=null;
-    if(k&&sub==='font'){ t=k.font; m=t&&t.parentNode.querySelector('.nb-sb-msg'); }
+    if(k&&sub==='font'){ t=k.font; m=t&&t.closest('.nb-sb-field').querySelector('.nb-sb-msg'); }
     else if(k&&sub==='fill'){ t=k.chips.querySelector('.nb-sb-chip'); m=k.colours.querySelector('.nb-sb-msg'); }
-    else if(k){ t=k.sel||k.input; m=t&&t.parentNode.querySelector('.nb-sb-msg'); }
+    else if(k){ t=k.sel||k.input; m=t&&t.closest('.nb-sb-field').querySelector('.nb-sb-msg'); }
     if(!m) m=dlg.querySelector('.nb-sb-msg[data-for="'+(k?at:'confirm')+'"]');
     if(!m) return;
     m.textContent=txt('not_available'); m.hidden=false;
