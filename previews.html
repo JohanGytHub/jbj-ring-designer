@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ring Builder Previews</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+<style>
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --soft2:#e4e8f0;
+  --ink:#151823; --ink2:#3f4758; --muted:#566074;
+  --line:#d3d8e3; --line2:#bcc4d3;
+  --accent:#4a59dc; --sel:#edf0ff;
+  --shadow:0 1px 2px rgba(21,24,35,.06),0 6px 20px rgba(21,24,35,.06);
+  --font:"DM Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#10131a; --card:#171b24; --soft2:#272d39;
+  --ink:#f2f4f9; --ink2:#d2d7e2; --muted:#aeb6c6;
+  --line:#333a48; --line2:#465064; --accent:#96a2ff; --sel:#272d45;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark}}
+*{box-sizing:border-box}
+body{background:#f4f6fa;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.45;margin:0;
+  padding:20px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+.wrap{max-width:1100px;margin:0 auto;display:grid;gap:22px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:26px;font-weight:700;letter-spacing:-.01em;margin:2px 0 6px}
+.lead{margin:0;color:var(--ink2);max-width:68ch}
+h2{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.grid{display:grid;gap:10px;grid-template-columns:1fr}
+@media (min-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:980px){.grid{grid-template-columns:repeat(3,1fr)}}
+.card{display:flex;align-items:center;gap:14px;min-height:64px;padding:12px 16px;background:var(--card);color:var(--ink);
+  border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);text-decoration:none}
+.card:hover{border-color:var(--accent);background:var(--sel)}
+.card:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.num{flex:none;width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;display:grid;place-items:center}
+@media (prefers-color-scheme: dark){.num{color:#10131a}}
+.txt{display:grid;gap:1px;min-width:0}
+.txt b{font-size:16px;font-weight:600;line-height:1.25}
+.txt span{font-size:14px;color:var(--muted)}
+.arrow{margin-left:auto;color:var(--accent);font-size:20px}
+.foot{margin:0;padding:14px 16px;background:var(--soft2);border-radius:14px;color:var(--ink2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="eyebrow">Jewelry by Johan</div>
+<h1>Ring Builder Previews</h1>
+<p class="lead">Tap a page to see its 4 design previews. These are mock-ups; the real Ring Builder is not changed yet.</p>
+</header>
+
+<section>
+<h2>Step 1 - Your band</h2>
+<div class="grid">
+<a class="card" href="base-metal-previews.html"><span class="num">1</span><span class="txt"><b>Base Metal</b><span>Choosing the metal</span></span><span class="arrow" aria-hidden="true">&rsaquo;</span></a>
+<a class="card" href="width-profile-previews.html"><span class="num">2</span><span class="txt"><b>Width &amp; Profile</b><span>Ring width, inlays yes or no, shape</span></span><span class="arrow" aria-hidden="true">&rsaquo;</span></a>
+<a class="card" href="made-to-order-popup-previews.html"><span class="num">3</span><span class="txt"><b>Your band, made to order (popup)</b><span>Plain precious-metal bands</span></span><span class="arrow" aria-hidden="true">&rsaquo;</span></a>
+</div>
+</section>
+
+<section>
+<h2>Step 2 - Make it yours</h2>
+<div class="grid">
+<a class="card" href="inlays-previews.html"><span class="num">4</span><span class="txt"><b>Add/Remove Inlays</b><span>Building the band from strips</span></span><span class="arrow" aria-hidden="true">&rsaquo;</span></a>
+<a class="card" href="add-inlay-popup-previews.html"><span class="num">5</span><span class="txt"><b>Add an Inlay (popup)</b><span>Picking a material and its width</span></span><span class="arrow" aria-hidden="true">&rsaquo;</span></a>
+<a class="card" href="sleeve-previews.html"><span class="num">6</span><span class="txt"><b>Sleeve</b><span>The inside of the ring</span></span><span class="arrow" aria-hidden="true">&rsaquo;</span></a>
+<a class="card" href="finish-previews.html"><span class="num">7</span><span class="txt"><b>Finish</b><span>Polished, brushed, hammered ...</span></span><span class="arrow" aria-hidden="true">&rsaquo;</span></a>
+</div>
+</section>
+
+<section>
+<h2>Step 3 - Get my quote</h2>
+<div class="grid">
+<a class="card" href="ring-size-previews.html"><span class="num">8</span><span class="txt"><b>Ring Size</b><span>Known size or send a ring sizer</span></span><span class="arrow" aria-hidden="true">&rsaquo;</span></a>
+<a class="card" href="summary-previews.html"><span class="num">9</span><span class="txt"><b>Summary and quote form</b><span>Review and send the request</span></span><span class="arrow" aria-hidden="true">&rsaquo;</span></a>
+</div>
+</section>
+
+<p class="foot">Each page has 4 previews. Note the number you like best for each page.</p>
+</div>
+</body>
+</html>
