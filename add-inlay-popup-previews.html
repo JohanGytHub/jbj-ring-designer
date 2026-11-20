@@ -1,0 +1,921 @@
+<title>Add Inlay Popup Previews</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+<style>
+/* Same outer shell as width-profile-previews-2026-11-20.html. Colours from the new builder (parts 109l + 109p).
+   Material pictures are drawn with CSS textures (no photo files), so the file works next to index.html and in claude\previews\. */
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --soft:#edf0f6; --soft2:#e4e8f0;
+  --ink:#151823; --ink2:#3f4758; --muted:#566074;
+  --line:#d3d8e3; --line2:#bcc4d3;
+  --accent:#4a59dc; --accent2:#5f6eea; --on-accent:#ffffff; --sel:#edf0ff;
+  --ok:#2f7a4a; --ok-bg:#eef6f0; --ok-line:#a9cdb4; --warn:#8a5a00; --warn-bg:#fff6e5;
+  --dim:rgba(16,19,30,.55);
+  --shadow:0 1px 2px rgba(21,24,35,.06),0 6px 20px rgba(21,24,35,.06);
+  --font:"DM Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --r-lg:18px; --r-md:14px; --r-sm:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10131a; --card:#171b24; --soft:#1d222d; --soft2:#272d39;
+  --ink:#f2f4f9; --ink2:#d2d7e2; --muted:#aeb6c6; --line:#333a48; --line2:#465064;
+  --accent:#96a2ff; --accent2:#b3bcff; --on-accent:#10131a; --sel:#272d45;
+  --ok:#8fd3a5; --ok-bg:#16261d; --ok-line:#2f5a40; --warn:#f3c56b; --warn-bg:#2e2412; --dim:rgba(0,0,0,.62);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10131a; --card:#171b24; --soft:#1d222d; --soft2:#272d39;
+  --ink:#f2f4f9; --ink2:#d2d7e2; --muted:#aeb6c6; --line:#333a48; --line2:#465064;
+  --accent:#96a2ff; --accent2:#b3bcff; --on-accent:#10131a; --sel:#272d45;
+  --ok:#8fd3a5; --ok-bg:#16261d; --ok-line:#2f5a40; --warn:#f3c56b; --warn-bg:#2e2412; --dim:rgba(0,0,0,.62);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.45;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+h1,h2,h3{text-wrap:balance;margin:0}
+.wrap{max-width:1160px;margin:0 auto;display:grid;gap:18px}
+
+/* ---------- page header + switcher (same as set 1) ---------- */
+.intro{display:grid;gap:6px;max-width:68ch}
+.intro .eyebrow{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.intro h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
+.intro p{margin:0;color:var(--ink2)}
+.switch{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;background:var(--soft2);padding:5px;border-radius:var(--r-md)}
+@media (min-width:760px){.switch{grid-template-columns:repeat(4,1fr)}}
+.switch button{border:0;background:transparent;border-radius:var(--r-sm);padding:9px 10px;text-align:left;display:grid;gap:1px;min-height:52px}
+.switch button b{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.switch button span{font-weight:600;font-size:14px;line-height:1.25}
+.switch button[aria-selected="true"]{background:var(--card);box-shadow:var(--shadow)}
+.switch button[aria-selected="true"] b{color:var(--accent)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.viewtoggle{display:none;gap:4px;background:var(--soft2);padding:4px;border-radius:999px}
+@media (min-width:760px){.viewtoggle{display:inline-flex}}
+.viewtoggle button,.modetoggle button{border:0;background:transparent;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--muted)}
+.viewtoggle button[aria-pressed="true"],.modetoggle button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.modetoggle{display:inline-flex;gap:4px;background:var(--soft2);padding:4px;border-radius:999px}
+.tools-l{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.linkbtn{border:0;background:none;color:var(--accent);font-weight:600;font-size:14px;padding:6px 2px;text-decoration:underline;text-underline-offset:3px}
+
+.stage{display:grid;gap:16px;justify-items:center}
+.device{width:100%;max-width:390px;height:800px;background:var(--bg);border:1px solid var(--line2);border-radius:30px;overflow:clip;
+  box-shadow:0 20px 50px rgba(21,24,35,.12);container-type:inline-size;position:relative}
+.stage.pc .device{max-width:1100px;height:760px;border-radius:16px}
+@media (max-width:520px){.device{border-radius:20px;height:760px}}
+.changed{width:100%;max-width:640px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px 18px;display:grid;gap:8px}
+.changed h2{font-size:16px}
+.changed ul{margin:0;padding-left:20px;display:grid;gap:4px;color:var(--ink2)}
+.changed .diff{font-size:13px;color:var(--muted);margin:0}
+
+/* ---------- builder chrome behind the popup ---------- */
+.page{position:absolute;inset:0;display:flex;flex-direction:column}
+.b-top{background:var(--card);border-bottom:1px solid var(--line);padding:12px 14px 0;display:grid;gap:10px}
+.brand{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
+.brand b{color:var(--ink);font-size:14px;letter-spacing:.02em}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.steps .st{display:grid;gap:4px}
+.steps .st i{display:block;height:5px;border-radius:3px;background:var(--soft2)}
+.steps .st.on i,.steps .st.done i{background:var(--accent)}
+.steps .st small{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.steps .st.on small{color:var(--accent)}
+.steps .st span{font-size:13px;font-weight:600;line-height:1.2}
+.steps .st:not(.on) span{color:var(--muted)}
+.subtabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:0 14px}
+.subtabs div{white-space:nowrap;font-size:13.5px;font-weight:600;padding:9px 4px 10px;margin-right:14px;color:var(--muted);border-bottom:3px solid transparent}
+.subtabs .on{color:var(--ink);border-bottom-color:var(--accent)}
+.b-body{padding:16px 14px 18px;display:grid;gap:12px;align-content:start;flex:1;overflow:hidden}
+.ptitle{display:grid;gap:4px}
+.ptitle h2{font-size:22px;font-weight:700;letter-spacing:-.01em}
+.ptitle p{margin:0;color:var(--ink2);font-size:14px}
+.b-bar{background:var(--card);border-top:1px solid var(--line);padding:10px 14px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px}
+.b-bar .back{border:1px solid var(--line2);background:var(--card);border-radius:12px;padding:11px 14px;font-weight:600}
+.b-bar .mid{text-align:center;font-size:12.5px;color:var(--muted);font-weight:600}
+.b-bar .next{border:0;background:var(--accent);color:var(--on-accent);border-radius:12px;padding:12px 16px;font-weight:700;white-space:nowrap}
+@container (min-width:720px){.b-bar{padding-inline:28px}.b-body{padding:24px 28px}.b-top{padding-inline:28px}.subtabs{margin:0 -28px;padding:0 28px}}
+.pgcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px;display:grid;gap:10px}
+.striprow{display:flex;gap:10px;align-items:center;font-size:14px;padding:6px 0;border-top:1px solid var(--line)}
+.striprow:first-of-type{border-top:0}
+.striprow .n{width:22px;height:22px;border-radius:50%;background:var(--soft2);font-size:12px;font-weight:700;display:grid;place-items:center;flex:0 0 auto}
+.striprow .sw{width:26px;height:26px;border-radius:6px;flex:0 0 auto}
+.striprow .w{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums}
+.striprow.hl{background:var(--sel);border-radius:8px;padding-inline:6px}
+.addbtn{border:1.5px dashed var(--accent);color:var(--accent);background:var(--sel);border-radius:12px;padding:12px;font-weight:700;width:100%}
+.pagetoast{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line);border-radius:10px;padding:9px 12px;font-size:14px;font-weight:600}
+
+/* band drawing (used behind and inside the popup) */
+.band{display:flex;height:34px;border-radius:7px;overflow:hidden;border:1px solid var(--line2);background:repeating-linear-gradient(135deg,var(--soft) 0 6px,var(--card) 6px 12px)}
+.band .seg{height:100%;min-width:2px;position:relative;box-shadow:inset -1px 0 rgba(0,0,0,.18)}
+.band .seg.new{outline:3px solid var(--accent);outline-offset:-3px;z-index:1}
+.band .seg.auto{background-blend-mode:normal}
+.band .seg.auto::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 3px,rgba(255,255,255,.35) 3px 4px)}
+.band .seg.ghost{background:transparent;border:2px dashed var(--accent);border-radius:4px}
+.band .free{flex:1}
+.ruler{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;padding:2px 1px 0}
+.bandkey{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12.5px;color:var(--ink2)}
+.bandkey span{display:inline-flex;gap:5px;align-items:center}
+.bandkey i{width:12px;height:12px;border-radius:3px;display:inline-block;flex:0 0 auto}
+.bandkey i.k-new{outline:2px solid var(--accent);outline-offset:-2px}
+.bandkey i.k-free{background:repeating-linear-gradient(135deg,var(--soft2) 0 3px,var(--card) 3px 6px);border:1px solid var(--line2)}
+
+/* ---------- the popup ---------- */
+.ov{position:absolute;inset:0;background:var(--dim);z-index:20}
+.ov.anim{animation:fade .18s ease}
+@keyframes fade{from{opacity:0}}
+@media (prefers-reduced-motion:reduce){.ov,.sheet{animation:none!important}}
+.sheet{position:absolute;left:0;right:0;bottom:0;top:22px;background:var(--card);border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 -10px 40px rgba(0,0,0,.25)}
+.ov.anim .sheet{animation:up .22s ease}
+@keyframes up{from{transform:translateY(30px);opacity:.4}}
+@container (min-width:720px){
+  .sheet{left:50%;top:32px;bottom:32px;width:min(940px,calc(100% - 64px));transform:translateX(-50%);border-radius:18px;animation:none}
+}
+.sh-head{padding:14px 16px 10px;display:grid;gap:8px;border-bottom:1px solid var(--line);position:relative}
+.sh-head h3{font-size:19px;font-weight:700;padding-right:44px;line-height:1.25}
+.sh-head .sub{font-size:13.5px;color:var(--muted);margin:0}
+.x{position:absolute;top:8px;right:8px;width:44px;height:44px;border-radius:50%;border:0;background:transparent;font-size:24px;line-height:1;color:var(--muted)}
+.x:hover{background:var(--soft)}
+.sh-body{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:12px 16px 16px;display:grid;gap:12px;align-content:start;position:relative}
+.sh-foot{border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));display:grid;gap:8px;background:var(--card);position:relative}
+@container (min-width:720px){.sh-head{padding:18px 24px 12px}.sh-body{padding:16px 24px 20px}.sh-foot{padding:12px 24px}}
+.status{font-size:13px;color:var(--muted);min-height:19px}
+.status b{color:var(--ink)}
+.status.ready{color:var(--ok)}
+.btnrow{display:flex;gap:8px;justify-content:flex-end}
+.btn{border:1.5px solid var(--line2);background:var(--card);border-radius:12px;padding:12px 16px;font-weight:600;min-height:46px}
+.btn.pri{border:0;background:linear-gradient(135deg,#5362e6 0%,#4654d2 58%,#3a46b4 100%);color:#fff;font-weight:700;flex:1;max-width:320px}
+.btn.pri[aria-disabled="true"]{background:var(--soft2);color:var(--muted);border:1px solid var(--line2)}
+.btn.grow{flex:1}
+.info{font-size:13.5px;background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line);border-radius:10px;padding:8px 11px;margin:0;display:flex;gap:8px;align-items:flex-start}
+.info::before{content:"i";flex:0 0 18px;height:18px;border-radius:50%;background:var(--ok);color:var(--card);font-size:12px;font-weight:700;display:grid;place-items:center;font-style:italic;margin-top:1px}
+.warnmsg{font-size:13.5px;background:var(--warn-bg);color:var(--warn);border-radius:10px;padding:8px 11px;margin:0}
+.label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.note{font-size:13px;color:var(--muted);margin:0}
+.contact{font-size:13px;color:var(--muted);text-align:center;margin:4px 0 0}
+.contact a{color:var(--accent);font-weight:600}
+.toast{position:absolute;left:16px;right:16px;bottom:calc(100% + 8px);background:#1d2230;color:#fff;border-radius:12px;padding:10px 12px;font-size:13.5px;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:6}
+.flash{animation:flash 1.2s ease}
+@keyframes flash{0%,100%{box-shadow:none}30%{box-shadow:0 0 0 4px var(--accent)}}
+@media (prefers-reduced-motion:reduce){.flash{animation:none;outline:3px solid var(--accent)}}
+
+/* search */
+.search{position:relative;display:flex;align-items:center}
+.search svg{position:absolute;left:12px;width:18px;height:18px;color:var(--muted);pointer-events:none}
+.search input{width:100%;border:1.5px solid var(--line2);background:var(--card);border-radius:12px;padding:12px 44px 12px 40px;font-size:16px;min-height:48px}
+.search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--sel)}
+.search input::placeholder{color:var(--muted)}
+.search .clr{position:absolute;right:4px;width:40px;height:40px;border:0;background:transparent;border-radius:50%;font-size:20px;color:var(--muted)}
+.search.big input{font-size:17px;min-height:54px;border-radius:14px}
+
+/* swatch + zoom */
+.sw{border-radius:9px;flex:0 0 auto;position:relative;background-color:var(--soft2)}
+.zoom{position:absolute;right:-6px;bottom:-6px;width:26px;height:26px;border-radius:50%;border:1px solid var(--line2);background:var(--card);color:var(--ink);display:grid;place-items:center;padding:0;box-shadow:var(--shadow)}
+.zoom svg{width:14px;height:14px}
+.zoom::before{content:"";position:absolute;inset:-9px}
+.lb{position:absolute;inset:0;z-index:40;background:rgba(10,12,18,.78);display:grid;place-items:center;padding:20px;animation:fade .15s ease}
+.lb-box{background:var(--card);border-radius:18px;padding:14px;width:min(360px,100%);display:grid;gap:10px;position:relative}
+.lb-pic{aspect-ratio:1;border-radius:12px}
+.lb-name{font-weight:700;font-size:17px;padding-right:40px}
+.lb-sub{font-size:13px;color:var(--muted);margin-top:-6px}
+.lb .x{top:6px;right:6px}
+.lb-use{border:0;background:var(--accent);color:var(--on-accent);border-radius:12px;padding:12px;font-weight:700}
+.lb-use[aria-disabled="true"]{background:var(--soft2);color:var(--muted)}
+
+/* material rows (list) */
+.mlist{display:grid;gap:4px}
+.mrow{cursor:pointer;display:flex;gap:16px;align-items:center;border:1.5px solid transparent;background:transparent;border-radius:12px;padding:5px 10px 5px 6px;text-align:left;width:100%;min-height:54px}
+.mrow:hover{background:var(--soft)}
+.mrow .sw{width:42px;height:42px}
+.mrow .tx{display:grid;min-width:0;flex:1}
+.mrow .nm{font-weight:600;font-size:15px;line-height:1.25;overflow-wrap:anywhere}
+.mrow .mn{font-size:12.5px;color:var(--muted)}
+.mrow[aria-pressed="true"]{border-color:var(--accent);background:var(--sel)}
+.mrow[aria-pressed="true"]::after,.mcard[aria-pressed="true"] .tick{content:"";flex:0 0 22px;height:22px;border-radius:50%;background:var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.5l2.5 2.5L12 5.5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/16px no-repeat}
+.mrow.off{opacity:1}
+.mrow.off .nm{color:var(--muted)}
+.mrow.off .sw{filter:saturate(.3) opacity(.7)}
+.mrow.off .mn{color:var(--warn)}
+.ghead{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:10px 4px 2px;display:flex;justify-content:space-between}
+.count{font-size:13px;color:var(--muted)}
+.count b{color:var(--ink)}
+.empty{padding:16px;text-align:center;color:var(--muted);font-size:14px;background:var(--soft);border-radius:12px}
+
+/* chips */
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:2px 16px 4px;scroll-padding-inline:16px}
+.chips::-webkit-scrollbar{display:none}
+.chip{border:1.5px solid var(--line2);background:var(--card);border-radius:999px;padding:8px 13px;font-weight:600;font-size:14px;white-space:nowrap;display:inline-flex;gap:6px;align-items:center;scroll-snap-align:start;min-height:40px}
+.chip small{font-weight:500;color:var(--muted);font-size:12px}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:var(--on-accent)}
+.chip[aria-pressed="true"] small{color:var(--on-accent);opacity:.85}
+.chip .dot{width:16px;height:16px;border-radius:50%;flex:0 0 auto}
+@container (min-width:720px){.chips{flex-wrap:wrap;overflow:visible;margin:0;padding:0}}
+
+/* width controls */
+.stepper{display:grid;grid-template-columns:52px 1fr 52px;gap:10px;align-items:center}
+.rbtn{width:52px;height:52px;border-radius:50%;border:1.5px solid var(--line2);background:var(--card);font-size:24px;font-weight:600;line-height:1;padding:0}
+.rbtn[aria-disabled="true"]{opacity:.4}
+.wread{display:flex;justify-content:center;align-items:baseline;gap:4px}
+.wread input{width:96px;border:0;border-bottom:2px solid var(--line2);background:transparent;font-size:36px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums;padding:0}
+.wread input:focus{outline:none;border-color:var(--accent)}
+.wread span{font-size:16px;color:var(--muted)}
+.limits{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);gap:8px}
+.limits b{color:var(--ink2)}
+.qw{display:flex;gap:6px;flex-wrap:wrap}
+.qw .chip{font-size:13px;padding:7px 11px;min-height:38px}
+.num{display:inline-flex;align-items:center;gap:4px;border:1.5px solid var(--line2);border-radius:10px;padding:4px 8px;background:var(--card)}
+.num input{width:56px;border:0;background:transparent;font-weight:700;font-size:16px;text-align:right;font-variant-numeric:tabular-nums}
+.num input:focus{outline:none}
+.num:focus-within{border-color:var(--accent)}
+.num span{color:var(--muted);font-size:14px}
+.locked{opacity:.5;pointer-events:none}
+
+/* ---------- Preview 1: two short steps ---------- */
+.prog{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.prog button{border:0;background:var(--soft);border-radius:10px;padding:7px 10px;text-align:left;display:flex;gap:8px;align-items:center;font-size:13.5px;font-weight:600;color:var(--muted);min-height:44px}
+.prog button i{width:24px;height:24px;border-radius:50%;background:var(--soft2);display:grid;place-items:center;font-style:normal;font-size:12.5px;font-weight:700;flex:0 0 auto}
+.prog button span{display:grid;line-height:1.2;min-width:0}
+.prog button span small{font-weight:500;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog button.on{background:var(--sel);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.prog button.on i{background:var(--accent);color:var(--on-accent)}
+.prog button.ok i{background:var(--ok);color:#fff}
+.prog button[aria-disabled="true"]{cursor:default}
+.p1-sticky{position:sticky;top:-12px;z-index:3;background:var(--card);margin:-12px -16px 0;padding:12px 16px 6px;display:grid;gap:8px;border-bottom:1px solid var(--line)}
+.chosen{display:grid;grid-template-columns:64px 1fr auto;gap:14px;align-items:center;background:var(--soft);border-radius:14px;padding:10px 12px}
+.chosen .sw{width:64px;height:64px}
+.chosen .t{font-weight:700;font-size:16px;line-height:1.25}
+.chosen .d{font-size:13px;color:var(--muted)}
+.wbox{border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;gap:12px}
+@container (min-width:720px){
+  .p1-split{display:grid;grid-template-columns:1.25fr 1fr;gap:24px;align-items:start}
+  .p1-split .p1-sticky{margin:0;padding:0 0 8px;top:0}
+  .p1-col2{position:sticky;top:0;display:grid;gap:12px}
+}
+
+/* ---------- Preview 2: group tiles ---------- */
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@container (min-width:720px){.tiles{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tile{border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:0;overflow:hidden;text-align:left;display:grid;grid-template-rows:56px auto}
+.tile .pic{display:block}
+.tile .tt{padding:8px 10px 10px;display:grid;gap:1px}
+.tile .tt b{font-size:14px;line-height:1.2}
+.tile .tt span{font-size:12px;color:var(--muted);line-height:1.25}
+.tile:hover{border-color:var(--accent2)}
+.tile.all{grid-column:1/-1;grid-template-rows:auto;grid-template-columns:1fr;background:var(--sel);border-color:var(--accent)}
+.crumb{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.crumb button{border:0;background:var(--soft);border-radius:999px;padding:8px 12px;font-weight:600;font-size:13.5px;min-height:40px}
+.crumb b{font-size:16px}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@container (min-width:720px){.cards{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.mcard{cursor:pointer;border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:6px;text-align:left;display:grid;gap:6px;position:relative;align-content:start}
+.mcard .sw{width:100%;aspect-ratio:4/3;height:auto;border-radius:10px}
+.mcard .zoom{right:8px;bottom:auto;top:8px}
+.mcard .nm{font-weight:600;font-size:14px;line-height:1.25;padding:0 4px;overflow-wrap:anywhere}
+.mcard .mn{font-size:12px;color:var(--muted);padding:0 4px 2px}
+.mcard[aria-pressed="true"]{border-color:var(--accent);background:var(--sel);box-shadow:inset 0 0 0 1px var(--accent)}
+.mcard .tick{position:absolute;left:12px;top:12px;width:24px;height:24px}
+.mcard.off .sw{filter:saturate(.3) opacity(.7)}
+.mcard.off .mn{color:var(--warn)}
+.dock{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center}
+.dock .sw{width:44px;height:44px}
+.dock .t{font-weight:700;font-size:14.5px;line-height:1.2}
+.dock .d{font-size:12.5px;color:var(--muted)}
+.mini{display:flex;align-items:center;gap:4px}
+.mini .rbtn{width:40px;height:40px;font-size:20px}
+.mini .num input{width:44px}
+.hint2{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:13.5px;color:var(--muted);align-items:center}
+.hint2 i{width:22px;height:22px;border-radius:50%;background:var(--soft2);font-style:normal;font-weight:700;font-size:12px;display:grid;place-items:center;color:var(--ink2)}
+.hint2 .done{background:var(--ok);color:#fff}
+
+/* ---------- Preview 3: live band ---------- */
+.live{display:grid;gap:5px;background:var(--soft);border-radius:14px;padding:10px 12px}
+.live .cap{display:flex;justify-content:space-between;gap:8px;font-size:13.5px;flex-wrap:wrap}
+.live .cap b{font-size:14.5px}
+.ddwrap{position:relative}
+.ddbtn{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:46px;padding:0 18px;border-radius:23px;border:1.5px solid var(--line2);background:var(--card);font-size:15px;font-weight:500;text-align:left}
+.ddbtn::after{content:"";width:8px;height:8px;margin:-4px 2px 0 12px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg)}
+.ddbtn[aria-expanded="true"]::after{margin-top:4px;transform:rotate(225deg)}
+.ddlist{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:8;max-height:330px;overflow-y:auto;overscroll-behavior:contain;padding:4px 0;border:1px solid var(--line2);border-radius:12px;background:var(--card);box-shadow:0 10px 28px rgba(0,0,0,.22)}
+.ddrow{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:4px 16px;border:0;background:var(--card);font-size:15px;text-align:left}
+.ddrow small{margin-left:auto;color:var(--muted);font-size:12.5px}
+.ddrow.on{background:var(--soft2);font-weight:600}
+.ddrow .dot{width:18px;height:18px;border-radius:5px;flex:0 0 auto}
+.showing{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.tag{display:inline-flex;gap:6px;align-items:center;background:var(--sel);color:var(--accent);border-radius:999px;padding:4px 6px 4px 10px;font-weight:600;font-size:13px}
+.tag button{border:0;background:transparent;color:inherit;width:26px;height:26px;border-radius:50%;padding:0;font-size:16px;line-height:1}
+.p3-mlist{max-height:none}
+input[type=range]{width:100%;accent-color:var(--accent);height:32px}
+.wline{display:flex;gap:10px;align-items:center}
+@container (min-width:720px){
+  .p3-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .p3-mlist{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* ---------- Preview 4: search first ---------- */
+.pop{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding:0 16px 4px}
+.pop::-webkit-scrollbar{display:none}
+.popc{flex:0 0 96px;border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:5px;display:grid;gap:4px;text-align:left;position:relative}
+.popc .sw{width:100%;height:56px;border-radius:8px}
+.popc span{font-size:12.5px;font-weight:600;line-height:1.2}
+.popc[aria-pressed="true"]{border-color:var(--accent);background:var(--sel)}
+@container (min-width:720px){.pop{flex-wrap:wrap;overflow:visible;margin:0;padding:0}}
+.acc{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.acc + .acc{margin-top:-6px}
+.acc-h{display:flex;gap:12px;align-items:center;width:100%;border:0;background:var(--card);padding:8px 12px;min-height:52px;text-align:left}
+.acc-h .sw{width:34px;height:34px;border-radius:8px}
+.acc-h b{font-size:15px;flex:1}
+.acc-h small{color:var(--muted);font-size:12.5px}
+.acc-h::after{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);margin-left:4px}
+.acc.open .acc-h::after{transform:rotate(45deg)}
+.acc.open .acc-h{background:var(--soft)}
+.acc .mlist{padding:4px}
+.sel4{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center}
+.sel4 .sw{width:40px;height:40px}
+.sel4 .t{font-weight:700;font-size:14.5px;line-height:1.2}
+.sel4 .d{font-size:12.5px;color:var(--muted)}
+.chg{border:0;background:none;color:var(--accent);font-weight:600;font-size:14px;padding:8px 4px;min-height:40px}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:0 0 auto;border:1.5px solid var(--line2);background:var(--card);border-radius:10px;padding:6px 10px;display:grid;justify-items:center;min-width:58px;min-height:46px}
+.pill b{font-size:15px;font-variant-numeric:tabular-nums}
+.pill small{font-size:10.5px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+.pill[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:var(--on-accent)}
+.pill[aria-pressed="true"] small{color:var(--on-accent)}
+.mark{background:color-mix(in srgb,var(--accent) 22%,transparent);color:inherit;border-radius:3px;padding:0 1px}
+@container (min-width:720px){
+  .p4-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+}
+.srOnly{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <div class="eyebrow">New Ring Builder · design mock-ups · 20 Nov 2026</div>
+    <h1>Add an Inlay Strip: four ways to pick</h1>
+    <p>Each preview is clickable. The popup has two jobs: <b>find one material</b> among 360+, then <b>set its width</b>. The blue button only turns on when both are done. Switch between the Add and the Edit popup above the frame. Nothing here talks to the real builder or to prices.</p>
+  </header>
+
+  <div class="toolbar">
+    <div class="switch" role="tablist" aria-label="Choose a preview" id="switch" style="flex:1 1 100%"></div>
+  </div>
+  <div class="toolbar">
+    <div class="tools-l">
+      <div class="modetoggle" role="group" aria-label="Which popup">
+        <button type="button" id="md-add" aria-pressed="true">Add an Inlay Strip</button>
+        <button type="button" id="md-edit" aria-pressed="false">Edit Strip 2</button>
+      </div>
+      <div class="viewtoggle" role="group" aria-label="Frame size">
+        <button type="button" id="vt-phone" aria-pressed="true">Phone</button>
+        <button type="button" id="vt-pc" aria-pressed="false">PC</button>
+      </div>
+    </div>
+    <button type="button" class="linkbtn" id="resetBtn">Start this preview again</button>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="device" id="device"></div>
+    <section class="changed" id="changed" aria-live="polite"></section>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- real data: materials, groups and minimum widths from jbj-pricing.test.json (hidden materials left out) ---------- */
+var RAW=[["Antler","Antler",1,"#F5DEB3"],["Crushed Antler","Antler",1,"#D9CFC0"],["Customer Antler","Antler",1,null],["Horn","Antler",1,null],["Carbon Fiber","Carbon Fiber",3,"#333333"],["Enamel Glow in the Dark","Enamel",0.5,"#7FFF00"],["Enamel Pinstripe","Enamel",0.5,null],["Aquamarine","Lapidary",1.5,null],["Boulder Opal","Lapidary",2,null],["Cement / Concrete","Lapidary",1.5,null],["Charoite","Lapidary",1.5,null],["Chrysocolla","Lapidary",2,null],["Coprolite Crushed","Lapidary",1.5,null],["Coquina Jasper Crushed","Lapidary",2,null],["Dino Bone Solid","Dinosaur Bone",2,"#8B7355"],["Elk Ivory","Lapidary",1.5,null],["Goldstone Crushed","Lapidary",2,"#B8860B"],["Granite","Lapidary",1.5,null],["Jade - Black Crushed","Lapidary",2,"#2F4F4F"],["Jade - Green Crushed","Lapidary",2,"#00A86B"],["Jasper","Lapidary",2,null],["Labradorite","Lapidary",2,null],["Lapis Lazuli","Lapidary",2,"#26619C"],["Lava (Basalt)","Lapidary",1.5,null],["Limestone","Lapidary",1.5,null],["Malachite - Synthetic Crushed","Lapidary",2,"#0BDA51"],["Obsidian","Lapidary",2,"#1C1C1C"],["Onyx","Lapidary",2,"#353935"],["Petrified Wood","Lapidary",2,null],["Rhodonite","Lapidary",1.5,null],["Stones","Lapidary",0.5,null],["Sugilite","Lapidary",2,null],["Yooperlite","Lapidary",2,"#5C6784"],["Tigers Eye","Lapidary",2,"#C88141"],["Turquoise","Lapidary",2,"#40E0D0"],["Woolly Mammoth Bone","Lapidary",2,null],["Black Ceramic","Metals",0.5,"#1A1A1A"],["Damascus","Metals",1,"#9E9E9E"],["Metal Mokume","Metals",1.5,null],["Platinum","Metals Precious",0.75,"#E5E4E2"],["Titanium","Metals",0.5,"#C0C0C0"],["Tungsten","Metals",0.5,"#8A8A8A"],["Zirconium","Metals",0.5,"#2C2C2C"],["Rose 14K","Metals Precious",0.75,"#B76E79"],["Silver","Metals Precious",0.75,"#E0E0E0"],["White 10K","Metals Precious",0.75,"#E8E8E8"],["White 14K","Metals Precious",0.75,"#ECECEC"],["White 18K","Metals Precious",0.75,"#F0F0F0"],["Yellow 10K","Metals Precious",0.75,"#D4A017"],["Yellow 14K","Metals Precious",0.75,"#DAA520"],["Yellow 18K","Metals Precious",0.75,"#FFD700"],["Faceted Gibeon Meteorite","Meteorite",4,"#4A4A4A"],["Gibeon Meteorite","Meteorite",2,"#5A5A5A"],["Perfect Meteorite","Meteorite",2,"#6A6A6A"],["Mokume-Black & Gold","Mokume Composite",1,"#8B7355"],["Mokume-Black & White","Mokume Composite",1,"#696969"],["Mokume-Black and Red","Mokume Composite",1,null],["Mokume-Blue Bronze and Red Copper","Mokume Composite",1,"#7B4B3A"],["Mokume-Blue Bronze and White Silver","Mokume Composite",1,"#4682B4"],["Mokume-Cobaltium","Mokume Composite",1,"#708090"],["Mokume-Lapis","Mokume Composite",1,null],["Mokume-White","Mokume Composite",1,null],["Mother of Pearl","Mother of Pearl",1.5,"#FDEEF4"],["Flower Petals","Petals",1.5,"#FF69B4"],["Supply Your Own Flower Petals","Petals",1.5,"#FF69B4"],["Moss","Petals",1.5,"#228B22"],["Camouflage","Prints",2.5,null],["Snake Skin","Prints",2.5,null],["Sand","Sand",1.5,"#C2B280"],["Supply Your Own Sand","Sand",1.5,"#C2B280"],["Dirt","Sand",1.5,"#6B4E31"],["Diamond Dust","Stardust",2,"#E8E8E8"],["Flower Petals and Stardust","Stardust",1,null],["Platinum Flakes and Stardust","Stardust",1,null],["Rose Gold Flakes and Stardust","Stardust",1,null],["Silver Flakes and Stardust","Stardust",1,null],["Stardust","Stardust",1,"#C0C0C0"],["White Gold Flakes and Stardust","Stardust",1,null],["Yellow Gold Flakes and Stardust","Stardust",1,null],["Whale Bone","Whale Bone",1.5,null],["Bike Chain","Bike Chain",3,"#6E7B8B"],["Afzelia","Woods",1,null],["Amboyna","Woods",1,null],["Apple Wood","Woods",1,null],["Apricot","Woods",1,null],["Aspen","Woods",1,null],["Bamboo","Woods",1,null],["Birch","Woods",1,null],["Black Ash Burl","Woods",1,null],["Blackwood (African)","Woods",1,null],["Blackwood (Burmese)","Woods",1,null],["Blackwood (Tazmanian)","Woods",1,null],["Bloodwood","Woods",1,"#8B0000"],["Bocote","Woods",1,"#7B6840"],["Box Elder (Camo)","Woods",1,null],["Box Elder Burl (Black)","Woods",1,null],["Box Elder Burl (Blue)","Woods",1,"#4682B4"],["Box Elder Burl (Flame)","Woods",1,null],["Box Elder Burl (Gold)","Woods",1,null],["Box Elder Burl (Green)","Woods",1,"#2E8B57"],["Box Elder Burl (Magenta)","Woods",1,null],["Box Elder Burl (Natural)","Woods",1,null],["Box Elder Burl (Peridot)","Woods",1,null],["Box Elder Burl (Purple)","Woods",1,"#8B668B"],["Box Elder Burl (Red)","Woods",1,"#CD5C5C"],["Box Elder Burl (yellow/black)","Woods",1,null],["Brazillian BrownHeart","Woods",1,null],["Briar","Woods",1,null],["Bubinga","Woods",1,"#A0522D"],["Buckeye Burl","Woods",1,null],["Camo Burl","Woods",1,null],["Campara","Woods",1,null],["Canary","Woods",1,null],["Cedar","Woods",1,"#A0522D"],["Cedar (Red)","Woods",1,null],["Cherry (Brazillian)","Woods",1,null],["Cherry Burl","Woods",1,null],["Cherry Wood","Woods",1,"#B5651D"],["Cocobolo","Woods",1,"#8B4513"],["Coolibah","Woods",1,null],["Cork","Woods",1.5,null],["Curly Satin","Woods",1,null],["Customer Wood","Woods",1,null],["Cypress","Woods",1,null],["Dalmata","Woods",1,null],["Dymonwood (camo)","Woods",1,null],["Ebony (Black & White)","Woods",1,null],["Ebony (Black)","Woods",1,"#3C3024"],["Ebony (Macassar)","Woods",1,null],["Elm","Woods",1,null],["Eucalyptus (Lyptus)","Woods",1,null],["Eucalyptus (Red Gum)","Woods",1,null],["Eucalyptus (Tazmanian)","Woods",1,null],["Garapa","Woods",1,null],["Holly","Woods",1,null],["Homino Negro","Woods",1,null],["Ipe","Woods",1,null],["Ironwood","Woods",1,null],["Ironwood (Burl)","Woods",1,null],["Jack Daniels Wood","Woods",1,"#654321"],["Jubillo","Woods",1,null],["Kauri","Woods",1,null],["King","Woods",1,null],["Koa","Woods",1,"#8B5A2B"],["Leopard","Woods",1,null],["Lignum Vitae","Woods",1,null],["Lyptus","Woods",1,null],["Madrone","Woods",1,null],["Mahogany","Woods",1,null],["Mangowood","Woods",1,null],["Maple","Woods",1,"#FFE4B5"],["Maple (Ambrosia)","Woods",1,null],["Maple (Birds Eye)","Woods",1,null],["Maple (Burl)","Woods",1,null],["Maple (Curly)","Woods",1,null],["Maple (Silver)","Woods",1,null],["Maple (Spalted Burl)","Woods",1,null],["Marblewood","Woods",1,null],["Mesquite","Woods",1,null],["Mesquite (Black)","Woods",1,null],["Mesquite (Burl)","Woods",1,null],["Mulberry","Woods",1,null],["Myrtlewood","Woods",1,null],["Oak","Woods",1,"#C19A6B"],["Oak (1st Generation)","Woods",1,null],["Olive","Woods",1,"#808000"],["Olive (Bethlehem)","Woods",1,null],["Olive (Jerusalem)","Woods",1,null],["Olive Burl","Woods",1,null],["Osage","Woods",1,null],["Padauk","Woods",1,"#CC3300"],["Palm (Black)","Woods",1,null],["Palm (Red)","Woods",1,null],["Pear","Woods",1,null],["Poplar (Green and Black)","Woods",1,null],["Poplar (Pink and Purple)","Woods",1,null],["Poplar (Red and Black)","Woods",1,null],["Poplar (Yellow and Black)","Woods",1,null],["Poplar Burl","Woods",1,null],["Purple Heart","Woods",1,"#6A0DAD"],["Queen","Woods",1,null],["Redwood (Green)","Woods",1,null],["Redwood (Natural)","Woods",1,"#A52A2A"],["Redwood (Purple)","Woods",1,null],["Redwood (Ruby)","Woods",1,null],["Redwood (Sequoia)","Woods",1,null],["Redwood Burl (Black)","Woods",1,null],["Redwood Burl (Blue)","Woods",1,null],["Redwood Burl (Green)","Woods",1,null],["Redwood Burl (Natural)","Woods",1,null],["Redwood Burl (Purple)","Woods",1,null],["Redwood Burl (Ruby)","Woods",1,null],["Redwood Burl (Turquoise)","Woods",1,null],["Rosewood (Amazon)","Woods",1,null],["Rosewood (Bolivian)","Woods",1,null],["Rosewood (Brazilian)","Woods",1,null],["Rosewood (Caribbean)","Woods",1,null],["Rosewood (East Indian)","Woods",1,null],["Rosewood (Honduran Burl)","Woods",1,null],["Rosewood (Honduran)","Woods",1,null],["Rosewood (Yucatan)","Woods",1,null],["Rowan","Woods",1,null],["Sindora","Woods",1,null],["Snakewood","Woods",1,null],["Stinkwood (Black)","Woods",1,null],["Sycamore","Woods",1,null],["Tagua Nut Wood","Woods",1,null],["Tamarind","Woods",1,null],["Tamarind (Spalted Burl)","Woods",1,null],["Tazevecaly","Woods",1,null],["Teak","Woods",1,null],["Teak (Burl)","Woods",1,null],["Tineo","Woods",1,null],["Tulipwood","Woods",1,null],["Walnut","Woods",1,"#5C4033"],["Wenge","Woods",1,null],["Willow","Woods",1,null],["Woods","Woods",1,null],["Yew","Woods",1,null],["Zebrawood","Woods",1,"#D2B48C"],["Zircote","Woods",1,null],["Dino Bone Premium Solid","Dinosaur Bone",2,"#6B4226"],["Dino Bone Crushed","Dinosaur Bone",1.5,"#B8A080"],["Supply Your Own String","Guitar Strings",1.25,"#A0A0A0"],["White (Nickel) Guitar String","Guitar Strings",1.25,"#B0B0B0"],["Yellow Guitar String","Guitar Strings",1.25,"#DAA520"],["Rose Guitar String","Guitar Strings",1.25,"#B76E79"],["Supply Your Own Vinyl Record","Vinyl Record",2,"#2C2C2C"],["Vinyl LP Record","Vinyl Record",2,"#2C2C2C"],["Supply Your Own Ash","Memorial",1.5,"#808080"],["Supply Your Own Fur/Hair","Memorial",1.5,"#D2B48C"],["Supply Your Own Whiskers","Memorial",1.5,"#A9A9A9"],["Supply Your Own Feathers","Memorial",1.5,"#E8E4D8"],["Supply Your Own Collar","Memorial",1.5,"#8B4513"],["Supply Your Own Tennis Ball","Memorial",1.5,"#C6E84B"],["Supply Your Own Horse Hoof","Memorial",1.5,"#8B7355"],["Citrine Crushed","Lapidary",1.5,null],["Emerald Crushed","Lapidary",1.5,null],["Garnet Crushed","Lapidary",1.5,null],["Peridot Crushed","Lapidary",1.5,null],["Ruby Crushed","Lapidary",1.5,null],["Sapphire Crushed","Lapidary",1.5,null],["Tanzanite Crushed","Lapidary",1.5,null],["Diamond Crushed","Lapidary",1.5,null],["Moldavite Crushed","Lapidary",1.5,null],["Smokey Quartz Crushed","Lapidary",1.5,null],["Enamel - Black","Enamel",0.5,null],["Enamel - Blue","Enamel",0.5,null],["Enamel - Green","Enamel",0.5,null],["Enamel - Orange","Enamel",0.5,null],["Enamel - Purple","Enamel",0.5,null],["Enamel - Red","Enamel",0.5,null],["Enamel - White","Enamel",0.5,null],["Enamel - Yellow","Enamel",0.5,null],["Enamel - Green Glow","Enamel",0.5,"#39FF14"],["Enamel - Orange Glow","Enamel",0.5,"#FF9E1B"],["Enamel - Purple Glow","Enamel",0.5,"#B026FF"],["Glow Powder","Glow Powder",1.5,"#B8F5C8"],["Opal OP03 Crushed","Lapidary",2,null],["Opal OP05 Crushed","Lapidary",2,null],["Opal OP14 Crushed","Lapidary",2,null],["Opal OP17 Crushed","Lapidary",2,null],["Opal OP19 Crushed","Lapidary",2,null],["Opal OP31 Crushed","Lapidary",2,null],["Opal OP35 Crushed","Lapidary",2,null],["Opal OP41 Crushed","Lapidary",2,null],["Opal OP45 Crushed","Lapidary",2,null],["Opal OP73 Crushed","Lapidary",2,null],["Opal OP76 Crushed","Lapidary",2,null],["Rainbow Fire Opal Crushed","Lapidary",2,null],["Stardust - Black","Stardust",1,null],["Stardust - Blue","Stardust",1,null],["Stardust - Green","Stardust",1,null],["Stardust - Orange","Stardust",1,null],["Stardust - Purple","Stardust",1,null],["Stardust - Red","Stardust",1,null],["Stardust - Yellow","Stardust",1,null],["Mica Powder","Stardust",1.5,"#C9B8DD"],["Stardust - Black Gold","Stardust",1,null],["Stardust - Blue Gold","Stardust",1,null],["Stardust - Green Gold","Stardust",1,null],["Stardust - Orange Gold","Stardust",1,null],["Stardust - Purple Gold","Stardust",1,null],["Stardust - Red Gold","Stardust",1,null],["Stardust - Dino Bone Crushed","Dinosaur Bone",1.5,null],["Turquoise Crushed","Lapidary",2,null],["Turquoise Crushed Gold Flakes","Lapidary",2,null],["Turquoise Crushed Gold Foil","Lapidary",2,null],["Lapis Lazuli Crushed","Lapidary",2,null],["Larimar","Lapidary",2,null],["Larimar Crushed","Lapidary",2,null],["Moss Agate","Lapidary",2,null],["Moss Agate Crushed","Lapidary",2,null],["Desert Mosaic","Lapidary",2,null],["Desert Mosaic Crushed","Lapidary",2,null],["Lava Turquoise","Lapidary",2,null],["Lava Turquoise Crushed","Lapidary",2,null],["Lava Mosaic Turquoise","Lapidary",2,null],["Lava Mosaic Turquoise Crushed","Lapidary",2,null],["Petrified Wood Crushed","Lapidary",2,null],["Crushed Wood","Crushed Wood",1.5,"#8B6F47"],["Compact Crushed Meteorite","Meteorite",2,null],["Antler - Light","Antler",1,null],["Pine (Red)","Woods",1,null],["Pine Needles (Brown)","Petals",1.5,null],["Pine Needles (Green)","Petals",1.5,null],["Mokume-Blue Bronze","Mokume Composite",1,null],["Mokume-Blue Bronze and Red","Mokume Composite",1,null],["Mokume-Purple","Mokume Composite",1,null],["Mokume-Red and Black","Mokume Composite",1,null],["Leather","Antler",1,"#8B5A2B"],["Mammoth Ivory","Antler",1,"#EDE6D6"],["Softball Leather","Antler",1,"#F2EBD3"],["Crushed Golf Tee","Crushed Wood",1.5,"#D2B48C"],["Baseball Bat - White Ash","Woods",1,"#E3D5B8"],["Don Julio","Woods",1,"#B98A4A"],["Ponderosa Pine","Woods",1,"#D8B27A"],["Purple Vinyl LP Record","Vinyl Record",2,"#6A3FA0"],["Serpentine Crushed","Lapidary",2,"#4C7A4C"],["Red Coral Stone","Lapidary",2,"#E0574F"],["Agate Crushed","Lapidary",2,"#B0A99F"],["Charoite Crushed","Lapidary",2,"#7B4FA6"],["Chrysocolla Crushed","Lapidary",2,"#2E8B8B"],["Granite Crushed","Lapidary",2,"#9A9A9A"],["Jasper Crushed","Lapidary",2,"#A6533B"],["Labradorite Crushed","Lapidary",2,"#5F7C8A"],["Obsidian Crushed","Lapidary",2,"#1E1E1E"],["Onyx Crushed","Lapidary",2,"#101010"],["Rhodonite Crushed","Lapidary",2,"#C76A8A"],["Sugilite Crushed","Lapidary",2,"#8A4FA8"],["Tigers Eye Crushed","Lapidary",2,"#B5731F"],["Boulder Opal Crushed","Lapidary",2,"#7FA8A0"],["Limestone Crushed","Lapidary",2,"#CFC5AE"],["Woolly Mammoth Bone Crushed","Lapidary",2,"#C9B79C"],["Crushed Lapis Lazuli With Stardust And White Gold Flakes","Lapidary",2,"#2B4C9B"],["Abalone","Lapidary",2,"#7EC8C0"],["Lava (Basalt) Crushed","Lapidary",2,"#4A4A4A"],["Crushed Seaglass","Lapidary",2,"#9FD8CB"],["Red Coral Stone Crushed","Lapidary",2,"#E0574F"],["Accoustic Bass Bronze 1.18mm","Guitar Strings",1.25,"#B08D57"],["Accoustic Bass Bronze 1.39mm","Guitar Strings",1.25,"#B08D57"],["Accoustic Bass Bronze 2.02mm","Guitar Strings",1.25,"#B08D57"],["Accoustic Bass Bronze 2.52mm","Guitar Strings",1.25,"#B08D57"],["Electric Bass Nickel 1.16mm","Guitar Strings",1.25,"#AFAFAF"],["Electric Bass Nickel 1.270mm","Guitar Strings",1.25,"#AFAFAF"],["Electric Guitar Nickel 1.18mm","Guitar Strings",1.25,"#B5B5B5"],["Stardust and OP17","Stardust",1,"#CFE8E5"],["Stardust and OP41","Stardust",1,"#E8CFE0"],["Waterproof Meteorite Shavings","Meteorite",2,"#55565E"],["Alexandrite Crushed","Lapidary",1.5,null],["Amethyst Crushed","Lapidary",1.5,null],["Topaz Crushed","Lapidary",1.5,null],["Jade - Purple Crushed","Lapidary",2,"#2F4F4F"],["Opal OP90 Crushed","Lapidary",2,null],["Woolly Mammoth Ivory Crushed","Lapidary",1.5,null],["Bullet Shell Casing Crushed","Bike Chain",3,"#6E7B8B"],["Crushed Customer Antler","Antler",1,"#D9CFC0"],["Crushed Pinecone","Crushed Wood",1.5,"#8B6F47"],["Crushed Pine Needles","Petals",1.5,null],["Coffee","Crushed Wood",1.5,"#8B6F47"],["Eucalyptus (Macassar)","Woods",1,null],["Oak (Whiskey Barrel)","Woods",1,"#654321"],["Supply Your Own Fabric","Memorial",1.5,"#8B4513"],["Supply Your Own Wedding Dress","Memorial",1.5,"#8B4513"],["Supply Your Own Fishing Line","Memorial",1.5,"#8B4513"],["Forged Carbon Fiber","Carbon Fiber",3,"#333333"],["Gold Flakes","Stardust",1,null],["Gold Leaf","Stardust",1.5,null],["Stardust - White","Stardust",1,null],["Stardust - White Gold","Stardust",1,null],["Stardust - Yellow Gold","Stardust",1,null]];
+var M={}, NAMES_ALL=[];
+RAW.forEach(function(r){
+  if(r[0]==='Tungsten'||r[0]==='Black Ceramic')return; /* hidden as inlays (disabled_metal_inlays) */
+  M[r[0]]={g:r[1],min:+r[2],c:r[3]||null}; NAMES_ALL.push(r[0]);
+});
+NAMES_ALL.sort();
+var POP_WOODS=['Customer Wood','Maple (Burl)','Bloodwood','Ironwood','Bocote','Black Ash Burl','Aspen','Ebony (Black)','Jack Daniels Wood','Box Elder Burl (Blue)','Box Elder Burl (Green)','Box Elder Burl (Purple)'];
+var STEP=0.25, EPS=1e-6, BASE='Yellow 14K', RING=8, EDGE=0.75;
+function isMetal(n){var g=M[n]&&M[n].g;return g==='Metals'||g==='Metals Precious';}
+function stepOf(n){return (n==='Dino Bone Solid'||n==='Dino Bone Premium Solid')?0.5:STEP;}
+
+/* group order = the engine's order (priority groups first, then A-Z); labels as the engine writes them, first letter capitalised */
+var GROUP_DESC={ /* invented helper lines (P2 and P4) */
+  'Meteorite':'From space, e.g. Gibeon','Dinosaur Bone':'Real fossil bone','Antler':'Antler, horn, leather, ivory','pop':'Our best-loved woods',
+  'Bike Chain':'Chain and shell casing','Carbon Fiber':'Woven and forged','Crushed Wood':'Coffee, pinecone, golf tee','Enamel':'Bright colours, glow',
+  'Glow Powder':'Glows in the dark','Guitar Strings':'Real or your own string','Lapidary':'Stones, gems and opal','Memorial':'Your own ashes, fabric, hair',
+  'Metals':'Titanium, Damascus, Mokume','Metals Precious':'Gold, platinum, silver','Mokume Composite':'Layered patterns','Mother of Pearl':'Shimmering shell',
+  'Petals':'Flowers, moss, pine needles','Prints':'Camouflage, snake skin','Sand':'Sand and dirt, yours too','Stardust':'Sparkle and gold flakes',
+  'Vinyl Record':'Real LP records','Whale Bone':'Natural bone','other':'Every other wood we carry'};
+var GROUPS=[];
+(function(){
+  var seen={};NAMES_ALL.forEach(function(n){seen[M[n].g]=1;});
+  var sorted=Object.keys(seen).sort();
+  var wi=sorted.indexOf('Woods'); if(wi>=0){sorted[wi]='pop';sorted.splice(wi+1,0,'other');}
+  var prio=['Meteorite','Dinosaur Bone','Antler','pop'];
+  var top=prio.filter(function(g){return sorted.indexOf(g)>=0;}), rest=sorted.filter(function(g){return prio.indexOf(g)<0;});
+  top.concat(rest).forEach(function(k){
+    var label=k==='pop'?'Most popular Woods':k==='other'?'Other Woods':k==='Metals'?'Alternative Metals':k==='Metals Precious'?'Precious Metals':k;
+    GROUPS.push({k:k,label:label,desc:GROUP_DESC[k]||''});
+  });
+})();
+function inGroup(n,k){var g=M[n].g;if(k==='pop')return g==='Woods'&&POP_WOODS.indexOf(n)>=0;if(k==='other')return g==='Woods'&&POP_WOODS.indexOf(n)<0;return g===k;}
+function groupOf(n){for(var i=0;i<GROUPS.length;i++)if(inGroup(n,GROUPS[i].k))return GROUPS[i];return null;}
+function gLabel(k){if(k==='All')return 'All materials';for(var i=0;i<GROUPS.length;i++)if(GROUPS[i].k===k)return GROUPS[i].label;return k;}
+
+/* ---------- the two popups (example ring: 8 mm Flat band in Yellow 14K) ---------- */
+var CTX={
+  add:{title:'Add an Inlay Strip',avail:3.5,availLabel:'Available',btn:'Add Strip',wLabel:'Strip Width',
+    band:[[BASE,0.75],['Bloodwood',3]],at:2,auto:EDGE,
+    notes:['Inserting after strip 2 (Bloodwood).','A 0.75mm Yellow 14K pinstripe will be auto-inserted before this strip.'],
+    availNote:'Available: 3.50mm (after auto Yellow 14K)'},
+  edit:{title:'Edit Strip 2',avail:3,availLabel:'Max',btn:'Save Changes',wLabel:'Width',
+    band:[[BASE,0.75],['Bloodwood',3],[BASE,0.75],['Gibeon Meteorite',2.75],[BASE,0.75]],at:1,
+    current:'Currently: Bloodwood at 3mm',availNote:'Max: 3.00mm'}
+};
+var MODE='add';
+function ctx(){return CTX[MODE];}
+function pool(k){ /* what a group shows: "All" = inlay materials only in Add (engine rule); everything in Edit */
+  return NAMES_ALL.filter(function(n){
+    if(k==='All')return MODE==='edit'||!isMetal(n);
+    return inGroup(n,k);
+  });
+}
+function countAll(){return pool('All').length;}
+function fits(n){return M[n].min<=ctx().avail+EPS;}
+function fmt(v){return String(Math.round(v*100)/100);}
+function fmt2(v){return (Math.round(v*100)/100).toFixed(2);}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function minTxt(n){return fits(n)?'min '+fmt(M[n].min)+' mm':'needs '+fmt(M[n].min)+' mm · only '+fmt(ctx().avail)+' mm free';}
+
+/* ---------- CSS textures in place of the photos ---------- */
+var KW=[['turquoise','#3fb5a8'],['lapis','#26489a'],['opal','#bcd8e6'],['jade - black','#1f2a24'],['jade - purple','#8a6aa8'],['jade','#3c8f5c'],['ruby','#9b1b30'],['emerald','#1f7a4f'],['sapphire','#1f3f8f'],
+  ['amethyst','#8a5cb8'],['citrine','#e3a72f'],['garnet','#7b1f2a'],['topaz','#e7b35a'],['onyx','#1e1e22'],['obsidian','#1b1b20'],['malachite','#1e7b55'],['charoite','#7a4c9e'],['larimar','#7ec4d8'],
+  ['sugilite','#7a3d8f'],['tigers eye','#a8742c'],['labradorite','#4f6c7a'],['granite','#8a8580'],['lava','#3d3a3a'],['limestone','#d9d2bf'],['cement','#a3a29d'],['sand','#d8c39a'],['dirt','#6b4f35'],['coffee','#4a3122'],
+  ['moss','#5e7a3a'],['pine','#6b4a2b'],['leather','#7a4a2a'],['ivory','#eee3c8'],['bone','#d9cbb0'],['coral','#c24a3a'],['jasper','#a0522d'],['agate','#b58a6a'],['peridot','#8fb13a'],['aquamarine','#7fd1d6'],
+  ['tanzanite','#4b4ea8'],['moldavite','#4f7a3a'],['diamond','#e8eef2'],['seaglass','#9fd3c7'],['goldstone','#b5652d'],['yooperlite','#5a5a5f'],['rhodonite','#c76b7a'],['chrysocolla','#2f9aa0'],['serpentine','#6b8a4a'],
+  ['quartz','#8a7d70'],['alexandrite','#5c6b8f'],['emerald','#1f7a4f'],['coprolite','#7a5a40'],['mosaic','#b0703f'],['petrified','#8a6a4a'],['abalone','#4f8a9a'],['pearl','#efe9e0'],
+  ['black','#1e1e22'],['white','#efeee9'],['blue','#2f5fb3'],['green','#2f8a4e'],['orange','#e07a2a'],['purple','#6d3fa0'],['red','#b3262e'],['yellow','#e3c13b'],['magenta','#b0307a'],['ruby','#9b1b30'],['turq','#3fb5a8'],
+  ['ebony','#2a201c'],['walnut','#5a3d2b'],['maple','#d8b07a'],['bloodwood','#8a1f1a'],['padauk','#b4472a'],['purple heart','#6b2f5a'],['redwood','#9a4a32'],['cherry','#9a5032'],['oak','#b88a55'],['ash','#cdb48a'],
+  ['olive','#a8875a'],['zebra','#c9a36a'],['wenge','#3b2a20'],['koa','#a2662f'],['teak','#a0703c'],['cedar','#b0603a'],['birch','#e0cba0'],['aspen','#e3d3ad'],['mahogany','#7a3524'],['rosewood','#5a2a20'],
+  ['cocobolo','#8a3f22'],['bocote','#a87a3c'],['ironwood','#4a3328'],['box elder','#c8b090'],['canary','#e3b83a'],['holly','#efe6d2'],['yew','#c77a45'],['jack daniels','#7a4a28'],['whiskey','#7a4a28'],
+  ['gold','#d4af37'],['rose','#d9a08b'],['silver','#c9ccd1'],['platinum','#d5d7da'],['titanium','#a9adb2'],['zirconium','#2c2c2c'],['damascus','#6c6f73'],['cobalt','#3a4f8a'],['bronze','#a8743a'],['copper','#b8633a']];
+function hsh(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function kwColor(n){var l=n.toLowerCase();for(var i=0;i<KW.length;i++)if(l.indexOf(KW[i][0])>=0)return KW[i][1];return null;}
+function shade(hex,amt){var c=hex.replace('#','');if(c.length===3)c=c.replace(/./g,'$&$&');var n=parseInt(c,16),r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  function f(x){return Math.max(0,Math.min(255,Math.round(amt<0?x*(1+amt):x+(255-x)*amt)));}
+  return 'rgb('+f(r)+','+f(g)+','+f(b)+')';}
+var SWC={};
+function swatch(n){
+  if(SWC[n])return SWC[n];
+  var m=M[n]||{g:'',c:null}, g=m.g, h=hsh(n), l=n.toLowerCase();
+  var c=m.c||kwColor(n)||({'Woods':'#a0703c','Crushed Wood':'#7a5235','Antler':'#d8c7a6','Lapidary':'#7f8c8d','Meteorite':'#8d9399','Stardust':'#2a2d4a','Memorial':'#b8aea0','Petals':'#c06a8a','Enamel':'#3a6ad0','Guitar Strings':'#c9a86a','Mokume Composite':'#8a7a6a','Vinyl Record':'#18181b','Prints':'#6b6b40','Sand':'#d8c39a','Glow Powder':'#7fff7a','Whale Bone':'#e3dccb','Mother of Pearl':'#efe9e0','Bike Chain':'#6a6e74','Dinosaur Bone':'#8b7355','Carbon Fiber':'#2b2b2e'}[g])||'#888888';
+  var a=(h%40)-20, crushed=/crush|dust|flakes|powder|shavings|sand|dirt|coffee|tee|cone|needles|petals|moss|ash\b|your own ash|glitter|leaf/.test(l)||g==='Sand'||g==='Stardust'||g==='Petals'||g==='Glow Powder';
+  var css;
+  if(g==='Metals Precious'||g==='Metals'&&!/damascus|mokume/.test(l)){
+    css='linear-gradient(135deg,'+shade(c,.55)+' 0%,'+c+' 45%,'+shade(c,-.35)+' 100%)';
+  }else if(g==='Meteorite'||/damascus/.test(l)){
+    css='repeating-linear-gradient(60deg,rgba(255,255,255,.38) 0 1px,transparent 1px 6px),repeating-linear-gradient(-60deg,rgba(0,0,0,.28) 0 1px,transparent 1px 7px),repeating-linear-gradient(0deg,rgba(255,255,255,.16) 0 1px,transparent 1px 9px),linear-gradient(135deg,'+shade(c,.25)+','+shade(c,-.3)+')';
+  }else if(g==='Mokume Composite'||/mokume/.test(l)){
+    var c2=kwColor(n.replace(/mokume-?/i,''))||'#c9ccd1';
+    css='repeating-radial-gradient(ellipse at '+(20+h%60)+'% '+(30+h%40)+'%,'+c2+' 0 3px,'+shade(c2,-.5)+' 3px 6px,#d9c07a 6px 8px)';
+  }else if(g==='Carbon Fiber'){
+    css='repeating-linear-gradient(45deg,#1b1b1e 0 4px,#3a3b40 4px 8px),linear-gradient(#000,#000)';
+    css='repeating-linear-gradient(45deg,rgba(255,255,255,.12) 0 3px,transparent 3px 6px),repeating-linear-gradient(-45deg,#1b1b1e 0 3px,#3a3b40 3px 6px)';
+  }else if(g==='Vinyl Record'){
+    css='repeating-radial-gradient(circle at 50% 50%,'+(/purple/.test(l)?'#4a2a6a':'#18181b')+' 0 2px,#2d2d33 2px 3px)';
+  }else if(g==='Guitar Strings'){
+    css='repeating-linear-gradient(90deg,'+shade(c,.4)+' 0 2px,'+shade(c,-.3)+' 2px 4px),linear-gradient('+c+','+c+')';
+  }else if(g==='Bike Chain'){
+    css='radial-gradient(circle at 25% 50%,#2a2c30 0 18%,transparent 19%),radial-gradient(circle at 75% 50%,#2a2c30 0 18%,transparent 19%),linear-gradient(90deg,#9aa0a6,#5f646a)';css+=';background-size:20px 20px,20px 20px,100% 100%';
+  }else if(g==='Prints'){
+    css=/snake/.test(l)?'radial-gradient(circle at 30% 30%,#d8c08a 0 18%,transparent 20%),radial-gradient(circle at 70% 70%,#d8c08a 0 18%,transparent 20%),linear-gradient(#5a4a2a,#3a2f1a)'
+      :'radial-gradient(circle at 25% 35%,#3a4a2a 0 22%,transparent 24%),radial-gradient(circle at 70% 60%,#8a7a4a 0 25%,transparent 27%),radial-gradient(circle at 45% 80%,#2a2a1a 0 15%,transparent 17%),linear-gradient(#6b6b40,#6b6b40)';
+  }else if(crushed){
+    var dots=[], cols=[shade(c,.5),shade(c,-.45),shade(c,.2),g==='Stardust'||/gold|flake|dust|diamond/.test(l)?'#f5e08a':shade(c,.7)];
+    for(var i=0;i<12;i++){var x=(h>>(i%24))%100, y=(h*(i+7)>>3)%100;dots.push('radial-gradient(circle at '+x+'% '+y+'%,'+cols[i%4]+' 0 '+(1.2+(i%3)*.8)+'px,transparent '+(2+(i%3)*.8)+'px)');}
+    css=dots.join(',')+',radial-gradient(circle at 40% 40%,'+shade(c,.12)+','+shade(c,-.25)+')';
+    css+=';background-size:'+Array(13).join('22px 22px,').slice(0,-1)+',100% 100%';
+  }else if(g==='Woods'||g==='Antler'&&/antler|horn/.test(l)){
+    css='repeating-linear-gradient('+(95+a/4)+'deg,rgba(0,0,0,.16) 0 1.5px,transparent 1.5px '+(5+h%4)+'px),repeating-linear-gradient('+(88+a/3)+'deg,rgba(255,255,255,.12) 0 2px,transparent 2px 11px),'+
+      (/burl|birds eye|amboyna/.test(l)?'radial-gradient(circle at '+(h%80+10)+'% '+(h%60+20)+'%,'+shade(c,-.4)+' 0 3px,transparent 6px),radial-gradient(circle at '+((h>>3)%80+10)+'% '+((h>>5)%60+20)+'%,'+shade(c,-.4)+' 0 2px,transparent 5px),':'')+
+      'linear-gradient(90deg,'+shade(c,-.15)+','+shade(c,.12)+' 50%,'+shade(c,-.2)+')';
+  }else if(g==='Enamel'){
+    css='radial-gradient(circle at 30% 25%,rgba(255,255,255,.45),transparent 45%),linear-gradient('+c+','+shade(c,-.2)+')';
+  }else{ /* stones and the rest: soft veins */
+    css='radial-gradient(ellipse at '+(h%70+15)+'% '+((h>>4)%70+15)+'%,'+shade(c,.35)+' 0 12%,transparent 40%),'+
+      'repeating-linear-gradient('+(h%180)+'deg,transparent 0 9px,'+shade(c,-.3)+' 9px 10px,transparent 10px 17px),'+
+      'linear-gradient('+(h%360)+'deg,'+shade(c,-.18)+','+shade(c,.1)+')';
+    if(/opal|abalone|mother of pearl|pearl/.test(l))css='radial-gradient(circle at 30% 30%,#ffd6f0 0 10%,transparent 30%),radial-gradient(circle at 70% 60%,#bff0d8 0 12%,transparent 32%),radial-gradient(circle at 50% 80%,#c8d8ff 0 12%,transparent 32%),linear-gradient(135deg,'+c+','+shade(c,-.2)+')';
+  }
+  SWC[n]='background:'+css;
+  return SWC[n];
+}
+function sw(n,cls,zoom){
+  return '<span class="sw'+(cls?' '+cls:'')+'" style="'+esc(swatch(n))+'" aria-hidden="'+(zoom?'false':'true')+'">'+
+    (zoom?'<button type="button" class="zoom" data-act="zoom" data-v="'+esc(n)+'" aria-label="Zoom '+esc(n)+'">'+ICON.zoom+'</button>':'')+'</span>';
+}
+var ICON={
+  zoom:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>',
+  search:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5"/></svg>'
+};
+
+/* ---------- state ---------- */
+function fresh(){
+  var e=MODE==='edit';
+  return {mat:e?'Bloodwood':null,w:e?3:0.5,q:'',g:'All',tileG:null,step:e?2:1,dd:false,zoom:null,toast:'',wnote:'',closed:false,result:null,acc:null,exact:false,anim:true};
+}
+var S=[fresh(),fresh(),fresh(),fresh()];
+var cur=0, toastT=0;
+function valid(s){return !!s.mat&&s.w>=M[s.mat].min-EPS&&s.w<=ctx().avail+EPS;}
+function clampW(s,v){
+  var st=s.mat?stepOf(s.mat):STEP, mn=Math.max(STEP,s.mat?M[s.mat].min:STEP), mx=ctx().avail;
+  v=Math.round(v/st)*st; if(isNaN(v))v=mn;
+  if(v<mn){v=mn;if(s.mat)s.wnote='Strip width changed to '+fmt(mn)+'mm, the minimum for '+s.mat+'.';}
+  else s.wnote='';
+  if(v>mx)v=mx;
+  return Math.round(v*100)/100;
+}
+function pick(s,n){
+  if(!fits(n)){toast(s,n+' needs at least '+fmt(M[n].min)+'mm, but only '+fmt2(ctx().avail)+'mm is available for this strip.');return false;}
+  s.mat=n;
+  if(MODE==='add'){s.w=M[n].min;s.wnote='';}           /* real rule: a chosen material starts at its own minimum */
+  else if(s.w<M[n].min){s.w=M[n].min;s.wnote='Strip width changed to '+fmt(M[n].min)+'mm, the minimum for '+n+'.';}
+  if(s.w>ctx().avail)s.w=ctx().avail;
+  return true;
+}
+function toast(s,t){s.toast=t;clearTimeout(toastT);toastT=setTimeout(function(){s.toast='';var el=device.querySelector('.toast');if(el)el.remove();},3200);}
+function filterQ(list,q,alsoGroup){
+  if(!q)return list; q=q.toLowerCase().trim();
+  return list.filter(function(n){if(n.toLowerCase().indexOf(q)>=0)return true;if(alsoGroup){var g=groupOf(n);return g&&g.label.toLowerCase().indexOf(q)>=0;}return false;});
+}
+function hl(n,q){
+  if(!q)return esc(n); var i=n.toLowerCase().indexOf(q.toLowerCase().trim()); if(i<0)return esc(n);
+  var L=q.trim().length; return esc(n.slice(0,i))+'<mark class="mark">'+esc(n.slice(i,i+L))+'</mark>'+esc(n.slice(i+L));
+}
+
+/* ---------- pieces ---------- */
+function bandModel(s,forPage){
+  var c=ctx(), segs=c.band.map(function(b){return {n:b[0],w:b[1],k:''};});
+  if(MODE==='add'){
+    if(forPage&&!s.result)return segs;
+    var m=forPage?s.result.mat:s.mat, w=forPage?s.result.w:s.w;
+    var ins=[];
+    if(!m||!isMetal(m))ins.push({n:BASE,w:c.auto,k:'auto'});
+    ins.push(m?{n:m,w:w,k:'new'}:{n:null,w:Math.max(1,w),k:'ghost'});
+    segs.splice.apply(segs,[c.at,0].concat(ins));
+  }else{
+    var mm=forPage?(s.result?s.result.mat:null):s.mat, ww=forPage?(s.result?s.result.w:null):s.w;
+    if(mm){segs[c.at]={n:mm,w:ww,k:forPage?'':'new'};}
+    else if(!forPage)segs[c.at].k='new';
+  }
+  return segs;
+}
+function bandHTML(segs){
+  var used=0;
+  var h='<div class="band" role="img" aria-label="Band layout, '+RING+' mm wide">'+segs.map(function(sg){
+    used+=sg.w;
+    return '<span class="seg'+(sg.k?' '+sg.k:'')+'" style="flex:0 0 '+(sg.w/RING*100)+'%;'+(sg.n?esc(swatch(sg.n)):'')+'"></span>';
+  }).join('')+'<span class="free"></span></div>';
+  var ticks='';for(var t=0;t<=RING;t+=2)ticks+='<span>'+t+(t===RING?' mm':'')+'</span>';
+  return h+'<div class="ruler">'+ticks+'</div>';
+}
+function bandKey(s,segs){
+  var used=segs.reduce(function(a,b){return a+b.w;},0), free=Math.max(0,RING-used);
+  var nw=segs.filter(function(x){return x.k==='new'||x.k==='ghost';})[0];
+  return '<div class="bandkey">'+
+    (nw?'<span><i class="k-new" style="'+(nw.n?esc(swatch(nw.n)):'')+'"></i>'+(nw.n?esc(nw.n)+' '+fmt(nw.w)+' mm':'Your new strip')+'</span>':'')+
+    (MODE==='add'&&(!s.mat||!isMetal(s.mat))?'<span><i style="'+esc(swatch(BASE))+'"></i>Automatic '+BASE+' 0.75 mm</span>':'')+
+    '<span><i class="k-free"></i>'+fmt(free)+' mm free</span></div>';
+}
+function notesHTML(){
+  var c=ctx();
+  if(MODE==='edit')return '';
+  return c.notes.map(function(t){return '<p class="info">'+esc(t)+'</p>';}).join('');
+}
+function contactHTML(){return '<p class="contact">Not seeing what you\'re looking for? <a href="https://www.jewelrybyjohan.com/pages/contact-us" target="_blank" rel="noopener">Contact us</a> — we may be able to source it for you.</p>';}
+function searchHTML(i,s,ph,big){
+  return '<label class="search'+(big?' big':'')+'">'+ICON.search+'<span class="srOnly">Search materials</span><input id="q'+i+'" type="search" data-act="q" autocomplete="off" enterkeyhint="search" placeholder="'+esc(ph)+'" value="'+esc(s.q)+'">'+
+    (s.q?'<button type="button" class="clr" data-act="clearq" aria-label="Clear search">×</button>':'')+'</label>';
+}
+function rowHTML(s,n,q,showGroup){
+  var off=!fits(n), g=showGroup?groupOf(n):null;
+  return '<div class="mrow'+(off?' off':'')+'" role="button" tabindex="0" data-act="pick" data-v="'+esc(n)+'" aria-pressed="'+(s.mat===n)+'">'+sw(n,'',true)+
+    '<span class="tx"><span class="nm">'+hl(n,q)+'</span><span class="mn">'+(g?esc(g.label)+' · ':'')+minTxt(n)+'</span></span></div>';
+}
+function statusHTML(s){
+  if(valid(s))return '<div class="status ready">✓ '+esc(s.mat)+', '+fmt(s.w)+' mm wide</div>';
+  if(!s.mat)return '<div class="status">Still to do: <b>pick a material</b>, then the width</div>';
+  return '<div class="status">Still to do: <b>set the width</b></div>';
+}
+function footHTML(s,leftBtn){
+  return '<div class="sh-foot">'+(s.toast?'<div class="toast" role="status">'+esc(s.toast)+'</div>':'')+statusHTML(s)+
+    '<div class="btnrow">'+(leftBtn||'<button type="button" class="btn" data-act="close">Cancel</button>')+
+    '<button type="button" class="btn pri" data-act="commit" aria-disabled="'+(!valid(s))+'">'+ctx().btn+'</button></div></div>';
+}
+function quickWidths(s){
+  if(!s.mat)return [];
+  var mn=M[s.mat].min, mx=ctx().avail, out=[{v:mn,l:'Smallest'}];
+  for(var v=Math.ceil(mn+0.01);v<mx-0.01;v++)out.push({v:v,l:''});
+  if(mx-mn>0.01)out.push({v:mx,l:MODE==='add'?'All that\'s left':'Max'});
+  return out;
+}
+function stepperHTML(i,s){
+  var mn=s.mat?M[s.mat].min:STEP, mx=ctx().avail, lock=!s.mat;
+  return '<div class="'+(lock?'locked':'')+'" style="display:grid;gap:10px">'+
+    '<div class="stepper"><button type="button" class="rbtn" data-act="wstep" data-v="-1" aria-label="Narrower by 0.25 mm" aria-disabled="'+(s.w<=mn+EPS)+'">−</button>'+
+    '<label class="wread"><span class="srOnly">'+ctx().wLabel+' in mm</span><input id="w'+i+'" data-act="wnum" inputmode="decimal" value="'+fmt(s.w)+'"><span>mm</span></label>'+
+    '<button type="button" class="rbtn" data-act="wstep" data-v="1" aria-label="Wider by 0.25 mm" aria-disabled="'+(s.w>=mx-EPS)+'">+</button></div>'+
+    '<div class="limits"><span>Smallest <b>'+fmt(mn)+' mm</b></span><span>'+ctx().availLabel+' <b>'+fmt2(mx)+' mm</b></span></div>'+
+    '<div class="qw">'+quickWidths(s).map(function(q){return '<button type="button" class="chip" data-act="wset" data-v="'+q.v+'" aria-pressed="'+(Math.abs(s.w-q.v)<EPS)+'">'+(q.l?q.l+' · ':'')+fmt(q.v)+' mm</button>';}).join('')+'</div>'+
+    (s.wnote?'<p class="warnmsg" role="status">⚠ '+esc(s.wnote)+'</p>':'')+'</div>';
+}
+function headHTML(extra){
+  return '<div class="sh-head"><h3 id="dlgT">'+ctx().title+'</h3><button type="button" class="x" data-act="close" aria-label="Close">×</button>'+(MODE==='edit'?'<p class="sub">'+esc(ctx().current)+'</p>':'')+(extra||'')+'</div>';
+}
+function lightbox(s){
+  if(!s.zoom)return '';
+  var n=s.zoom, ok=fits(n), g=groupOf(n);
+  return '<div class="lb" data-act="lbbg" role="dialog" aria-modal="true" aria-label="'+esc(n)+' up close"><div class="lb-box">'+
+    '<button type="button" class="x" data-act="lbclose" aria-label="Close">×</button>'+
+    '<div class="lb-name">'+esc(n)+'</div><div class="lb-sub">'+esc(g?g.label:'')+' · '+minTxt(n)+'</div>'+
+    '<div class="lb-pic" style="'+esc(swatch(n))+'"></div>'+
+    '<button type="button" class="lb-use" data-act="lbuse" data-v="'+esc(n)+'" aria-disabled="'+(!ok)+'">'+(s.mat===n?'✓ Chosen':'Use '+esc(n))+'</button>'+
+    '</div></div>';
+}
+
+/* ---------- the dimmed page behind ---------- */
+function pageHTML(s){
+  var segs=bandModel(s,true), c=ctx();
+  var rows=segs.map(function(sg,k){return '<div class="striprow'+(MODE==='edit'&&k===c.at&&!s.closed?' hl':'')+'"><span class="n">'+(k+1)+'</span><span class="sw" style="'+esc(swatch(sg.n))+'"></span><span>'+esc(sg.n)+'</span><span class="w">'+fmt(sg.w)+' mm</span></div>';}).join('');
+  var msg=s.closed?(s.result?'<div class="pagetoast" role="status">✓ '+(MODE==='add'?'Added ':'Saved ')+esc(s.result.mat)+', '+fmt(s.result.w)+' mm</div>':''):'';
+  return '<div class="page" '+(s.closed?'':'aria-hidden="true" inert')+'><div class="b-top">'+
+      '<div class="brand"><b>JEWELRY BY JOHAN</b><span>Ring Builder</span></div>'+
+      '<div class="steps"><div class="st done"><i></i><small>Step 1</small><span>Your band</span></div><div class="st on"><i></i><small>Step 2</small><span>Make it yours</span></div><div class="st"><i></i><small>Step 3</small><span>Get my quote</span></div></div>'+
+      '<div class="subtabs"><div class="on">Add/Remove Inlays</div><div>Sleeve</div><div>Finish</div></div></div>'+
+    '<div class="b-body"><div class="ptitle"><h2>Add/Remove Inlays</h2><p>Add inlay materials one at a time. Yellow 14K edges and pinstripes are inserted automatically between inlays. Any remaining width will be filled with a Yellow 14K edge when you continue.</p></div>'+
+      msg+'<div class="pgcard">'+bandHTML(segs)+rows+'</div>'+
+      '<button type="button" class="addbtn" data-act="reopen">'+(MODE==='add'?'+ Add an Inlay Strip':'Edit Strip 2 again')+'</button>'+
+    '</div><div class="b-bar"><button type="button" class="back">← Back</button><div class="mid">Make it yours</div><button type="button" class="next">Sleeve →</button></div></div>';
+}
+
+/* ---------- Preview 1: two short steps ---------- */
+function P1(i,s){
+  var step=s.step, c=ctx();
+  var prog='<div class="prog" role="tablist" aria-label="Steps in this popup">'+
+    '<button type="button" role="tab" class="'+(step===1?'on':(s.mat?'ok':''))+'" data-act="p1step" data-v="1" aria-selected="'+(step===1)+'"><i>'+(s.mat&&step!==1?'✓':'1')+'</i><span>Material<small>'+(s.mat?esc(s.mat):'Not chosen yet')+'</small></span></button>'+
+    '<button type="button" role="tab" class="'+(step===2?'on':'')+'" data-act="p1step" data-v="2" aria-selected="'+(step===2)+'" aria-disabled="'+(!s.mat)+'"><i>2</i><span>Width<small>'+(s.mat?fmt(s.w)+' mm':'After the material')+'</small></span></button></div>';
+  var list=filterQ(pool(s.g),s.q);
+  var chips='<div class="chips" data-keep="chips'+i+'">'+[{k:'All',label:'All materials'}].concat(GROUPS).map(function(g){
+      var n=filterQ(pool(g.k),s.q).length;
+      if(s.q&&!n&&g.k!=='All'&&s.g!==g.k)return '';
+      return '<button type="button" class="chip" data-act="group" data-v="'+esc(g.k)+'" aria-pressed="'+(s.g===g.k)+'">'+esc(g.label)+' <small>'+n+'</small></button>';
+    }).join('')+'</div>';
+  var matPane='<div class="p1-sticky">'+searchHTML(i,s,'Search materials, e.g. walnut, opal')+chips+'</div>'+
+    '<div class="count"><b>'+list.length+'</b> in '+esc(gLabel(s.g))+(s.q?' matching “'+esc(s.q)+'”':'')+' · A–Z · tap a photo to see it up close</div>'+
+    '<div class="mlist">'+(list.length?list.map(function(n){return rowHTML(s,n,s.q,s.g==='All');}).join(''):'<div class="empty">No material matches “'+esc(s.q)+'” here. Try All materials or another word.</div>')+'</div>'+contactHTML();
+  var wPane='<div class="p1-col2">'+(s.mat?'<div class="chosen">'+sw(s.mat,'',true)+'<div><div class="t">'+esc(s.mat)+'</div><div class="d">'+esc(groupOf(s.mat).label)+' · min '+fmt(M[s.mat].min)+' mm</div></div><button type="button" class="chg" data-act="p1step" data-v="1">Change</button></div>':'')+
+    '<div class="wbox" data-q="w"><div class="label">'+c.wLabel+'</div>'+stepperHTML(i,s)+'</div>'+
+    '<div class="wbox"><div class="label">Where it goes</div>'+bandHTML(bandModel(s))+bandKey(s,bandModel(s))+notesHTML()+'</div></div>';
+  var pc=device.clientWidth>=720;
+  var body;
+  if(pc){ body='<div class="p1-split"><div style="display:grid;gap:10px" data-q="m">'+matPane+'</div>'+wPane+'</div>'; }
+  else body=step===1?'<div style="display:grid;gap:10px" data-q="m">'+matPane+'</div>':wPane;
+  var left=(!pc&&step===2)?'<button type="button" class="btn" data-act="p1step" data-v="1">← Material</button>':'<button type="button" class="btn" data-act="close">Cancel</button>';
+  var foot=(!pc&&step===1)
+    ?'<div class="sh-foot">'+(s.toast?'<div class="toast" role="status">'+esc(s.toast)+'</div>':'')+statusHTML(s)+'<div class="btnrow"><button type="button" class="btn" data-act="close">Cancel</button><button type="button" class="btn pri" data-act="p1next" aria-disabled="'+(!s.mat)+'">Next: width →</button></div></div>'
+    :footHTML(s,left);
+  return '<div class="ov'+(s.anim?' anim':'')+'"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="dlgT">'+headHTML(pc?'':prog)+'<div class="sh-body" data-keep="body'+i+'-'+step+'">'+body+'</div>'+foot+lightbox(s)+'</div></div>';
+}
+
+/* ---------- Preview 2: group tiles ---------- */
+var TILE_PIC={'Meteorite':'Gibeon Meteorite','Dinosaur Bone':'Dino Bone Solid','Antler':'Antler','pop':'Bloodwood','Bike Chain':'Bike Chain','Carbon Fiber':'Carbon Fiber','Crushed Wood':'Coffee','Enamel':'Enamel - Blue','Glow Powder':'Glow Powder','Guitar Strings':'Yellow Guitar String','Lapidary':'Turquoise','Memorial':'Supply Your Own Ash','Metals':'Damascus','Metals Precious':'Yellow 18K','Mokume Composite':'Mokume-Black & Gold','Mother of Pearl':'Mother of Pearl','Petals':'Flower Petals','Prints':'Camouflage','Sand':'Sand','Stardust':'Stardust - Blue Gold','Vinyl Record':'Vinyl LP Record','Whale Bone':'Whale Bone','other':'Walnut'};
+function cardHTML(s,n,q,showGroup){
+  var off=!fits(n), g=showGroup?groupOf(n):null;
+  return '<div class="mcard'+(off?' off':'')+'" role="button" tabindex="0" data-act="pick" data-v="'+esc(n)+'" aria-pressed="'+(s.mat===n)+'">'+sw(n,'',true)+(s.mat===n?'<span class="tick"></span>':'')+
+    '<span class="nm">'+hl(n,q)+'</span><span class="mn">'+(g?esc(g.label)+' · ':'')+minTxt(n)+'</span></div>';
+}
+function P2(i,s){
+  var body='';
+  var top=notesHTML()+searchHTML(i,s,'Search all '+countAll()+' materials');
+  if(s.q){
+    var r=filterQ(pool('All').concat(MODE==='add'?pool('Metals').concat(pool('Metals Precious')):[]),s.q);
+    body=top+'<div class="crumb"><button type="button" data-act="clearq">‹ All groups</button><b>'+r.length+' found</b></div>'+
+      (r.length?'<div class="cards">'+r.map(function(n){return cardHTML(s,n,s.q,true);}).join('')+'</div>':'<div class="empty">Nothing called “'+esc(s.q)+'”. Try a shorter word.</div>');
+  }else if(!s.tileG){
+    body=top+'<div class="label">Choose a group</div><div class="tiles">'+
+      '<button type="button" class="tile all" data-act="tile" data-v="All"><span class="tt"><b>All materials A–Z</b><span>'+countAll()+' materials in one list</span></span></button>'+
+      GROUPS.map(function(g){var n=pool(g.k).length;return '<button type="button" class="tile" data-act="tile" data-v="'+esc(g.k)+'"><span class="pic" style="'+esc(swatch(TILE_PIC[g.k]||pool(g.k)[0]))+'"></span><span class="tt"><b>'+esc(g.label)+'</b><span>'+n+' · '+esc(g.desc)+'</span></span></button>';}).join('')+'</div>';
+  }else{
+    var list=pool(s.tileG);
+    body=top+'<div class="crumb"><button type="button" data-act="tile" data-v="">‹ All groups</button><b>'+esc(gLabel(s.tileG))+'</b><span class="count">'+list.length+'</span></div>'+
+      '<div class="cards">'+list.map(function(n){return cardHTML(s,n,'',s.tileG==='All');}).join('')+'</div>';
+  }
+  body+=contactHTML();
+  var dock=s.mat
+    ?'<div class="dock" data-q="w">'+sw(s.mat,'',false)+'<div style="min-width:0"><div class="t">'+esc(s.mat)+'</div><div class="d">'+ctx().availLabel+' '+fmt2(ctx().avail)+' mm</div></div>'+
+       '<div class="mini"><button type="button" class="rbtn" data-act="wstep" data-v="-1" aria-label="Narrower" aria-disabled="'+(s.w<=M[s.mat].min+EPS)+'">−</button><label class="num"><input id="w'+i+'" data-act="wnum" inputmode="decimal" value="'+fmt(s.w)+'" aria-label="'+ctx().wLabel+' in mm"><span>mm</span></label><button type="button" class="rbtn" data-act="wstep" data-v="1" aria-label="Wider" aria-disabled="'+(s.w>=ctx().avail-EPS)+'">+</button></div></div>'+
+       (s.wnote?'<p class="warnmsg" role="status">⚠ '+esc(s.wnote)+'</p>':'')
+    :'<div class="hint2" data-q="w"><i>1</i><span>Pick a group, then tap a material</span><i>2</i><span>Its width appears here</span></div>';
+  var foot='<div class="sh-foot">'+(s.toast?'<div class="toast" role="status">'+esc(s.toast)+'</div>':'')+dock+statusHTML(s)+
+    '<div class="btnrow"><button type="button" class="btn" data-act="close">Cancel</button><button type="button" class="btn pri" data-act="commit" aria-disabled="'+(!valid(s))+'">'+ctx().btn+'</button></div></div>';
+  return '<div class="ov'+(s.anim?' anim':'')+'"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="dlgT">'+headHTML(MODE==='edit'?'':'')+'<div class="sh-body" data-q="m" data-keep="body'+i+'-'+(s.tileG||'')+'">'+body+'</div>'+foot+lightbox(s)+'</div></div>';
+}
+
+/* ---------- Preview 3: live band on top ---------- */
+function P3(i,s){
+  var segs=bandModel(s), used=segs.reduce(function(a,b){return a+b.w;},0);
+  var live='<div class="live" aria-live="polite"><div class="cap"><b>'+(s.mat?esc(s.mat)+' · '+fmt(s.w)+' mm':'New strip')+'</b><span>'+fmt(Math.max(0,RING-used))+' of '+RING+' mm free</span></div>'+bandHTML(segs)+
+    '<div class="bandkey"><span><i class="k-new"></i>New strip</span>'+(MODE==='add'&&(!s.mat||!isMetal(s.mat))?'<span><i style="'+esc(swatch(BASE))+'"></i>Auto '+BASE+'</span>':'')+'<span><i class="k-free"></i>Free</span></div>'+
+    (MODE==='add'?'<p class="note" style="color:var(--ok)">'+esc(ctx().notes[0])+' '+esc(ctx().notes[1])+'</p>':'')+'</div>';
+  var list=filterQ(pool(s.g),s.q);
+  var n=GROUPS.length;
+  var dd='<div class="ddwrap"><button type="button" class="ddbtn" data-act="dd" aria-expanded="'+s.dd+'" aria-controls="dd'+i+'">Select Material Group ('+n+')</button>'+
+    (s.dd?'<div class="ddlist" id="dd'+i+'" role="group" aria-label="Material groups" data-keep="dd'+i+'">'+[{k:'All',label:'All materials'}].concat(GROUPS).map(function(g){
+      return '<button type="button" class="ddrow'+(s.g===g.k?' on':'')+'" data-act="group" data-v="'+esc(g.k)+'" aria-pressed="'+(s.g===g.k)+'">'+(g.k==='All'?'':'<span class="dot" style="'+esc(swatch(TILE_PIC[g.k]||pool(g.k)[0]))+'"></span>')+esc(g.label)+'<small>'+pool(g.k).length+'</small></button>';
+    }).join('')+'</div>':'')+'</div>';
+  var body=
+    '<div class="p3-grid">'+dd+searchHTML(i,s,'Search materials...')+'</div>'+
+    '<div class="showing">Showing <span class="tag">'+esc(gLabel(s.g))+' · '+list.length+(s.g!=='All'?'<button type="button" data-act="group" data-v="All" aria-label="Show all materials">×</button>':'')+'</span>'+(s.q?'matching “'+esc(s.q)+'”':'')+'</div>'+
+    '<div class="mlist p3-mlist" data-q="m">'+(list.length?list.map(function(m){return rowHTML(s,m,s.q,s.g==='All');}).join(''):'<div class="empty">No match. Try All materials.</div>')+'</div>'+contactHTML();
+  var mn=s.mat?M[s.mat].min:STEP, mx=ctx().avail;
+  var wsec=!s.mat?'<div class="note" data-q="w"><b>'+ctx().wLabel+':</b> set it here after you pick a material.</div>':'<div data-q="w" style="display:grid;gap:6px">'+
+    '<div class="wline"><span class="label" style="flex:1">'+ctx().wLabel+(s.mat?'':' · pick a material first')+'</span><label class="num"><input id="w'+i+'" data-act="wnum" inputmode="decimal" value="'+fmt(s.w)+'" aria-label="'+ctx().wLabel+' in mm"><span>mm</span></label></div>'+
+    '<input type="range" id="r'+i+'" data-act="wrange" min="'+mn+'" max="'+mx+'" step="'+(s.mat?stepOf(s.mat):STEP)+'" value="'+s.w+'" aria-label="'+ctx().wLabel+'">'+
+    '<div class="limits"><span>Smallest '+fmt(mn)+' mm</span><span>'+ctx().availLabel+' '+fmt2(mx)+' mm</span></div>'+
+    (s.wnote?'<p class="warnmsg" role="status">⚠ '+esc(s.wnote)+'</p>':'')+'</div>';
+  var foot='<div class="sh-foot">'+(s.toast?'<div class="toast" role="status">'+esc(s.toast)+'</div>':'')+wsec+statusHTML(s)+
+    '<div class="btnrow"><button type="button" class="btn" data-act="close">Cancel</button><button type="button" class="btn pri" data-act="commit" aria-disabled="'+(!valid(s))+'">'+ctx().btn+'</button></div></div>';
+  return '<div class="ov'+(s.anim?' anim':'')+'"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="dlgT">'+headHTML(live)+'<div class="sh-body" data-keep="body'+i+'">'+body+'</div>'+foot+lightbox(s)+'</div></div>';
+}
+
+/* ---------- Preview 4: search first ---------- */
+function P4(i,s){
+  var left;
+  if(s.q){
+    var all=pool('All').concat(MODE==='add'?pool('Metals').concat(pool('Metals Precious')):[]);
+    var r=filterQ(all,s.q,true), by={};
+    r.forEach(function(n){var g=groupOf(n);(by[g.k]=by[g.k]||[]).push(n);});
+    var html=GROUPS.filter(function(g){return by[g.k];}).map(function(g){
+      return '<div class="ghead"><span>'+esc(g.label)+'</span><span>'+by[g.k].length+'</span></div><div class="mlist">'+by[g.k].map(function(n){return rowHTML(s,n,s.q,false);}).join('')+'</div>';
+    }).join('');
+    left='<div class="count"><b>'+r.length+'</b> found for “'+esc(s.q)+'” (names and groups)</div>'+(r.length?html:'<div class="empty">Nothing found. Check the spelling, or browse the groups.</div>');
+  }else{
+    left='<div class="label">What would you like inlaid? Popular picks</div><div class="pop" data-keep="pop'+i+'">'+POP_WOODS.concat(['Gibeon Meteorite','Antler','Dino Bone Solid']).map(function(n){
+        return '<button type="button" class="popc" data-act="pick" data-v="'+esc(n)+'" aria-pressed="'+(s.mat===n)+'">'+sw(n,'',false)+'<span>'+esc(n)+'</span></button>';
+      }).join('')+'</div>'+
+      '<div class="label" style="margin-top:6px">Or browse '+GROUPS.length+' groups</div><div>'+
+      [{k:'All',label:'All materials A–Z'}].concat(GROUPS).map(function(g){
+        var open=s.acc===g.k, list=pool(g.k);
+        return '<div class="acc'+(open?' open':'')+'"><button type="button" class="acc-h" data-act="acc" data-v="'+esc(g.k)+'" aria-expanded="'+open+'">'+(g.k==='All'?'':sw(TILE_PIC[g.k]||list[0],'',false))+'<b>'+esc(g.label)+'</b><small>'+list.length+'</small></button>'+
+          (open?'<div class="mlist">'+list.map(function(n){return rowHTML(s,n,'',false);}).join('')+'</div>':'')+'</div>';
+      }).join('')+'</div>';
+  }
+  left+=contactHTML();
+  var pills='';
+  if(s.mat){
+    var mn=M[s.mat].min, mx=ctx().avail, vals=[];
+    for(var v=mn;v<=mx+EPS;v+=0.5)vals.push(Math.round(v*100)/100);
+    if(Math.abs(vals[vals.length-1]-mx)>EPS)vals.push(mx);
+    pills='<div class="pills" data-keep="pills'+i+'">'+vals.map(function(v,k){return '<button type="button" class="pill" data-act="wset" data-v="'+v+'" aria-pressed="'+(Math.abs(s.w-v)<EPS)+'"><b>'+fmt(v)+'</b><small>'+(k===0?'SMALLEST':(Math.abs(v-mx)<EPS?(MODE==='add'?'ALL LEFT':'MAX'):'mm'))+'</small></button>';}).join('')+
+      '<label class="num" style="flex:0 0 auto"><input id="w'+i+'" data-act="wnum" inputmode="decimal" value="'+fmt(s.w)+'" aria-label="Exact '+ctx().wLabel.toLowerCase()+' in mm"><span>mm</span></label></div>';
+  }
+  var sel=s.mat
+    ?'<div class="sel4">'+sw(s.mat,'',true)+'<div style="min-width:0"><div class="t">'+esc(s.mat)+'</div><div class="d">'+ctx().wLabel+': tap a size · '+esc(ctx().availNote)+'</div></div><button type="button" class="chg" data-act="clearmat">Change</button></div>'+pills+
+      (s.wnote?'<p class="warnmsg" role="status">⚠ '+esc(s.wnote)+'</p>':'')
+    :'<div class="status"><b>1 of 2:</b>&nbsp;pick a material above. The width comes next, here.</div>';
+  var foot='<div class="sh-foot" data-q="w">'+(s.toast?'<div class="toast" role="status">'+esc(s.toast)+'</div>':'')+sel+(MODE==='add'&&s.mat?'<p class="note">'+esc(ctx().notes[0])+' '+esc(ctx().notes[1])+'</p>':'')+
+    '<div class="btnrow"><button type="button" class="btn" data-act="close">Cancel</button><button type="button" class="btn pri" data-act="commit" aria-disabled="'+(!valid(s))+'">'+(valid(s)?ctx().btn+' · '+fmt(s.w)+' mm':ctx().btn)+'</button></div></div>';
+  var head=headHTML(searchHTML(i,s,'Search: walnut, opal, ashes…',true));
+  return '<div class="ov'+(s.anim?' anim':'')+'"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="dlgT">'+head+'<div class="sh-body" data-q="m" data-keep="body'+i+'-'+(s.q?'q':'b')+'"><div class="p4-grid"><div style="display:grid;gap:10px">'+left+'</div>'+
+    '<div style="display:grid;gap:10px">'+(device.clientWidth>=720?'<div class="label">Where it goes</div>'+bandHTML(bandModel(s))+bandKey(s,bandModel(s))+(MODE==='add'?notesHTML():''):'')+'</div></div></div>'+foot+lightbox(s)+'</div></div>';
+}
+
+var NAMES=['Two short steps','Group picture tiles','Live band on top','Search first, size pills'];
+var CHANGED=[
+  {lead:'The popup asks one thing at a time: first the material, then the width. On a PC both sit side by side.',
+   items:['Two tabs at the top, "1 Material" and "2 Width", show what is done and what is next.',
+   'Search sits on top and the groups are one sideways row of buttons with counts; every material shows its smallest width.',
+   'Tapping a material jumps to the width: big − / + buttons, quick sizes like "Smallest" and "All that\'s left".',
+   'A small drawing shows where the strip goes and the automatic Yellow 14K pinstripe.']},
+  {lead:'The popup opens with big picture tiles for the 23 groups, like aisles in a shop.',
+   items:['Each tile has a picture, the number of materials and a short hint (e.g. "Your own ashes, fabric, hair").',
+   'Inside a group the materials are large photo cards, 2 per row on a phone; the magnifier still zooms.',
+   'The width appears in a bar at the bottom as soon as a material is chosen, so it can\'t be missed.',
+   'One search box always searches all materials, whatever group is open.']},
+  {lead:'A drawing of the band stays at the top of the popup and changes with every tap.',
+   items:['The band shows the strips you have, the automatic pinstripe, your new strip (blue frame) and the free space.',
+   'Keeps today\'s "Select Material Group (23)" button; a tag under it now says which group is showing, with × to clear.',
+   'The width is a slider plus a number box, fixed above the buttons; it stays grey until a material is chosen.',
+   'Order stays as today: notes, groups, search, list, width, Cancel / Add Strip.']},
+  {lead:'Opens with one big search box, like a shop search. Most people know what they want.',
+   items:['Search also finds group names: "wood" or "meteorite" lists the whole group, sorted under headings.',
+   'Under the search: popular picks as photo buttons, then all groups as fold-out lists.',
+   'Width is a row of size buttons from the material\'s smallest size to "All left", plus an exact box.',
+   'The chosen material sits above the blue button, which shows the size: "Add Strip · 2 mm".']}
+];
+
+var R=[P1,P2,P3,P4];
+var device=document.getElementById('device');
+
+function render(){
+  var s=S[cur];
+  var keep={},act=document.activeElement,fid=act&&device.contains(act)?act.id:null,sel=null;
+  if(fid&&act.setSelectionRange){try{sel=[act.selectionStart,act.selectionEnd];}catch(e){}}
+  device.querySelectorAll('[data-keep]').forEach(function(el){keep[el.getAttribute('data-keep')]=[el.scrollTop,el.scrollLeft];});
+  device.innerHTML=pageHTML(s)+(s.closed?'':R[cur](cur,s));
+  s.anim=false;
+  device.querySelectorAll('[data-keep]').forEach(function(el){var k=keep[el.getAttribute('data-keep')];if(k){el.scrollTop=k[0];el.scrollLeft=k[1];}});
+  if(fid){var f=document.getElementById(fid);if(f){f.focus({preventScroll:true});if(sel&&f.setSelectionRange)try{f.setSelectionRange(sel[0],sel[1]);}catch(e){}}}
+}
+function renderChanged(){
+  var c=CHANGED[cur];
+  document.getElementById('changed').innerHTML='<h2>What changed · Preview '+(cur+1)+': '+NAMES[cur]+'</h2><p class="diff">'+c.lead+'</p><ul>'+c.items.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>';
+}
+function select(n){
+  cur=n;
+  document.querySelectorAll('#switch button').forEach(function(b,k){b.setAttribute('aria-selected',String(k===n));b.tabIndex=k===n?0:-1;});
+  try{localStorage.setItem('aiPreview',String(n));}catch(e){}
+  render();renderChanged();
+}
+function flashMissing(s){
+  var key=!s.mat?'m':'w';
+  if(cur===0&&!s.mat&&device.clientWidth<720){s.step=1;render();}
+  var el=device.querySelector('[data-q="'+key+'"]');
+  if(el){el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');if(key==='m'&&el.scrollIntoView)el.scrollIntoView({block:'nearest'});}
+}
+function scrollBodyTop(){var b=device.querySelector('.sh-body');if(b)b.scrollTop=0;}
+
+/* ---------- events ---------- */
+device.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]'); if(!b||!device.contains(b))return;
+  var s=S[cur], a=b.getAttribute('data-act'), v=b.getAttribute('data-v');
+  if(a==='zoom'){e.stopPropagation();s.zoom=v;render();var c=device.querySelector('.lb .x');if(c)c.focus();return;}
+  if(a==='lbbg'){if(e.target===b){s.zoom=null;render();}return;}
+  if(a==='lbclose'){s.zoom=null;render();return;}
+  if(a==='lbuse'){if(b.getAttribute('aria-disabled')==='true'){toast(s,v+' needs at least '+fmt(M[v].min)+'mm, but only '+fmt2(ctx().avail)+'mm is available for this strip.');s.zoom=null;render();return;}
+    s.zoom=null;if(pick(s,v)&&cur===0)s.step=2;render();return;}
+  if(a==='close'){s.closed=true;s.result=null;render();return;}
+  if(a==='reopen'){var keepR=s.result;S[cur]=fresh();if(MODE==='add')S[cur].result=null;render();return;}
+  if(a==='pick'){var ok=pick(s,v);if(ok&&cur===0&&device.clientWidth<720){s.step=2;render();scrollBodyTop();return;}render();return;}
+  if(a==='group'){s.g=v;s.dd=false;render();var bd=device.querySelector('.sh-body');if(bd&&cur===0){var st=device.querySelector('.p1-sticky');bd.scrollTop=0;}else if(bd)bd.scrollTop=0;return;}
+  if(a==='dd'){s.dd=!s.dd;render();return;}
+  if(a==='clearq'){s.q='';render();var q=document.getElementById('q'+cur);if(q)q.focus();return;}
+  if(a==='tile'){s.tileG=v||null;render();scrollBodyTop();return;}
+  if(a==='acc'){s.acc=s.acc===v?null:v;render();return;}
+  if(a==='clearmat'){s.mat=null;s.wnote='';render();var q2=document.getElementById('q'+cur);if(q2)q2.focus();return;}
+  if(a==='p1step'){var n=parseInt(v,10);if(n===2&&!s.mat){flashMissing(s);return;}s.step=n;render();scrollBodyTop();return;}
+  if(a==='p1next'){if(!s.mat){flashMissing(s);toast(s,'Pick a material first: tap one in the list.');render();return;}s.step=2;render();scrollBodyTop();return;}
+  if(a==='wstep'){if(!s.mat)return;s.w=clampW(s,s.w+parseInt(v,10)*stepOf(s.mat));render();return;}
+  if(a==='wset'){s.w=clampW(s,parseFloat(v));render();return;}
+  if(a==='commit'){
+    if(b.getAttribute('aria-disabled')==='true'){flashMissing(s);toast(s,!s.mat?'Pick a material first.':'Set a width between '+fmt(M[s.mat].min)+' and '+fmt2(ctx().avail)+' mm.');render();return;}
+    s.result={mat:s.mat,w:s.w};s.closed=true;render();return;
+  }
+});
+device.addEventListener('keydown',function(e){
+  var s=S[cur];
+  if(e.key==='Escape'){if(s.zoom){s.zoom=null;render();}else if(s.dd){s.dd=false;render();}else if(!s.closed){s.closed=true;render();}return;}
+  var t=e.target;
+  if((e.key==='Enter'||e.key===' ')&&t.classList&&(t.classList.contains('mcard')||t.classList.contains('mrow'))){e.preventDefault();t.click();}
+});
+device.addEventListener('input',function(e){
+  var t=e.target, s=S[cur], a=t.getAttribute&&t.getAttribute('data-act');
+  if(a==='q'){s.q=t.value;if(cur===1&&s.q)s.tileG=null;render();}
+  else if(a==='wrange'){s.w=clampW(s,parseFloat(t.value));
+    var n=document.getElementById('w'+cur);if(n)n.value=fmt(s.w);
+    var live=device.querySelector('.live');if(live){var tmp=document.createElement('div');tmp.innerHTML=P3(cur,s);var nl=tmp.querySelector('.live');if(nl)live.innerHTML=nl.innerHTML;}
+    var ft=device.querySelector('.sh-foot .status'),pb=device.querySelector('.sh-foot .btn.pri');
+    if(ft){var tmp2=document.createElement('div');tmp2.innerHTML=statusHTML(s);ft.replaceWith(tmp2.firstChild);}
+    if(pb)pb.setAttribute('aria-disabled',String(!valid(s)));
+  }
+});
+device.addEventListener('change',function(e){
+  var t=e.target, s=S[cur], a=t.getAttribute&&t.getAttribute('data-act');
+  if(a==='wnum'){if(!s.mat){t.value=fmt(s.w);return;}var v=parseFloat(String(t.value).replace(',','.'));if(isNaN(v))v=s.w;s.w=clampW(s,v);render();}
+  if(a==='wrange'){render();}
+});
+device.addEventListener('keydown',function(e){
+  var t=e.target;if(e.key==='Enter'&&t.getAttribute&&t.getAttribute('data-act')==='wnum'){t.blur();}
+});
+
+/* ---------- switcher + view + mode ---------- */
+var sw0=document.getElementById('switch');
+sw0.innerHTML=NAMES.map(function(n,k){return '<button type="button" role="tab" id="tab'+k+'" aria-selected="false"><b>Preview '+(k+1)+'</b><span>'+n+'</span></button>';}).join('');
+sw0.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;select([].indexOf.call(sw0.children,b));});
+sw0.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='ArrowLeft'){var n=(cur+(e.key==='ArrowRight'?1:3))%4;select(n);sw0.children[n].focus();}});
+var stage=document.getElementById('stage');
+function view(pc){stage.classList.toggle('pc',pc);document.getElementById('vt-phone').setAttribute('aria-pressed',String(!pc));document.getElementById('vt-pc').setAttribute('aria-pressed',String(pc));render();}
+function mode(m){MODE=m;S=[fresh(),fresh(),fresh(),fresh()];document.getElementById('md-add').setAttribute('aria-pressed',String(m==='add'));document.getElementById('md-edit').setAttribute('aria-pressed',String(m==='edit'));render();}
+document.getElementById('vt-phone').addEventListener('click',function(){view(false);});
+document.getElementById('vt-pc').addEventListener('click',function(){view(true);});
+document.getElementById('md-add').addEventListener('click',function(){mode('add');});
+document.getElementById('md-edit').addEventListener('click',function(){mode('edit');});
+document.getElementById('resetBtn').addEventListener('click',function(){S[cur]=fresh();render();});
+window.addEventListener('resize',function(){render();});
+
+var start=0;
+var hash=(location.hash||'').replace('#','');
+if(/^p[1-4]/.test(hash))start=parseInt(hash.charAt(1),10)-1;
+else{try{var st=parseInt(localStorage.getItem('aiPreview'),10);if(st>=0&&st<4)start=st;}catch(e){}}
+if(/edit/.test(hash))MODE='edit',S=[fresh(),fresh(),fresh(),fresh()],document.getElementById('md-add').setAttribute('aria-pressed','false'),document.getElementById('md-edit').setAttribute('aria-pressed','true');
+select(start);
+window.__ai={S:function(){return S;},select:select,view:view,mode:mode,M:M,GROUPS:GROUPS};
+})();
+</script>

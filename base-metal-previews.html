@@ -1,0 +1,637 @@
+<title>Base Metal Previews</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+<style>
+/* Same outer shell and colours as the Width & Profile previews (copied from the new builder look).
+   Colours copied from the new builder (src/common/109l + 109p): soft grey ground, white cards, indigo primary. */
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --soft:#edf0f6; --soft2:#e4e8f0;
+  --ink:#151823; --ink2:#3f4758; --muted:#566074;
+  --line:#d3d8e3; --line2:#bcc4d3;
+  --accent:#4a59dc; --accent2:#5f6eea; --on-accent:#ffffff; --sel:#edf0ff;
+  --ok:#2f7a4a; --ok-bg:#eef6f0; --warn:#8a5a00; --warn-bg:#fff6e5;
+  --skin:#efd3bf; --skin-line:#d8b298; --wood:#9a5b2e; --wood2:#c27c45;
+  --g1:#f2d88a; --g2:#d8b45a; --g3:#a9822f;
+  --shadow:0 1px 2px rgba(21,24,35,.06),0 6px 20px rgba(21,24,35,.06);
+  --font:"DM Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --r-lg:18px; --r-md:14px; --r-sm:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10131a; --card:#171b24; --soft:#1d222d; --soft2:#272d39;
+  --ink:#f2f4f9; --ink2:#d2d7e2; --muted:#aeb6c6; --line:#333a48; --line2:#465064;
+  --accent:#96a2ff; --accent2:#b3bcff; --on-accent:#10131a; --sel:#272d45;
+  --ok:#8fd3a5; --ok-bg:#16261d; --warn:#f3c56b; --warn-bg:#2e2412;
+  --skin:#6b5548; --skin-line:#86695a; --wood:#b0703f; --wood2:#d08d55;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10131a; --card:#171b24; --soft:#1d222d; --soft2:#272d39;
+  --ink:#f2f4f9; --ink2:#d2d7e2; --muted:#aeb6c6; --line:#333a48; --line2:#465064;
+  --accent:#96a2ff; --accent2:#b3bcff; --on-accent:#10131a; --sel:#272d45;
+  --ok:#8fd3a5; --ok-bg:#16261d; --warn:#f3c56b; --warn-bg:#2e2412;
+  --skin:#6b5548; --skin-line:#86695a; --wood:#b0703f; --wood2:#d08d55;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.45;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+h1,h2,h3{text-wrap:balance;margin:0}
+.wrap{max-width:1160px;margin:0 auto;display:grid;gap:18px}
+
+/* ---------- page header + switcher ---------- */
+.intro{display:grid;gap:6px;max-width:68ch}
+.intro .eyebrow{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.intro h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
+.intro p{margin:0;color:var(--ink2)}
+.switch{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;background:var(--soft2);padding:5px;border-radius:var(--r-md)}
+@media (min-width:760px){.switch{grid-template-columns:repeat(4,1fr)}}
+.switch button{border:0;background:transparent;border-radius:var(--r-sm);padding:9px 10px;text-align:left;display:grid;gap:1px;min-height:52px}
+.switch button b{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.switch button span{font-weight:600;font-size:14px;line-height:1.25}
+.switch button[aria-selected="true"]{background:var(--card);box-shadow:var(--shadow)}
+.switch button[aria-selected="true"] b{color:var(--accent)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.viewtoggle{display:none;gap:4px;background:var(--soft2);padding:4px;border-radius:999px}
+@media (min-width:760px){.viewtoggle{display:inline-flex}}
+.viewtoggle button{border:0;background:transparent;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--muted)}
+.viewtoggle button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.linkbtn{border:0;background:none;color:var(--accent);font-weight:600;font-size:14px;padding:6px 2px;text-decoration:underline;text-underline-offset:3px}
+
+.stage{display:grid;gap:16px;justify-items:center}
+.device{width:100%;max-width:390px;background:var(--bg);border:1px solid var(--line2);border-radius:30px;overflow:clip;
+  box-shadow:0 20px 50px rgba(21,24,35,.12);container-type:inline-size;position:relative}
+.stage.pc .device{max-width:1100px;border-radius:16px}
+@media (max-width:520px){.device{border-radius:20px}}
+.changed{width:100%;max-width:640px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px 18px;display:grid;gap:8px}
+.changed h2{font-size:16px}
+.changed ul{margin:0;padding-left:20px;display:grid;gap:4px;color:var(--ink2)}
+.changed .diff{font-size:13px;color:var(--muted);margin:0}
+
+/* ---------- builder chrome (copied look) ---------- */
+.b-top{background:var(--card);border-bottom:1px solid var(--line);padding:12px 14px 0;display:grid;gap:10px}
+.brand{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
+.brand b{color:var(--ink);font-size:14px;letter-spacing:.02em}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.steps .st{display:grid;gap:4px}
+.steps .st i{display:block;height:5px;border-radius:3px;background:var(--soft2)}
+.steps .st.on i{background:var(--accent)}
+.steps .st small{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.steps .st.on small{color:var(--accent)}
+.steps .st span{font-size:13px;font-weight:600;line-height:1.2}
+.steps .st:not(.on) span{color:var(--muted)}
+.subtabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:0 14px}
+.subtabs div{white-space:nowrap;font-size:13.5px;font-weight:600;padding:9px 4px 10px;margin-right:14px;color:var(--muted);border-bottom:3px solid transparent;display:flex;gap:6px;align-items:center}
+.subtabs .done::before{content:"";width:16px;height:16px;border-radius:50%;background:var(--ok) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.5l2.5 2.5L12 5.5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/16px no-repeat}
+.subtabs .on{color:var(--ink);border-bottom-color:var(--accent)}
+.b-body{padding:16px 14px 18px;display:grid;gap:14px}
+.ptitle{display:grid;gap:4px}
+.ptitle h2{font-size:22px;font-weight:700;letter-spacing:-.01em}
+.ptitle p{margin:0;color:var(--ink2);font-size:14.5px}
+
+.b-bar{position:sticky;bottom:0;z-index:5;background:var(--card);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));display:grid;gap:8px}
+.b-bar .todo{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.b-bar .todo b{color:var(--ink)}
+.b-bar .todo.ready{color:var(--ok)}
+.b-bar .row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px}
+.b-bar .back{border:1px solid var(--line2);background:var(--card);border-radius:12px;padding:11px 14px;font-weight:600}
+.b-bar .mid{text-align:center;font-size:12.5px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+.b-bar .next{border:0;background:var(--accent);color:var(--on-accent);border-radius:12px;padding:12px 16px;font-weight:700;white-space:nowrap}
+.b-bar .next[aria-disabled="true"]{background:var(--soft2);color:var(--muted)}
+@container (min-width:720px){.b-bar{padding-inline:28px}.b-body{padding:24px 28px 28px}.b-top{padding-inline:28px}.subtabs{margin:0 -28px;padding:0 28px}}
+
+/* ---------- shared controls ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px}
+.label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.help{margin:0;color:var(--ink2);font-size:14px}
+.note{font-size:13px;color:var(--muted);margin:0}
+.notice{font-size:13.5px;background:var(--warn-bg);color:var(--warn);border-radius:var(--r-sm);padding:8px 10px;margin:0}
+.flash{animation:flash 1.2s ease}
+@keyframes flash{0%,100%{box-shadow:none}30%{box-shadow:0 0 0 4px var(--accent)}}
+@media (prefers-reduced-motion:reduce){.flash{animation:none;outline:3px solid var(--accent)}}
+.opt{border:1.5px solid var(--line2);background:var(--card);border-radius:var(--r-md);padding:12px;text-align:left;display:grid;gap:4px;transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--accent2)}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--sel);box-shadow:inset 0 0 0 1px var(--accent)}
+.opt .t{font-weight:700;font-size:15px}
+.opt .d{font-size:13px;color:var(--muted);line-height:1.3}
+.opt svg{display:block;width:100%;height:auto}
+.chip{border:1.5px solid var(--line2);background:var(--card);border-radius:999px;padding:9px 14px;font-weight:600;font-size:14px;white-space:nowrap}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:var(--on-accent)}
+.range{display:flex;gap:10px;align-items:center}
+.range input[type=range]{flex:1;accent-color:var(--accent);min-width:0;height:28px}
+.num{display:flex;align-items:center;gap:4px;border:1.5px solid var(--line2);border-radius:10px;padding:4px 8px;background:var(--card)}
+.num input{width:46px;border:0;background:transparent;font-weight:700;font-size:16px;text-align:right;font-variant-numeric:tabular-nums}
+.num input:focus{outline:none}
+.num:focus-within{border-color:var(--accent)}
+.num span{color:var(--muted);font-size:14px}
+.fig{background:var(--soft);border-radius:var(--r-md);padding:8px}
+.fig svg{display:block;width:100%;height:auto}
+.badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:var(--ok-bg);color:var(--ok);border-radius:999px;padding:2px 8px}
+.staff{border:1.5px dashed var(--line2);border-radius:var(--r-md);padding:10px 12px;font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.staff b{letter-spacing:.06em}
+
+/* ---------- Preview 1: one question at a time ---------- */
+.q{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);overflow:clip}
+.q-head{width:100%;border:0;background:transparent;display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:14px;text-align:left}
+.q-n{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:14px;background:var(--soft2);color:var(--ink2)}
+.q.open .q-n{background:var(--accent);color:var(--on-accent)}
+.q.answered .q-n{background:var(--ok);color:#fff}
+.q-title{font-weight:700;font-size:16px;line-height:1.25}
+.q-sum{font-size:13.5px;color:var(--muted);display:block;font-weight:500}
+.q.answered .q-sum{color:var(--ok)}
+.q-act{font-size:13px;font-weight:600;color:var(--accent)}
+.q.locked .q-head{cursor:default}
+.q.locked .q-title{color:var(--muted)}
+.q-body{padding:0 14px 16px;display:grid;gap:12px}
+/* ---------- Base Metal page: shared ---------- */
+.b-bar .back[aria-disabled="true"]{opacity:.45;cursor:default}
+.sw{display:block;border-radius:12px;border:1px solid rgba(0,0,0,.14);box-shadow:inset 0 1px 2px rgba(255,255,255,.45),inset 0 -3px 6px rgba(0,0,0,.18)}
+.mcard{border:1.5px solid var(--line2);background:var(--card);border-radius:var(--r-md);padding:10px;text-align:left;display:grid;gap:8px;position:relative;transition:border-color .15s,background .15s;min-width:0}
+.mcard:hover{border-color:var(--accent2)}
+.mcard[aria-pressed="true"]{border-color:var(--accent);background:var(--sel);box-shadow:inset 0 0 0 1px var(--accent)}
+.mcard[aria-pressed="true"]::after{content:"✓";position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-size:13px;font-weight:700}
+.mcard .t{font-weight:700;font-size:14.5px;line-height:1.2}
+.mcard .d{font-size:12.5px;color:var(--muted);line-height:1.3}
+.mcard .badge{position:absolute;top:6px;left:6px;font-size:9.5px;padding:1px 6px}
+.mgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@container (min-width:520px){.mgrid{grid-template-columns:repeat(3,1fr)}}
+@container (min-width:900px){.mgrid{grid-template-columns:repeat(4,1fr)}}
+.mgrid .sw{height:64px}
+.welcome{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px;display:grid;gap:10px}
+.welcome h3{font-size:17px}
+.welcome p{margin:0;color:var(--ink2);font-size:14px}
+.road{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.road li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;font-size:14px;color:var(--ink2)}
+.road li b{color:var(--ink);display:block;font-size:14.5px}
+.road .n{width:26px;height:26px;border-radius:50%;background:var(--soft2);color:var(--ink2);display:grid;place-items:center;font-weight:700;font-size:13px}
+.road li.now .n{background:var(--accent);color:var(--on-accent)}
+.road.row3{grid-template-columns:repeat(3,1fr);gap:6px}
+.road.row3 li{grid-template-columns:1fr;justify-items:center;text-align:center;font-size:12px;gap:4px}
+.road.row3 li b{font-size:12.5px}
+.promise{display:flex;gap:6px;flex-wrap:wrap}
+.promise span{font-size:12px;font-weight:600;border-radius:999px;padding:3px 9px;background:var(--ok-bg);color:var(--ok)}
+.facts{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:12px 14px;display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:center}
+.facts .sw{width:56px;height:56px}
+.facts b{font-size:16px}
+.facts ul{margin:4px 0 0;padding-left:18px;font-size:13.5px;color:var(--ink2);display:grid;gap:2px}
+.facts.empty{grid-template-columns:1fr;color:var(--muted);font-size:14px;border-style:dashed;background:transparent}
+.changenote{border:1px solid rgba(91,108,255,.45);border-radius:var(--r-sm);background:var(--sel);padding:10px 12px;font-size:13.5px;display:grid;gap:4px}
+.changenote ul{margin:0;padding-left:18px;display:grid;gap:3px;color:var(--ink2)}
+.changenote.okline{border-color:var(--ok);background:var(--ok-bg);color:var(--ok);font-weight:600}
+.came{font-size:13px;color:var(--muted);background:var(--soft);border-radius:var(--r-sm);padding:8px 10px;margin:0}
+.gtabs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gtab{border:1.5px solid var(--line2);background:var(--card);border-radius:var(--r-md);padding:10px 12px;text-align:left;display:grid;gap:2px}
+.gtab b{font-size:14.5px}
+.gtab span{font-size:12px;color:var(--muted);line-height:1.3}
+.gtab[aria-pressed="true"]{border-color:var(--accent);background:var(--sel);box-shadow:inset 0 0 0 1px var(--accent)}
+.gtab[aria-pressed="true"] b{color:var(--accent)}
+
+/* ---------- Preview 1: welcome + two questions ---------- */
+@container (min-width:720px){.p1{max-width:760px;margin:0 auto;width:100%}}
+.gbig{border:1.5px solid var(--line2);background:var(--card);border-radius:var(--r-lg);padding:12px;text-align:left;display:grid;grid-template-columns:86px 1fr;gap:12px;align-items:center}
+.gbig[aria-pressed="true"]{border-color:var(--accent);background:var(--sel);box-shadow:inset 0 0 0 1px var(--accent)}
+.gbig .t{font-weight:700;font-size:16px}
+.gbig .d{font-size:13px;color:var(--muted);display:block}
+.gbig .dots{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.gbig .dots i{width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,.18)}
+.gbig svg{width:86px;height:auto;display:block}
+.glist{display:grid;gap:10px}
+@container (min-width:520px){.glist{grid-template-columns:1fr 1fr}}
+
+/* ---------- Preview 2: every metal on one page ---------- */
+.p2{display:grid;gap:18px}
+.jump{position:sticky;top:0;z-index:4;background:var(--bg);padding:8px 0;margin:-8px 0 0;display:flex;gap:8px;flex-wrap:wrap}
+.jump .chip{font-size:13px;padding:7px 12px}
+.howto{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:10px 12px}
+.howto ol{margin:0;padding:0;list-style:none;display:flex;gap:6px;flex:1;flex-wrap:wrap;font-size:12.5px;color:var(--ink2)}
+.howto ol li{display:flex;gap:5px;align-items:center}
+.howto ol li+li::before{content:"›";color:var(--muted);margin-right:2px}
+.howto ol b{color:var(--ink)}
+.howto .x{border:0;background:var(--soft2);border-radius:999px;padding:5px 10px;font-size:12px;font-weight:600;color:var(--ink2)}
+.tilegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@container (min-width:720px){.tilegrid{grid-template-columns:repeat(6,1fr)}}
+.tile{border:1.5px solid var(--line2);background:var(--card);border-radius:var(--r-md);padding:6px 6px 8px;display:grid;gap:6px;text-align:center;position:relative;min-width:0}
+.tile .sw{height:auto;aspect-ratio:1/1;border-radius:10px}
+.tile .t{font-weight:700;font-size:13px;line-height:1.2}
+.tile[aria-pressed="true"]{border-color:var(--accent);background:var(--sel);box-shadow:inset 0 0 0 1px var(--accent)}
+.tile[aria-pressed="true"]::after{content:"✓";position:absolute;top:10px;right:10px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-size:13px;font-weight:700}
+.tile .badge{position:absolute;top:10px;left:10px;font-size:9px;padding:1px 5px}
+.ghead{display:grid;gap:2px}
+.ghead h3{font-size:17px}
+.ghead p{margin:0;font-size:13px;color:var(--muted)}
+
+/* ---------- Preview 3: live ring on top ---------- */
+.live{position:sticky;top:0;z-index:4;background:var(--card);border-bottom:1px solid var(--line);padding:10px 14px 12px;display:grid;gap:6px}
+.live .fig{padding:2px 8px}
+.live .fig svg{max-height:150px;margin:0 auto}
+.live-cap{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.live-cap b{font-size:16px}
+.live-cap span{font-size:13px;color:var(--muted)}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--soft2);border-radius:12px;padding:4px;gap:4px}
+.seg button{border:0;background:transparent;border-radius:9px;padding:9px 8px;font-weight:600;font-size:14px;line-height:1.2;display:grid;gap:1px}
+.seg button small{font-size:11.5px;font-weight:500;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--card);box-shadow:var(--shadow);color:var(--accent)}
+.dotrow{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x proximity;margin:0 -14px;padding:4px 14px 8px;scrollbar-width:none}
+.dotrow::-webkit-scrollbar{display:none}
+.dot{flex:0 0 76px;border:0;background:none;padding:0;display:grid;gap:6px;justify-items:center;scroll-snap-align:start;text-align:center}
+.dot .sw{width:60px;height:60px;border-radius:50%;outline:2px solid transparent;outline-offset:3px;transition:outline-color .15s}
+.dot[aria-pressed="true"] .sw{outline-color:var(--accent)}
+.dot .t{font-size:12.5px;font-weight:600;line-height:1.2}
+.dot[aria-pressed="true"] .t{color:var(--accent)}
+.swipehint{font-size:12px;color:var(--muted);margin:-4px 0 0}
+@container (min-width:720px){
+  .p3wrap{display:grid;grid-template-columns:400px 1fr;align-items:start}
+  .p3wrap .live{top:16px;margin:24px 0 24px 28px;border:1px solid var(--line);border-radius:var(--r-lg)}
+  .p3wrap .b-body{padding-left:24px}
+  .dotrow{flex-wrap:wrap;overflow:visible;margin:0;padding:4px 0}
+  .swipehint{display:none}
+}
+
+/* ---------- Preview 4: choose by colour ---------- */
+.hero{background:linear-gradient(135deg,var(--sel),var(--card));border:1px solid var(--line);border-radius:var(--r-lg);padding:14px;display:grid;gap:8px}
+.hero h3{font-size:18px}
+.hero .bar{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.hero .bar div{display:grid;gap:3px;font-size:11.5px;font-weight:600;color:var(--muted)}
+.hero .bar i{display:block;height:5px;border-radius:3px;background:var(--soft2)}
+.hero .bar .now i{background:var(--accent)}
+.hero .bar .now{color:var(--accent)}
+.colors{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@container (min-width:720px){.colors{grid-template-columns:repeat(7,1fr)}}
+.cchip{border:1.5px solid var(--line2);background:var(--card);border-radius:var(--r-md);padding:8px 6px;display:grid;justify-items:center;gap:5px;font-size:12.5px;font-weight:600;text-align:center;line-height:1.15}
+.cchip i{width:30px;height:30px;border-radius:50%;border:1px solid rgba(0,0,0,.16);display:block}
+.cchip[aria-pressed="true"]{border-color:var(--accent);background:var(--sel);box-shadow:inset 0 0 0 1px var(--accent);color:var(--accent)}
+.cchip.all i{background:conic-gradient(#daa520,#e8e8e8,#b76e79,#8a8a8a,#1a1a1a,#9e9e9e,#daa520)}
+.sortrow{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.mini-seg{display:inline-flex;background:var(--soft2);border-radius:999px;padding:3px;gap:2px}
+.mini-seg button{border:0;background:transparent;border-radius:999px;padding:5px 11px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.mini-seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.rowcards{display:grid;gap:8px}
+@container (min-width:520px){.rowcards{grid-template-columns:1fr 1fr}}
+@container (min-width:900px){.rowcards{grid-template-columns:1fr 1fr 1fr}}
+.rcard{border:1.5px solid var(--line2);background:var(--card);border-radius:var(--r-md);padding:8px 10px;display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;text-align:left;min-width:0}
+.rcard .sw{width:52px;height:52px}
+.rcard .t{font-weight:700;font-size:14.5px;display:block}
+.rcard .d{font-size:12.5px;color:var(--muted);display:block;line-height:1.3}
+.rcard .tag{font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--soft);border-radius:999px;padding:2px 7px;white-space:nowrap}
+.rcard[aria-pressed="true"]{border-color:var(--accent);background:var(--sel);box-shadow:inset 0 0 0 1px var(--accent)}
+.rcard[aria-pressed="true"] .tag{background:var(--accent);color:var(--on-accent)}
+.ghl{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+@container (min-width:720px){.p4{display:grid;grid-template-columns:1fr;gap:16px}}
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <div class="eyebrow">New Ring Builder · design mock-ups · 20 Nov 2026</div>
+    <h1>Base Metal: four ways to start</h1>
+    <p>This is the first page a customer sees. Each preview is clickable: pick a metal and watch the <b>Width &amp; Profile →</b> button turn blue. Use <b>Try: change the metal later</b> to see the note a customer gets when they come back from the Summary and switch metal. Nothing here talks to the real builder or to prices.</p>
+  </header>
+
+  <div class="toolbar">
+    <div class="switch" role="tablist" aria-label="Choose a preview" id="switch" style="flex:1 1 100%"></div>
+  </div>
+  <div class="toolbar">
+    <div class="viewtoggle" role="group" aria-label="Frame size">
+      <button type="button" id="vt-phone" aria-pressed="true">Phone</button>
+      <button type="button" id="vt-pc" aria-pressed="false">PC</button>
+    </div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap">
+      <button type="button" class="linkbtn" id="laterBtn">Try: change the metal later</button>
+      <button type="button" class="linkbtn" id="resetBtn">Start this preview again</button>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="device" id="device"></div>
+    <section class="changed" id="changed" aria-live="polite"></section>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- data: real metal names, groups and colours from the test pricing (builder_config + catalog colours) ---------- */
+var GROUPS={
+  alt:{name:'Alternative Metals',sub:'Titanium · Tungsten · Zirconium · Damascus…',plain:'Modern, tough metals for everyday wear'},
+  pre:{name:'Precious Metals',sub:'Gold · Platinum · Silver',plain:'Gold, platinum and silver'}
+};
+/* hex = real swatch colour; d = short plain-words line (example copy); fam = colour family for Preview 4 */
+var METALS=[
+  {n:'Black Ceramic',g:'alt',hex:'#1A1A1A',fam:'black',d:'Jet black, scratch-resistant',x:'Made from ready-made blanks, 8 mm wide'},
+  {n:'Damascus',g:'alt',hex:'#9E9E9E',fam:'pattern',d:'Patterned steel, every ring unique',pat:'dam'},
+  {n:'Metal Mokume',g:'alt',hex:'#B9A27A',fam:'pattern',d:'Layered metals, wood-grain look',pat:'mok'},
+  {n:'Titanium',g:'alt',hex:'#C0C0C0',fam:'grey',d:'Light and strong, soft grey'},
+  {n:'Tungsten',g:'alt',hex:'#8A8A8A',fam:'grey',d:'Heavy and very scratch-resistant',x:'Made from ready-made blanks, 6 or 8 mm wide',pop:true},
+  {n:'Zirconium',g:'alt',hex:'#2C2C2C',fam:'black',d:'Dark black-grey, light to wear'},
+  {n:'Platinum',g:'pre',hex:'#E5E4E2',fam:'white',d:'Naturally white, heavy, lasts a lifetime'},
+  {n:'Rose 14K',g:'pre',hex:'#B76E79',fam:'rose',d:'Warm pink gold'},
+  {n:'Silver',g:'pre',hex:'#E0E0E0',fam:'white',d:'Bright white, a softer metal'},
+  {n:'White 10K',g:'pre',hex:'#E8E8E8',fam:'white',d:'White gold, the toughest gold'},
+  {n:'White 14K',g:'pre',hex:'#ECECEC',fam:'white',d:'White gold, the classic choice'},
+  {n:'White 18K',g:'pre',hex:'#F0F0F0',fam:'white',d:'White gold, the richest gold'},
+  {n:'Yellow 10K',g:'pre',hex:'#D4A017',fam:'yellow',d:'Yellow gold, the toughest gold'},
+  {n:'Yellow 14K',g:'pre',hex:'#DAA520',fam:'yellow',d:'Yellow gold, the classic choice',pop:true},
+  {n:'Yellow 18K',g:'pre',hex:'#FFD700',fam:'yellow',d:'Yellow gold, the richest colour'}
+];
+var BY={}; METALS.forEach(function(m){BY[m.n]=m;});
+var FAMS=[
+  {id:'yellow',name:'Yellow gold',hex:'#DAA520'},
+  {id:'white',name:'White & silver',hex:'#ECECEC'},
+  {id:'rose',name:'Rose gold',hex:'#B76E79'},
+  {id:'grey',name:'Grey',hex:'#8A8A8A'},
+  {id:'black',name:'Black',hex:'#1A1A1A'},
+  {id:'pattern',name:'Patterned',hex:'#9E9E9E',pat:'dam'}
+];
+var PRE_NOTE='Without inlays it can be a made-to-order solid band';
+function facts(m){
+  var f=[m.d];
+  if(m.x)f.push(m.x);
+  if(m.g==='pre')f.push(PRE_NOTE);
+  f.push(m.g==='alt'?'Alternative metal':'Precious metal');
+  return f;
+}
+
+/* "come back later" example: the customer had 8 mm Flat, Yellow 14K edges + a 6 mm Koa inlay */
+var OLD='Yellow 14K';
+function changeNotes(to){
+  if(to==='Tungsten')return ['Tungsten is made from precut blanks - the closest one was chosen: 1mm Tungsten · 6mm Koa · 1mm Tungsten.'];
+  if(to==='Black Ceramic')return ['Black Ceramic is made from precut blanks - the closest one was chosen: 1mm Black Ceramic · 6mm Koa · 1mm Black Ceramic.'];
+  return [];
+}
+
+var NAMES=['Welcome + two questions','Every metal on one page','Live ring on top','Choose by colour'];
+var CHANGED=[
+  {lead:'A short welcome says what the builder is and the 3 steps, then two easy questions: what kind of metal, then which one.',
+   items:['New welcome box: "Design your ring, get a free quote by email", with the 3 steps listed.',
+   'First question: Alternative or Precious, as two big picture cards with colour dots.',
+   'Second question: only the metals of that kind, as big swatch cards with a one-line description.',
+   'Under the cards a "Good to know" box tells what the chosen metal means (for example ready-made blanks).']},
+  {lead:'No tabs: both metal groups are on one page, so nothing is hidden behind a tab.',
+   items:['A slim "3 steps" strip at the top, with "Got it" to close it.',
+   'Big square colour tiles, 3 per row on a phone, grouped under Alternative and Precious.',
+   'Two jump buttons stay at the top to skip to a group.',
+   'Today the precious metals hide behind a second tab; many people may never see gold.']},
+  {lead:'A drawing of the ring at the top takes the colour of the metal the customer taps.',
+   items:['Before a choice, the drawing area explains the 3 steps; after a tap it shows the ring in that metal.',
+   'Alternative / Precious become a simple two-way switch.',
+   'Metals are round colour swatches in a sideways row (swipe on a phone, all visible on a PC).',
+   'The chosen metal’s name and its "good to know" lines sit right under the drawing.']},
+  {lead:'Customers think in colours first ("I want yellow gold"), so the first question is the colour.',
+   items:['Six colour buttons plus "All": Yellow gold, White & silver, Rose gold, Grey, Black, Patterned.',
+   'Matching metals from both groups show as list cards, each labelled Alternative or Precious.',
+   'A small "Sort by colour / by type" switch still offers today’s two groups.',
+   'A progress bar at the top shows "Step 1 of 3"; the "Most chosen" badges are examples only.']}
+];
+
+function fresh(){return {metal:null,group:null,intro:true,fam:null,sort:'color',later:false,notes:null,q:1};}
+var S=[fresh(),fresh(),fresh(),fresh()];
+var cur=0, uid=0;
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+/* ---------- colours + drawings ---------- */
+function mix(hex,t,amt){
+  var n=parseInt(hex.slice(1),16),r=n>>16,g=n>>8&255,b=n&255,T=t==='w'?255:0;
+  r=Math.round(r+(T-r)*amt);g=Math.round(g+(T-g)*amt);b=Math.round(b+(T-b)*amt);
+  return '#'+((1<<24)|(r<<16)|(g<<8)|b).toString(16).slice(1);
+}
+function swBg(m){
+  if(m.pat==='dam')return 'repeating-linear-gradient(118deg,#6f6f6f 0 3px,#c4c4c4 3px 6px,#8d8d8d 6px 8px,#e0e0e0 8px 10px),#9e9e9e';
+  if(m.pat==='mok')return 'repeating-linear-gradient(160deg,#cfcfcf 0 4px,#b87333 4px 7px,#e0bd62 7px 10px,#8f8f8f 10px 13px)';
+  return 'linear-gradient(135deg,'+mix(m.hex,'w',.55)+' 0%,'+m.hex+' 45%,'+mix(m.hex,'b',.35)+' 100%)';
+}
+function sw(m,extra){return '<span class="sw" style="background:'+swBg(m)+';'+(extra||'')+'" aria-hidden="true"></span>';}
+/* a band seen at an angle, painted in the metal */
+function ringSVG(m,label){
+  var id='r'+(++uid), paint;
+  var defs;
+  if(!m){
+    return '<svg viewBox="0 0 220 120" role="img" aria-label="No metal chosen yet"><ellipse cx="110" cy="62" rx="78" ry="34" fill="none" stroke="currentColor" stroke-width="16" stroke-dasharray="2 4" opacity=".22"/></svg>';
+  }
+  if(m.pat){
+    var c=m.pat==='dam'?['#6f6f6f','#c4c4c4','#8d8d8d','#e0e0e0']:['#cfcfcf','#b87333','#e0bd62','#8f8f8f'];
+    defs='<pattern id="'+id+'" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(28)">'+
+      '<rect width="3" height="12" fill="'+c[0]+'"/><rect x="3" width="3" height="12" fill="'+c[1]+'"/><rect x="6" width="3" height="12" fill="'+c[2]+'"/><rect x="9" width="3" height="12" fill="'+c[3]+'"/></pattern>';
+  }else{
+    defs='<linearGradient id="'+id+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+mix(m.hex,'w',.6)+'"/><stop offset=".45" stop-color="'+m.hex+'"/><stop offset="1" stop-color="'+mix(m.hex,'b',.45)+'"/></linearGradient>';
+  }
+  paint='url(#'+id+')';
+  return '<svg viewBox="0 0 220 120" role="img" aria-label="'+esc(label||(m.n+' band'))+'"><defs>'+defs+'</defs>'+
+    '<ellipse cx="110" cy="66" rx="78" ry="34" fill="none" stroke="rgba(0,0,0,.10)" stroke-width="20"/>'+
+    '<ellipse cx="110" cy="60" rx="78" ry="34" fill="none" stroke="'+paint+'" stroke-width="20"/>'+
+    '<ellipse cx="110" cy="60" rx="88" ry="44" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.2"/>'+
+    '<ellipse cx="110" cy="60" rx="68" ry="24" fill="none" stroke="rgba(0,0,0,.28)" stroke-width="1.2"/>'+
+    '<path d="M44,40 Q110,8 176,40" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="3" stroke-linecap="round"/>'+
+  '</svg>';
+}
+
+/* ---------- shell ---------- */
+function shell(i,inner,opts){
+  opts=opts||{};
+  var s=S[i];
+  return '<div class="b-top">'+
+      '<div class="brand"><b>JEWELRY BY JOHAN</b><span>Ring Builder</span></div>'+
+      '<div class="steps" aria-label="Steps">'+
+        '<div class="st on"><i></i><small>Step 1</small><span>Your band</span></div>'+
+        '<div class="st"><i></i><small>Step 2</small><span>Make it yours</span></div>'+
+        '<div class="st"><i></i><small>Step 3</small><span>Get my quote</span></div>'+
+      '</div>'+
+      '<div class="subtabs"><div class="on'+(s.metal?' done':'')+'">Base Metal'+(s.metal?' · '+esc(s.metal):'')+'</div><div>Width &amp; Profile</div></div>'+
+    '</div>'+
+    (opts.wrapClass?'<div class="'+opts.wrapClass+'">':'')+
+    (opts.before||'')+
+    '<div class="b-body">'+inner+'</div>'+
+    (opts.wrapClass?'</div>':'')+
+    '<div class="b-bar">'+bar(s)+'</div>';
+}
+function bar(s){
+  var done=!!s.metal;
+  var todo=done?'<div class="todo ready">✓ '+esc(s.metal)+' chosen · next: width and shape</div>'
+    :'<div class="todo">Still to choose: <b>base metal</b></div>';
+  return todo+'<div class="row"><button type="button" class="back" aria-disabled="true" title="This is the first page">← Back</button><div class="mid">Your band</div>'+
+    '<button type="button" class="next" data-act="next" aria-disabled="'+(!done)+'">Width &amp; Profile →</button></div>';
+}
+function titleBlock(sub){
+  return '<div class="ptitle"><h2>Choose Your Base Metal</h2><p>'+(sub||'This metal forms the edges, pinstripes, and structural foundation of your ring.')+'</p></div>';
+}
+function noteBlock(s){
+  if(!s.later)return '';
+  if(!s.notes)return '<p class="came">You came back from the Summary. Your design so far: 8 mm Flat, '+OLD+' with a 6 mm Koa inlay. Pick another metal to see what happens.</p>';
+  if(!s.notes.length)return '<div class="changenote okline" role="status">Now '+esc(s.metal)+' - your design stayed exactly the same.</div>';
+  return '<div class="changenote" role="status"><strong>Now '+esc(s.metal)+' - your layout was kept:</strong><ul>'+s.notes.map(function(n){return '<li>'+esc(n)+'</li>';}).join('')+'</ul></div>';
+}
+function factsBox(s){
+  if(!s.metal)return '<div class="facts empty" data-q="m">Tap a metal to see what it is like.</div>';
+  var m=BY[s.metal];
+  return '<div class="facts" data-q="m">'+sw(m)+'<div><b>Good to know: '+esc(m.n)+'</b><ul>'+facts(m).map(function(f){return '<li>'+esc(f)+'</li>';}).join('')+'</ul></div></div>';
+}
+function road(cls){
+  return '<ol class="road '+(cls||'')+'">'+
+    '<li class="now"><span class="n">1</span><span><b>Your band</b>Metal, width and shape</span></li>'+
+    '<li><span class="n">2</span><span><b>Make it yours</b>Inlays, inside sleeve, finish</span></li>'+
+    '<li><span class="n">3</span><span><b>Get my quote</b>Ring size, then send</span></li>'+
+  '</ol>';
+}
+function promise(){return '<div class="promise"><span>✓ Free quote by email</span><span>✓ Nothing to pay now</span><span>✓ Change anything later</span></div>';}
+function mcard(s,m,showBadge){
+  return '<button type="button" class="mcard" data-act="metal" data-v="'+esc(m.n)+'" aria-pressed="'+(s.metal===m.n)+'">'+
+    (showBadge&&m.pop?'<span class="badge">Most chosen</span>':'')+sw(m)+'<span class="t">'+esc(m.n)+'</span><span class="d">'+esc(m.d)+'</span></button>';
+}
+function inGroup(g){return METALS.filter(function(m){return m.g===g;});}
+
+/* ---------- Preview 1: welcome + two questions ---------- */
+function P1(i,s){
+  var w='<section class="welcome"><h3>Design your own ring</h3><p>Choose each part of your ring in 3 short steps. At the end you send it to us and get a free quote by email.</p>'+road()+promise()+'</section>';
+  var g=s.group;
+  function gcard(k){
+    var dots=inGroup(k).slice(0,6).map(function(m){return '<i style="background:'+swBg(m)+'"></i>';}).join('');
+    var sample=k==='alt'?BY['Tungsten']:BY['Yellow 14K'];
+    return '<button type="button" class="gbig" data-act="group" data-v="'+k+'" aria-pressed="'+(g===k)+'">'+ringSVG(sample,GROUPS[k].name)+
+      '<span><span class="t">'+GROUPS[k].name+'</span><span class="d">'+GROUPS[k].sub+'</span><span class="dots">'+dots+'</span></span></button>';
+  }
+  var q1open=s.q===1||!g;
+  var q1='<section class="q'+(q1open?' open':' answered')+'" data-q="g"><button type="button" class="q-head" data-act="openq" data-v="1" aria-expanded="'+q1open+'">'+
+      '<span class="q-n">'+(q1open?'1':'✓')+'</span><span><span class="q-title">What kind of metal?</span><span class="q-sum">'+(g?GROUPS[g].name:'Not answered yet')+'</span></span><span class="q-act">'+(q1open?'':'Change')+'</span></button>'+
+      (q1open?'<div class="q-body"><div class="glist">'+gcard('alt')+gcard('pre')+'</div></div>':'')+'</section>';
+  var q2open=!!g&&s.q===2;
+  var q2='<section class="q'+(q2open?' open':'')+(s.metal&&!q2open?' answered':'')+(!g?' locked':'')+'" data-q="m2"><button type="button" class="q-head" data-act="openq" data-v="2" aria-expanded="'+q2open+'"'+(!g?' aria-disabled="true"':'')+'>'+
+      '<span class="q-n">'+(s.metal&&!q2open?'✓':'2')+'</span><span><span class="q-title">Which metal?</span><span class="q-sum">'+(!g?'Answer question 1 first':(s.metal?esc(s.metal):'Not chosen yet'))+'</span></span><span class="q-act">'+(!g||q2open?'':(s.metal?'Change':'Open'))+'</span></button>'+
+      (q2open?'<div class="q-body"><div class="mgrid">'+inGroup(g).map(function(m){return mcard(s,m,false);}).join('')+'</div>'+factsBox(s)+'</div>':'')+'</section>';
+  var inner=(s.later?'':w)+titleBlock(s.later?undefined:'It forms the edges, thin pinstripes and the frame of your ring.')+noteBlock(s)+
+    '<div class="p1" style="display:grid;gap:10px">'+q1+q2+'</div>';
+  return shell(i,inner);
+}
+
+/* ---------- Preview 2: every metal on one page ---------- */
+function P2(i,s){
+  var how=s.intro?'<div class="howto"><ol><li><b>1</b> Your band</li><li><b>2</b> Make it yours</li><li><b>3</b> Get my free quote</li></ol><button type="button" class="x" data-act="hideintro">Got it</button></div>':'';
+  function tile(m){
+    return '<button type="button" class="tile" data-act="metal" data-v="'+esc(m.n)+'" aria-pressed="'+(s.metal===m.n)+'">'+(m.pop?'<span class="badge">Most chosen</span>':'')+sw(m)+'<span class="t">'+esc(m.n)+'</span></button>';
+  }
+  function group(k){
+    return '<section class="sec" id="g2'+k+'" data-q="'+k+'"><div class="ghead"><h3>'+GROUPS[k].name+'</h3><p>'+GROUPS[k].sub+'</p></div><div class="tilegrid">'+inGroup(k).map(tile).join('')+'</div></section>';
+  }
+  var inner=how+titleBlock('Tap one metal. It forms the edges, pinstripes and frame of your ring.')+noteBlock(s)+
+    '<div class="jump"><button type="button" class="chip" data-act="jump" data-v="alt">Alternative Metals ↓</button><button type="button" class="chip" data-act="jump" data-v="pre">Precious Metals ↓</button></div>'+
+    '<div class="p2">'+group('alt')+group('pre')+factsBox(s)+
+    '<div class="staff"><b>STAFF: BASE METAL PRICES</b><span>placeholder · only shown with ?staff</span></div></div>';
+  return shell(i,inner);
+}
+
+/* ---------- Preview 3: live ring on top ---------- */
+function P3(i,s){
+  var g=s.group||(s.metal?BY[s.metal].g:'alt');
+  var m=s.metal?BY[s.metal]:null;
+  var top='<div class="live" aria-label="Your ring so far">'+
+    '<div class="fig">'+ringSVG(m)+'</div>'+
+    (m?'<div class="live-cap"><b>'+esc(m.n)+'</b><span>'+esc(GROUPS[m.g].name)+'</span></div><ul class="help" style="margin:0;padding-left:18px">'+facts(m).slice(0,m.g==='pre'||m.x?2:1).map(function(f){return '<li>'+esc(f)+'</li>';}).join('')+'</ul>'
+      :'<div class="live-cap"><b>Design your ring in 3 steps</b></div>'+road('row3')+'<p class="note" style="text-align:center">Free quote by email · nothing to pay now</p>')+
+  '</div>';
+  var row=inGroup(g).map(function(x){
+    return '<button type="button" class="dot" data-act="metal" data-v="'+esc(x.n)+'" aria-pressed="'+(s.metal===x.n)+'">'+sw(x)+'<span class="t">'+esc(x.n)+'</span></button>';
+  }).join('');
+  var inner=titleBlock('Tap a metal: the ring drawing takes its colour.')+noteBlock(s)+
+    '<div class="seg" data-q="m">'+['alt','pre'].map(function(k){return '<button type="button" data-act="group" data-v="'+k+'" aria-pressed="'+(g===k)+'">'+GROUPS[k].name+'<small>'+GROUPS[k].sub+'</small></button>';}).join('')+'</div>'+
+    '<div class="dotrow" aria-label="'+GROUPS[g].name+'">'+row+'</div><p class="swipehint">Swipe sideways to see all '+inGroup(g).length+' metals.</p>';
+  return shell(i,inner,{wrapClass:'p3wrap',before:top});
+}
+
+/* ---------- Preview 4: choose by colour ---------- */
+function P4(i,s){
+  var hero='<div class="hero"><h3>Design your ring, get a free quote</h3><p class="help">Three short steps. You are on step 1.</p>'+
+    '<div class="bar"><div class="now"><i></i>1 · Your band</div><div><i></i>2 · Make it yours</div><div><i></i>3 · Get my quote</div></div></div>';
+  var chips=FAMS.map(function(f){
+    return '<button type="button" class="cchip" data-act="fam" data-v="'+f.id+'" aria-pressed="'+(s.fam===f.id)+'"><i style="background:'+(f.pat?swBg({pat:f.pat}):swBg(f))+'"></i>'+f.name+'</button>';
+  }).join('')+'<button type="button" class="cchip all" data-act="fam" data-v="all" aria-pressed="'+(s.fam==='all')+'"><i></i>Show all</button>';
+  function rcard(m){
+    return '<button type="button" class="rcard" data-act="metal" data-v="'+esc(m.n)+'" aria-pressed="'+(s.metal===m.n)+'">'+sw(m)+
+      '<span><span class="t">'+esc(m.n)+'</span><span class="d">'+esc(m.d)+(m.pop?' · <b style="color:var(--ok)">Most chosen</b>':'')+'</span></span><span class="tag">'+(m.g==='alt'?'Alternative':'Precious')+'</span></button>';
+  }
+  var list='';
+  if(s.fam){
+    var pick=METALS.filter(function(m){return s.fam==='all'||m.fam===s.fam;});
+    if(s.sort==='type'){
+      list=['alt','pre'].map(function(k){var l=pick.filter(function(m){return m.g===k;});return l.length?'<div class="ghl">'+GROUPS[k].name+' · '+GROUPS[k].sub+'</div><div class="rowcards">'+l.map(rcard).join('')+'</div>':'';}).join('');
+    }else{
+      list='<div class="rowcards">'+pick.map(rcard).join('')+'</div>';
+    }
+    list='<div class="sortrow"><span class="label">'+pick.length+' metal'+(pick.length>1?'s':'')+'</span><div class="mini-seg" role="group" aria-label="Sort"><button type="button" data-act="sort" data-v="color" aria-pressed="'+(s.sort==='color')+'">By colour</button><button type="button" data-act="sort" data-v="type" aria-pressed="'+(s.sort==='type')+'">By type</button></div></div>'+list+factsBox(s);
+  }else{
+    list='<p class="note">Pick a colour to see the matching metals, or "Show all" for all 15.</p>';
+  }
+  var inner='<div class="p4" style="display:grid;gap:14px">'+(s.later?'':hero)+titleBlock('Start with the colour you like. This metal forms the edges, pinstripes and frame of your ring.')+noteBlock(s)+
+    '<section class="sec" data-q="m"><div class="label">1 · Which colour do you like?</div><div class="colors">'+chips+'</div></section>'+
+    '<section class="sec" data-q="m4">'+(s.fam?'<div class="label">2 · Pick your metal</div>':'')+list+'</section></div>';
+  return shell(i,inner);
+}
+
+var R=[P1,P2,P3,P4];
+var device=document.getElementById('device');
+function render(focusKey){
+  uid=0;
+  device.innerHTML=R[cur](cur,S[cur]);
+  if(focusKey){var f=device.querySelector(focusKey);if(f)f.focus({preventScroll:true});}
+}
+function renderChanged(){
+  var c=CHANGED[cur];
+  document.getElementById('changed').innerHTML='<h2>What changed · Preview '+(cur+1)+': '+NAMES[cur]+'</h2><p class="diff">'+c.lead+'</p><ul>'+c.items.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>';
+}
+function select(n){
+  cur=n;
+  document.querySelectorAll('#switch button').forEach(function(b,k){b.setAttribute('aria-selected',String(k===n));b.tabIndex=k===n?0:-1;});
+  try{localStorage.setItem('bmPreview',String(n));}catch(e){}
+  render();renderChanged();
+}
+function flashEl(el){if(!el)return;el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');}
+function flashMissing(s){
+  if(cur===0){s.q=s.group?2:1;render();flashEl(device.querySelector(s.group?'[data-q="m2"]':'[data-q="g"]'));return;}
+  if(cur===1){flashEl(device.querySelector('[data-q="alt"]'));return;}
+  if(cur===3&&s.fam){flashEl(device.querySelector('[data-q="m4"]'));return;}
+  flashEl(device.querySelector('[data-q="m"]'));
+}
+
+/* ---------- events ---------- */
+device.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]'); if(!b||!device.contains(b))return;
+  var s=S[cur], a=b.getAttribute('data-act'), v=b.getAttribute('data-v');
+  var key='[data-act="'+a+'"][data-v="'+v+'"]';
+  if(a==='metal'){
+    var was=s.metal; s.metal=v; s.group=BY[v].g;
+    if(s.later&&v!==was){s.notes=v===OLD?null:changeNotes(v);}
+    render(key);
+  }
+  else if(a==='group'){s.group=v;if(cur===0)s.q=2;render(key);if(cur===0){var q=device.querySelector('[data-q="m2"]');if(q&&q.getBoundingClientRect().top>innerHeight*.6)q.scrollIntoView({block:'start',behavior:'smooth'});}}
+  else if(a==='openq'){if(b.getAttribute('aria-disabled')==='true'){flashMissing(s);return;}s.q=parseInt(v,10);render('[data-act="openq"][data-v="'+v+'"]');}
+  else if(a==='hideintro'){s.intro=false;render();}
+  else if(a==='jump'){var g=device.querySelector('#g2'+v);if(g)g.scrollIntoView({block:'start',behavior:'smooth'});}
+  else if(a==='fam'){s.fam=v;render(key);}
+  else if(a==='sort'){s.sort=v;render(key);}
+  else if(a==='next'){
+    if(b.getAttribute('aria-disabled')==='true'){flashMissing(s);}
+    else{b.textContent='✓ Going to Width & Profile…';setTimeout(function(){if(b.isConnected)b.innerHTML='Width &amp; Profile →';},1400);}
+  }
+});
+
+/* ---------- switcher + view ---------- */
+var sw2=document.getElementById('switch');
+sw2.innerHTML=NAMES.map(function(n,k){return '<button type="button" role="tab" id="tab'+k+'" aria-selected="false"><b>Preview '+(k+1)+'</b><span>'+n+'</span></button>';}).join('');
+sw2.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;select([].indexOf.call(sw2.children,b));});
+sw2.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='ArrowLeft'){var n=(cur+(e.key==='ArrowRight'?1:3))%4;select(n);sw2.children[n].focus();}});
+var stage=document.getElementById('stage');
+function view(pc){stage.classList.toggle('pc',pc);document.getElementById('vt-phone').setAttribute('aria-pressed',String(!pc));document.getElementById('vt-pc').setAttribute('aria-pressed',String(pc));render();}
+document.getElementById('vt-phone').addEventListener('click',function(){view(false);});
+document.getElementById('vt-pc').addEventListener('click',function(){view(true);});
+document.getElementById('resetBtn').addEventListener('click',function(){S[cur]=fresh();render();});
+document.getElementById('laterBtn').addEventListener('click',function(){
+  var s=fresh(); s.later=true; s.metal=OLD; s.group='pre'; s.q=2; s.fam='yellow'; s.intro=false; S[cur]=s; render();
+});
+
+var start=0;
+var hash=(location.hash||'').replace('#','');
+if(/^p[1-4]$/.test(hash))start=parseInt(hash.slice(1),10)-1;
+else{try{var st=parseInt(localStorage.getItem('bmPreview'),10);if(st>=0&&st<4)start=st;}catch(e){}}
+select(start);
+window.__bm={S:S,select:select,view:view};
+})();
+</script>

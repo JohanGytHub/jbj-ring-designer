@@ -1,0 +1,803 @@
+<title>Metal Finish Previews</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+<style>
+/* Same outer shell as width-profile-previews-2026-11-20.html (one family of mock-ups). */
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --soft:#edf0f6; --soft2:#e4e8f0;
+  --ink:#151823; --ink2:#3f4758; --muted:#566074;
+  --line:#d3d8e3; --line2:#bcc4d3;
+  --accent:#4a59dc; --accent2:#5f6eea; --on-accent:#ffffff; --sel:#edf0ff;
+  --ok:#2f7a4a; --ok-bg:#eef6f0; --warn:#8a5a00; --warn-bg:#fff6e5;
+  --shadow:0 1px 2px rgba(21,24,35,.06),0 6px 20px rgba(21,24,35,.06);
+  --font:"DM Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --r-lg:18px; --r-md:14px; --r-sm:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10131a; --card:#171b24; --soft:#1d222d; --soft2:#272d39;
+  --ink:#f2f4f9; --ink2:#d2d7e2; --muted:#aeb6c6; --line:#333a48; --line2:#465064;
+  --accent:#96a2ff; --accent2:#b3bcff; --on-accent:#10131a; --sel:#272d45;
+  --ok:#8fd3a5; --ok-bg:#16261d; --warn:#f3c56b; --warn-bg:#2e2412;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10131a; --card:#171b24; --soft:#1d222d; --soft2:#272d39;
+  --ink:#f2f4f9; --ink2:#d2d7e2; --muted:#aeb6c6; --line:#333a48; --line2:#465064;
+  --accent:#96a2ff; --accent2:#b3bcff; --on-accent:#10131a; --sel:#272d45;
+  --ok:#8fd3a5; --ok-bg:#16261d; --warn:#f3c56b; --warn-bg:#2e2412;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.45;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+h1,h2,h3{text-wrap:balance;margin:0}
+.wrap{max-width:1160px;margin:0 auto;display:grid;gap:18px}
+
+/* ---------- page header + switcher ---------- */
+.intro{display:grid;gap:6px;max-width:68ch}
+.intro .eyebrow{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.intro h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
+.intro p{margin:0;color:var(--ink2)}
+.switch{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;background:var(--soft2);padding:5px;border-radius:var(--r-md)}
+@media (min-width:760px){.switch{grid-template-columns:repeat(4,1fr)}}
+.switch button{border:0;background:transparent;border-radius:var(--r-sm);padding:9px 10px;text-align:left;display:grid;gap:1px;min-height:52px}
+.switch button b{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.switch button span{font-weight:600;font-size:14px;line-height:1.25}
+.switch button[aria-selected="true"]{background:var(--card);box-shadow:var(--shadow)}
+.switch button[aria-selected="true"] b{color:var(--accent)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.viewtoggle{display:none;gap:4px;background:var(--soft2);padding:4px;border-radius:999px}
+@media (min-width:760px){.viewtoggle{display:inline-flex}}
+.viewtoggle button{border:0;background:transparent;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--muted)}
+.viewtoggle button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.linkbtn{border:0;background:none;color:var(--accent);font-weight:600;font-size:14px;padding:6px 2px;text-decoration:underline;text-underline-offset:3px}
+.demo{width:100%;border:1.5px dashed var(--line2);border-radius:var(--r-md);padding:10px 12px;display:grid;gap:8px}
+.demo .dl{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.demo .dl span{text-transform:none;letter-spacing:0;font-weight:500}
+.demo-row{display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin;padding-bottom:2px}
+.demo-row button{flex:0 0 auto;border:1.5px solid var(--line2);background:var(--card);border-radius:999px;padding:7px 12px;font-size:13px;font-weight:600;white-space:nowrap}
+.demo-row button[aria-pressed="true"]{border-color:var(--ink2);background:var(--ink2);color:var(--card)}
+
+.stage{display:grid;gap:16px;justify-items:center}
+.device{width:100%;max-width:390px;background:var(--bg);border:1px solid var(--line2);border-radius:30px;overflow:clip;
+  box-shadow:0 20px 50px rgba(21,24,35,.12);container-type:inline-size;position:relative}
+.stage.pc .device{max-width:1100px;border-radius:16px}
+@media (max-width:520px){.device{border-radius:20px}}
+.changed{width:100%;max-width:640px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px 18px;display:grid;gap:8px}
+.changed h2{font-size:16px}
+.changed ul{margin:0;padding-left:20px;display:grid;gap:4px;color:var(--ink2)}
+.changed .diff{font-size:13px;color:var(--muted);margin:0}
+
+/* ---------- builder chrome (copied look) ---------- */
+.b-top{background:var(--card);border-bottom:1px solid var(--line);padding:12px 14px 0;display:grid;gap:10px}
+.brand{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
+.brand b{color:var(--ink);font-size:14px;letter-spacing:.02em}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.steps .st{display:grid;gap:4px}
+.steps .st i{display:block;height:5px;border-radius:3px;background:var(--soft2)}
+.steps .st.on i{background:var(--accent)}
+.steps .st.done i{background:var(--ok)}
+.steps .st small{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.steps .st.on small{color:var(--accent)}
+.steps .st.done small{color:var(--ok)}
+.steps .st span{font-size:13px;font-weight:600;line-height:1.2}
+.steps .st:not(.on) span{color:var(--muted)}
+.subtabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:0 14px}
+.subtabs div{white-space:nowrap;font-size:13.5px;font-weight:600;padding:9px 4px 10px;margin-right:14px;color:var(--muted);border-bottom:3px solid transparent;display:flex;gap:6px;align-items:center}
+.subtabs .done::before{content:"";width:16px;height:16px;border-radius:50%;background:var(--ok) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.5l2.5 2.5L12 5.5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/16px no-repeat}
+.subtabs .on{color:var(--ink);border-bottom-color:var(--accent)}
+.b-body{padding:16px 14px 18px;display:grid;gap:14px;min-width:0}
+.ptitle{display:grid;gap:4px}
+.ptitle h2{font-size:22px;font-weight:700;letter-spacing:-.01em}
+.ptitle p{margin:0;color:var(--ink2);font-size:14.5px}
+
+.b-bar{position:sticky;bottom:0;z-index:5;background:var(--card);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));display:grid;gap:8px}
+.b-bar .todo{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.b-bar .todo b{color:var(--ink)}
+.b-bar .todo.ready{color:var(--ok)}
+.b-bar .row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px}
+.b-bar .back{border:1px solid var(--line2);background:var(--card);border-radius:12px;padding:11px 14px;font-weight:600}
+.b-bar .mid{text-align:center;font-size:12.5px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+.b-bar .next{border:0;background:var(--accent);color:var(--on-accent);border-radius:12px;padding:12px 16px;font-weight:700;white-space:nowrap}
+.b-bar .next[aria-disabled="true"]{background:var(--soft2);color:var(--muted)}
+@container (min-width:720px){.b-bar{padding-inline:28px}.b-body{padding:24px 28px 28px}.b-top{padding-inline:28px}.subtabs{margin:0 -28px;padding:0 28px}}
+
+/* ---------- shared controls ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px}
+.label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.help{margin:0;color:var(--ink2);font-size:14px}
+.note{font-size:13px;color:var(--muted);margin:0}
+.notice{font-size:13.5px;background:var(--warn-bg);color:var(--warn);border-radius:var(--r-sm);padding:8px 10px;margin:0}
+.okline{font-size:13px;background:var(--ok-bg);color:var(--ok);border-radius:var(--r-sm);padding:7px 10px;margin:0}
+.flash{animation:flash 1.2s ease}
+@keyframes flash{0%,100%{box-shadow:none}30%{box-shadow:0 0 0 4px var(--accent)}}
+@media (prefers-reduced-motion:reduce){.flash{animation:none;outline:3px solid var(--accent)}}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:var(--ok-bg);color:var(--ok);border-radius:999px;padding:2px 8px;vertical-align:middle}
+.badge.std{background:var(--sel);color:var(--accent)}
+.fixbtn{border:0;background:none;color:var(--accent);font-weight:700;font-size:13px;padding:2px 0;text-decoration:underline;text-underline-offset:3px;text-align:left}
+.lock{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--soft2);color:var(--muted);flex:0 0 22px}
+.lock svg{width:12px;height:12px}
+.grey svg.sw{filter:grayscale(1);opacity:.5}
+svg.sw{display:block;width:100%;height:auto}
+.toast{position:sticky;bottom:96px;z-index:6;margin:0 14px;background:var(--ink);color:var(--card);border-radius:12px;padding:10px 12px;font-size:13.5px;box-shadow:var(--shadow)}
+.radio{width:22px;height:22px;border-radius:50%;border:2px solid var(--line2);flex:0 0 22px;display:grid;place-items:center;background:var(--card)}
+[aria-pressed="true"] .radio,[aria-checked="true"] .radio{border-color:var(--accent);background:var(--accent)}
+[aria-pressed="true"] .radio::after,[aria-checked="true"] .radio::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--on-accent)}
+.svgdefs{position:absolute;width:0;height:0;overflow:hidden}
+
+/* ---------- Preview 1: texture tiles ---------- */
+.picked{display:grid;grid-template-columns:76px 1fr;gap:12px;align-items:center;background:var(--sel);border:1.5px solid var(--accent);border-radius:var(--r-lg);padding:10px 12px}
+.picked .k{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.picked .n{font-size:19px;font-weight:700;line-height:1.2}
+.picked .s{font-size:13px;color:var(--ink2)}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@container (min-width:620px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.tile{border:1.5px solid var(--line2);background:var(--card);border-radius:var(--r-lg);padding:0;text-align:left;display:grid;overflow:clip;transition:border-color .15s}
+.tile:hover{border-color:var(--accent2)}
+.tile .pic{background:var(--soft);padding:10px}
+.tile .txt{padding:8px 10px 11px;display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:start}
+.tile .t{font-weight:700;font-size:15px}
+.tile .d{font-size:12.5px;color:var(--muted);line-height:1.3;grid-column:1/2}
+.tile .radio{grid-row:1/3;grid-column:2}
+.tile[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.tile[aria-pressed="true"] .pic{background:var(--sel)}
+.blocked{display:grid;gap:8px}
+.brow{display:grid;grid-template-columns:64px 1fr;gap:10px;align-items:start;background:var(--soft);border-radius:var(--r-md);padding:10px}
+.brow .t{font-weight:700;color:var(--ink2);display:flex;gap:6px;align-items:center}
+.brow .why{font-size:13px;color:var(--ink2);margin:2px 0}
+.brow .pic{border-radius:8px;overflow:clip}
+.inlaynote{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--ink2);background:var(--soft);border-radius:var(--r-sm);padding:8px 10px;margin:0}
+.inlaynote i{flex:0 0 14px;height:14px;margin-top:3px;border-radius:3px;background:linear-gradient(90deg,#b9b9b9 0 30%,#8B5A2B 30% 70%,#b9b9b9 70%)}
+@container (min-width:720px){.p1{max-width:820px;margin:0 auto;width:100%;display:grid;gap:14px}}
+
+/* ---------- Preview 2: live ring + swatch row ---------- */
+.live{position:sticky;top:0;z-index:4;background:var(--card);border-bottom:1px solid var(--line);padding:8px 14px 10px;display:grid;gap:4px}
+.live .fig{background:radial-gradient(120% 90% at 50% 30%,var(--card),var(--soft));border-radius:var(--r-md);padding:4px 8px}
+.live .fig svg{display:block;width:100%;max-height:150px;height:auto;margin:0 auto}
+.live-cap{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.live-cap b{font-size:17px}
+.live-cap span{font-size:13px;color:var(--muted)}
+.live .desc{font-size:13.5px;color:var(--ink2);margin:0}
+.swrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 8px}
+.swb{border:0;background:none;padding:0;display:grid;justify-items:center;gap:5px;position:relative}
+.swb .ring{width:72px;height:72px;border-radius:50%;padding:3px;border:2.5px solid transparent;position:relative}
+.swb .ring svg{width:100%;height:100%;border-radius:50%;display:block}
+.swb[aria-pressed="true"] .ring{border-color:var(--accent)}
+.swb .nm{font-size:13.5px;font-weight:600;line-height:1.15;text-align:center}
+.swb .sub{font-size:11.5px;color:var(--muted);line-height:1.15;text-align:center}
+.swb[aria-disabled="true"] .nm{color:var(--muted)}
+.swb[aria-disabled="true"] .ring svg{filter:grayscale(1);opacity:.45}
+.swb .lock{position:absolute;right:-2px;bottom:-2px;border:2px solid var(--card)}
+.swb[aria-pressed="true"]::after{content:"";position:absolute;top:2px;right:calc(50% - 40px);width:20px;height:20px;border-radius:50%;background:var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.5l2.5 2.5L12 5.5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/16px no-repeat;border:2px solid var(--card)}
+.whycard{border:1.5px solid var(--warn);background:var(--warn-bg);border-radius:var(--r-md);padding:10px 12px;display:grid;gap:4px}
+.whycard h3{font-size:15px;color:var(--warn)}
+.whycard p{margin:0;font-size:13.5px;color:var(--ink2)}
+.whycard .x{justify-self:end;border:0;background:none;color:var(--muted);font-weight:600;font-size:13px;padding:0}
+.legend{display:flex;gap:6px;align-items:center;font-size:12.5px;color:var(--muted)}
+@container (min-width:720px){
+  .p2wrap{display:grid;grid-template-columns:440px 1fr;align-items:start}
+  .p2wrap .live{top:16px;margin:24px 0 24px 28px;border:1px solid var(--line);border-radius:var(--r-lg);padding:12px}
+  .p2wrap .live .fig svg{max-height:260px}
+  .p2wrap .b-body{padding-left:24px}
+  .swrow{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+/* ---------- Preview 3: guided (shine first) ---------- */
+.q{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);overflow:clip}
+.q-head{width:100%;border:0;background:transparent;display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:14px;text-align:left}
+.q-n{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:14px;background:var(--soft2);color:var(--ink2)}
+.q.open .q-n{background:var(--accent);color:var(--on-accent)}
+.q.answered .q-n{background:var(--ok);color:#fff}
+.q-title{font-weight:700;font-size:16px;line-height:1.25}
+.q-sum{font-size:13.5px;color:var(--muted);display:block;font-weight:500}
+.q.answered .q-sum{color:var(--ok)}
+.q-act{font-size:13px;font-weight:600;color:var(--accent)}
+.q.locked .q-head{cursor:default}
+.q.locked .q-title{color:var(--muted)}
+.q-body{padding:0 14px 16px;display:grid;gap:12px}
+.fams{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@container (min-width:620px){.fams{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.fam{border:1.5px solid var(--line2);background:var(--card);border-radius:var(--r-md);padding:8px 8px 10px;text-align:left;display:grid;gap:4px;align-content:start}
+.fam .pic{border-radius:9px;overflow:clip}
+.fam .t{font-weight:700;font-size:15px}
+.fam .d{font-size:12.5px;color:var(--muted);line-height:1.3}
+.fam .c{font-size:12px;font-weight:600;color:var(--ok)}
+.fam[aria-pressed="true"]{border-color:var(--accent);background:var(--sel);box-shadow:inset 0 0 0 1px var(--accent)}
+.fam[aria-disabled="true"]{background:var(--soft);border-style:dashed}
+.fam[aria-disabled="true"] .t{color:var(--muted)}
+.fam[aria-disabled="true"] .c{color:var(--warn)}
+.fam[aria-disabled="true"] .pic svg{filter:grayscale(1);opacity:.45}
+.members{display:grid;gap:8px}
+.mem{border:1.5px solid var(--line2);background:var(--card);border-radius:var(--r-md);padding:10px;display:grid;grid-template-columns:96px 1fr auto;gap:12px;align-items:center;text-align:left}
+.mem .pic{border-radius:8px;overflow:clip}
+.mem .t{font-weight:700}
+.mem .d{font-size:13px;color:var(--muted);line-height:1.3}
+.mem[aria-pressed="true"]{border-color:var(--accent);background:var(--sel);box-shadow:inset 0 0 0 1px var(--accent)}
+.mem[aria-disabled="true"]{background:var(--soft);border-style:dashed;cursor:default}
+.mem[aria-disabled="true"] .pic svg{filter:grayscale(1);opacity:.45}
+.mem[aria-disabled="true"] .d{color:var(--warn)}
+@container (min-width:720px){.p3{max-width:820px;margin:0 auto;width:100%}}
+
+/* ---------- Preview 4: compare + list ---------- */
+.cmp{position:relative;border-radius:var(--r-lg);overflow:clip;background:var(--soft);touch-action:pan-y;user-select:none}
+.cmp .layer{display:block}
+.cmp .layer svg{display:block;width:100%;height:auto}
+.cmp .top{position:absolute;inset:0;clip-path:inset(0 0 0 var(--cut,50%))}
+.cmp .div{position:absolute;top:0;bottom:0;left:var(--cut,50%);width:3px;margin-left:-1.5px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.25);pointer-events:none}
+.cmp .knob{position:absolute;top:50%;left:var(--cut,50%);width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.3);display:grid;place-items:center;color:#333;font-weight:700;font-size:14px;pointer-events:none}
+.cmp .tag{position:absolute;top:8px;font-size:12px;font-weight:700;background:rgba(21,24,35,.72);color:#fff;border-radius:999px;padding:3px 9px}
+.cmp .tag.l{left:8px}.cmp .tag.r{right:8px}
+.cmp input[type=range]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;margin:0}
+.rows{display:grid;gap:8px}
+.frow{border:1.5px solid var(--line2);background:var(--card);border-radius:var(--r-md);padding:10px;display:grid;grid-template-columns:auto 72px 1fr;gap:12px;align-items:center;text-align:left;width:100%}
+.frow .pic{border-radius:8px;overflow:clip}
+.frow .t{font-weight:700;font-size:15px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.frow .d{font-size:13px;color:var(--muted);line-height:1.3}
+.frow .meter{font-size:12px;color:var(--ink2);display:flex;gap:6px;align-items:center;margin-top:3px}
+.dots{display:inline-flex;gap:3px}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--soft2)}
+.dots i.on{background:var(--ok)}
+.frow[aria-checked="true"]{border-color:var(--accent);background:var(--sel);box-shadow:inset 0 0 0 1px var(--accent)}
+.frow[aria-disabled="true"]{background:var(--soft);border-style:dashed;cursor:default}
+.frow[aria-disabled="true"] .t{color:var(--muted)}
+.frow[aria-disabled="true"] .pic svg{filter:grayscale(1);opacity:.45}
+.frow .why{font-size:13px;color:var(--warn);line-height:1.35;display:block}
+.brow .fixbtn,.frow .fixbtn{display:inline-block;margin-top:3px}
+.brow .why{display:block}
+@container (min-width:720px){
+  .p4{display:grid;grid-template-columns:1fr 1fr;gap:18px 24px;align-items:start}
+  .p4 .full{grid-column:1/-1}
+  .p4 .stick{position:sticky;top:16px}
+}
+</style>
+
+<svg class="svgdefs" aria-hidden="true" focusable="false">
+  <defs>
+    <!-- Surface textures: neutral grey noise, laid over the metal colour so any metal can wear them -->
+    <filter id="fxBrushed" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.006 0.75" numOctaves="2" seed="7"/>
+      <feColorMatrix type="matrix" values="1.6 0 0 0 -.3  1.6 0 0 0 -.3  1.6 0 0 0 -.3  0 0 0 0 1"/>
+    </filter>
+    <filter id="fxMatte" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="2"/>
+      <feColorMatrix type="matrix" values="1 0 0 0 0  1 0 0 0 0  1 0 0 0 0  0 0 0 0 1"/>
+    </filter>
+    <filter id="fxSand" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="5"/>
+      <feColorMatrix type="matrix" values="2.2 0 0 0 -.6  2.2 0 0 0 -.6  2.2 0 0 0 -.6  0 0 0 0 1"/>
+    </filter>
+    <filter id="fxSpark" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="11"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  12 0 0 0 -7.4"/>
+    </filter>
+    <radialGradient id="rgDimple" cx=".5" cy=".5" r=".5" fx=".62" fy=".66">
+      <stop offset="0" stop-color="#fff" stop-opacity=".55"/>
+      <stop offset=".45" stop-color="#fff" stop-opacity=".05"/>
+      <stop offset=".8" stop-color="#000" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".05"/>
+    </radialGradient>
+    <pattern id="pHammer" patternUnits="userSpaceOnUse" width="18" height="15">
+      <ellipse cx="9" cy="7.5" rx="7.6" ry="6.6" fill="url(#rgDimple)"/>
+      <ellipse cx="0" cy="0" rx="7.6" ry="6.6" fill="url(#rgDimple)"/>
+      <ellipse cx="18" cy="0" rx="7.6" ry="6.6" fill="url(#rgDimple)"/>
+      <ellipse cx="0" cy="15" rx="7.6" ry="6.6" fill="url(#rgDimple)"/>
+      <ellipse cx="18" cy="15" rx="7.6" ry="6.6" fill="url(#rgDimple)"/>
+    </pattern>
+    <pattern id="pWood" patternUnits="userSpaceOnUse" width="60" height="9">
+      <rect width="60" height="9" fill="#8B5A2B"/>
+      <path d="M0,2 C15,0 30,4 60,2 M0,5.5 C20,7 40,3.5 60,5.5 M0,8 C18,7 35,9 60,8" fill="none" stroke="#5e3a19" stroke-width=".9" opacity=".7"/>
+      <path d="M0,3.8 C22,5 38,2.5 60,3.8" fill="none" stroke="#b07a45" stroke-width=".7" opacity=".7"/>
+    </pattern>
+    <pattern id="pMeteor" patternUnits="userSpaceOnUse" width="9" height="9" patternTransform="rotate(28)">
+      <rect width="9" height="9" fill="#5A5A5A"/>
+      <path d="M0,0 V9 M4.5,0 V9" stroke="#8c8c8c" stroke-width=".8"/>
+      <path d="M0,3 H9 M0,7.5 H9" stroke="#444" stroke-width=".6"/>
+    </pattern>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="intro">
+    <div class="eyebrow">New Ring Builder · design mock-ups · 20 Nov 2026</div>
+    <h1>Metal Finish: four ways to ask</h1>
+    <p>Each preview is clickable. Every finish is drawn as it looks, in the colour of the chosen metal. Use the grey "try a design" buttons to see how blocked finishes are explained. Nothing here talks to the real builder or to prices.</p>
+  </header>
+
+  <div class="toolbar">
+    <div class="switch" role="tablist" aria-label="Choose a preview" id="switch" style="flex:1 1 100%"></div>
+  </div>
+  <div class="demo" role="group" aria-label="Demo only: try another ring design">
+    <div class="dl">Demo only · try a design <span>(the customer never sees this row)</span></div>
+    <div class="demo-row" id="demoRow"></div>
+  </div>
+  <div class="toolbar">
+    <div class="viewtoggle" role="group" aria-label="Frame size">
+      <button type="button" id="vt-phone" aria-pressed="true">Phone</button>
+      <button type="button" id="vt-pc" aria-pressed="false">PC</button>
+    </div>
+    <button type="button" class="linkbtn" id="resetBtn">Start this preview again</button>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="device" id="device"></div>
+    <section class="changed" id="changed" aria-live="polite"></section>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- real data (builder_config.finishes, catalog materials .f, rules) ---------- */
+var FINISHES=['Polished','Brushed','Matte','Sandblasted','Frost','Hammer'];
+var HAMMER_PROFILES=['Flat','Round'];        /* rules.hammered_profiles */
+var HAMMER_MIN_EDGE=2;                        /* rules.hammered_min_edge_mm */
+var MIN_METAL={Sandblasted:1};                /* rules.finish_min_metal_strip_mm */
+var ALL5=['Polished','Brushed','Matte','Sandblasted','Frost'];
+var MAT={
+  'Yellow 14K':{c:'#DAA520',f:ALL5,metal:true},
+  'Rose 14K':{c:'#B76E79',f:ALL5,metal:true},
+  'Titanium':{c:'#C0C0C0',f:FINISHES,metal:true},
+  'Zirconium':{c:'#2C2C2C',f:['Brushed','Matte'],metal:true},
+  'Tungsten':{c:'#8A8A8A',f:['Polished'],metal:true},
+  'Koa':{c:'#8B5A2B',f:['Polished','Brushed','Matte','Sandblasted'],fill:'url(#pWood)',kind:'inlay'},
+  'Gibeon Meteorite':{c:'#5A5A5A',f:['Polished','Brushed','Matte','Frost','Hammer'],fill:'url(#pMeteor)',kind:'meteorite'}
+};
+/* which base metals offer each finish (real catalog, 17 base metals) */
+var WHERE={
+  Polished:'Every other base metal can be polished.',
+  Brushed:'It is offered on gold, platinum, silver, stainless steel, titanium and zirconium.',
+  Matte:'It is offered on gold, platinum, silver, stainless steel, titanium and zirconium.',
+  Sandblasted:'It is offered on gold, platinum, silver, stainless steel and titanium.',
+  Frost:'It is offered on gold, platinum, silver, stainless steel and titanium.',
+  Hammer:'Only Titanium can be hammered.'
+};
+/* plain-word descriptions (new wording, to be approved) */
+var FIN={
+  Polished:{d:'Mirror shine',long:'A bright, mirror-like shine. The metal colour looks its richest. Fine scratches show over time.',hide:1,fam:'shine'},
+  Brushed:{d:'Fine satin lines',long:'Fine lines brushed around the ring give a soft satin glow.',hide:2,fam:'soft'},
+  Matte:{d:'Smooth, no shine',long:'Smooth and calm, with no shine. A soft, modern look.',hide:2,fam:'none'},
+  Sandblasted:{d:'Even sandy grain',long:'An even, grainy surface, like very fine sand. No shine at all.',hide:3,fam:'none'},
+  Frost:{d:'Icy sparkle',long:'A frosty texture with tiny sparkles that catch the light.',hide:3,fam:'tex'},
+  Hammer:{d:'Hand-hammered dents',long:'Small hammered dents all over. A rugged, hand-made look.',hide:3,fam:'tex'}
+};
+var FAMS=[
+  {id:'shine',t:'Shiny',d:'Bright mirror shine'},
+  {id:'soft',t:'Soft glow',d:'Satin lines, gentle shine'},
+  {id:'none',t:'No shine',d:'Smooth or grainy, calm look'},
+  {id:'tex',t:'Textured',d:'Sparkly or hand-hammered'}
+];
+/* demo designs (example rings; rules applied exactly as the real page does) */
+var SCEN=[
+  {id:'gold',label:'Yellow 14K + Koa wood inlay',base:'Yellow 14K',profile:'Flat',width:8,strips:[{m:'Koa',w:4}]},
+  {id:'met',label:'Titanium + Gibeon Meteorite',base:'Titanium',profile:'Round',width:8,strips:[{m:'Gibeon Meteorite',w:4}]},
+  {id:'bevel',label:'Titanium, Bevel, no inlay',base:'Titanium',profile:'Bevel',width:8,strips:[]},
+  {id:'pin',label:'Titanium + Koa with 0.5 mm Rose pinstripes',base:'Titanium',profile:'Flat',width:8,strips:[{m:'Rose 14K',w:0.5},{m:'Koa',w:3},{m:'Rose 14K',w:0.5}]},
+  {id:'zr',label:'Zirconium, no inlay',base:'Zirconium',profile:'Flat',width:8,strips:[]},
+  {id:'w',label:'Tungsten, no inlay',base:'Tungsten',profile:'Flat',width:8,strips:[]}
+];
+var sc=SCEN[0];
+
+function inlayNames(){var n=[];sc.strips.forEach(function(s){if(n.indexOf(s.m)<0)n.push(s.m);});return n;}
+function edgeMM(){var t=0;sc.strips.forEach(function(s){t+=s.w;});return (sc.width-t)/2;}
+/* reasons a finish is not possible, in plain words (same order as the real page: metal, inlay, profile, strip width) */
+function reasons(f){
+  var r=[], base=MAT[sc.base];
+  if(base.f.indexOf(f)<0){
+    r.push({k:'metal',t:'Not offered on '+sc.base,
+      d:WHERE[f],
+      fix:'Change the base metal',go:'Base Metal'});
+  }
+  var seen={};
+  sc.strips.forEach(function(s){
+    var m=MAT[s.m]; if(seen[s.m]||m.f.indexOf(f)>=0)return; seen[s.m]=1;
+    r.push({k:'inlay',t:'Not with your '+s.m+(m.metal?' strip':' inlay'),d:s.m+' cannot take the '+f+' finish.',fix:'Change the inlay',go:'Band Composer'});
+  });
+  if(f==='Hammer'&&HAMMER_PROFILES.indexOf(sc.profile)<0)
+    r.push({k:'profile',t:'Not with the '+sc.profile+' shape',d:'Hammer only works on a Flat or Round profile.',fix:'Change the shape',go:'Width & Profile'});
+  if(MIN_METAL[f]){
+    var thin=sc.strips.filter(function(s){return MAT[s.m].metal&&s.w<MIN_METAL[f];});
+    var e=edgeMM();
+    if(thin.length)r.push({k:'width',t:'Your metal pinstripes are too thin',d:f+' needs every metal strip to be at least '+MIN_METAL[f]+' mm wide. Yours: '+thin[0].m+' '+thin[0].w+' mm.',fix:'Widen them',go:'Band Composer'});
+    else if(sc.strips.length&&e>0&&e<MIN_METAL[f])r.push({k:'width',t:'Your metal edges are too thin',d:f+' needs at least '+MIN_METAL[f]+' mm of metal.',fix:'Widen them',go:'Band Composer'});
+  }
+  return r;
+}
+function allowed(){return FINISHES.filter(function(f){return !reasons(f).length;});}
+function ok(f){return allowed().indexOf(f)>=0;}
+function standard(){var a=allowed();return a.indexOf('Polished')>=0?'Polished':a[0];}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+/* ---------- colour helpers ---------- */
+function rgb(h){h=h.replace('#','');return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];}
+function mix(a,b,t){var x=rgb(a),y=rgb(b);return '#'+[0,1,2].map(function(i){var v=Math.round(x[i]+(y[i]-x[i])*t);return ('0'+v.toString(16)).slice(-2);}).join('');}
+function stops(f,c){
+  var K='#000000',W='#ffffff';
+  var S={
+    Polished:[[0,mix(c,K,.55)],[.1,mix(c,K,.28)],[.23,mix(c,W,.45)],[.28,'#ffffff'],[.33,mix(c,W,.6)],[.5,c],[.72,mix(c,K,.5)],[.86,mix(c,W,.2)],[1,mix(c,K,.55)]],
+    Brushed:[[0,mix(c,K,.32)],[.26,mix(c,W,.32)],[.52,c],[.82,mix(c,K,.28)],[1,mix(c,K,.4)]],
+    Matte:[[0,mix(c,K,.2)],[.4,mix(c,W,.12)],[1,mix(c,K,.24)]],
+    Sandblasted:[[0,mix(c,K,.14)],[.42,mix(c,W,.2)],[1,mix(c,K,.18)]],
+    Frost:[[0,mix(mix(c,W,.22),K,.12)],[.42,mix(c,W,.42)],[1,mix(mix(c,W,.22),K,.14)]],
+    Hammer:[[0,mix(c,K,.5)],[.2,mix(c,W,.38)],[.3,mix(c,W,.55)],[.46,c],[.76,mix(c,K,.35)],[1,mix(c,K,.5)]]
+  }[f];
+  return S.map(function(s){return '<stop offset="'+s[0]+'" stop-color="'+s[1]+'"/>';}).join('');
+}
+var uid=0;
+/* texture overlay for a finish, clipped by clip id, over a box */
+function texture(f,clip,x,y,w,h){
+  var r='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" clip-path="url(#'+clip+')" ';
+  if(f==='Brushed')return r+'filter="url(#fxBrushed)" style="mix-blend-mode:overlay" opacity=".75"/>';
+  if(f==='Matte')return r+'filter="url(#fxMatte)" style="mix-blend-mode:soft-light" opacity=".3"/>';
+  if(f==='Sandblasted')return r+'filter="url(#fxSand)" style="mix-blend-mode:overlay" opacity=".7"/>';
+  if(f==='Frost')return r+'filter="url(#fxSand)" style="mix-blend-mode:overlay" opacity=".45"/>'+r+'filter="url(#fxSpark)" opacity=".95"/>';
+  if(f==='Hammer')return r+'fill="url(#pHammer)"/>';
+  /* Polished: a soft second reflection */
+  return '<ellipse cx="'+(x+w*.3)+'" cy="'+(y+h*.35)+'" rx="'+(w*.05)+'" ry="'+(h*.5)+'" fill="#fff" opacity=".35" clip-path="url(#'+clip+')"/>';
+}
+/* close-up of the band surface (front face), strips across, finish on the metal only */
+function swatch(f,o){
+  o=o||{};
+  var id='s'+(++uid), base=MAT[sc.base].c, W=o.w||120, H=o.h||72;
+  var face=o.circle?'<circle cx="'+W/2+'" cy="'+H/2+'" r="'+Math.min(W,H)/2+'"/>':
+    '<path d="M0,6 Q'+W/2+',0 '+W+',6 L'+W+','+(H-6)+' Q'+W/2+','+H+' 0,'+(H-6)+' Z"/>';
+  var grads='<linearGradient id="'+id+'g" x1="0" y1="0" x2="1" y2="0">'+stops(f,base)+'</linearGradient>';
+  var metalStrips='', inlays='';
+  var strips=o.plain?[]:sc.strips;
+  if(strips.length){
+    var tot=0;strips.forEach(function(s){tot+=s.w;});
+    var yy=(sc.width-tot)/2, top=6, span=H-12;
+    strips.forEach(function(s,k){
+      var m=MAT[s.m], y0=top+yy/sc.width*span, hh=s.w/sc.width*span; yy+=s.w;
+      if(m.metal){
+        grads+='<linearGradient id="'+id+'m'+k+'" x1="0" y1="0" x2="1" y2="0">'+stops(f,m.c)+'</linearGradient>';
+        metalStrips+='<rect x="0" y="'+y0+'" width="'+W+'" height="'+hh+'" fill="url(#'+id+'m'+k+')" clip-path="url(#'+id+'c)"/>';
+      }else{
+        inlays+='<rect x="0" y="'+y0+'" width="'+W+'" height="'+hh+'" fill="'+m.fill+'" clip-path="url(#'+id+'c)"/>'+
+          '<rect x="0" y="'+y0+'" width="'+W+'" height="'+hh+'" fill="url(#'+id+'sh)" clip-path="url(#'+id+'c)"/>';
+      }
+    });
+    grads+='<linearGradient id="'+id+'sh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset=".3" stop-color="#fff" stop-opacity=".18"/><stop offset=".7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></linearGradient>';
+  }
+  return '<svg class="sw" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(f+' finish on '+sc.base)+'">'+
+    '<defs>'+grads+'<clipPath id="'+id+'c">'+face+'</clipPath></defs>'+
+    '<g style="isolation:isolate">'+
+      '<rect width="'+W+'" height="'+H+'" fill="url(#'+id+'g)" clip-path="url(#'+id+'c)"/>'+metalStrips+
+      texture(f,id+'c',0,0,W,H)+inlays+
+    '</g></svg>';
+}
+/* the whole ring in 3/4 view; finish on the outside metal */
+function ringSVG(f){
+  var id='r'+(++uid), c=MAT[sc.base].c;
+  var cx=150,y0=62,rx=124,ry=46,H=84,t=9,irx=rx-t,iry=ry-t*ry/rx;
+  function band(a,b){return 'M'+(cx-rx)+','+a+' A'+rx+','+ry+' 0 0 0 '+(cx+rx)+','+a+' L'+(cx+rx)+','+b+' A'+rx+','+ry+' 0 0 1 '+(cx-rx)+','+b+' Z';}
+  var grads='<linearGradient id="'+id+'g" gradientUnits="userSpaceOnUse" x1="'+(cx-rx)+'" y1="0" x2="'+(cx+rx)+'" y2="0">'+stops(f,c)+'</linearGradient>'+
+    '<linearGradient id="'+id+'in" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="'+mix(c,'#ffffff',.35)+'"/><stop offset=".5" stop-color="'+mix(c,'#000000',.35)+'"/><stop offset="1" stop-color="'+mix(c,'#ffffff',.2)+'"/></linearGradient>'+
+    '<linearGradient id="'+id+'rim" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="'+mix(c,'#000000',.25)+'"/><stop offset=".35" stop-color="'+mix(c,'#ffffff',.5)+'"/><stop offset="1" stop-color="'+mix(c,'#000000',.2)+'"/></linearGradient>'+
+    '<linearGradient id="'+id+'sh" gradientUnits="userSpaceOnUse" x1="'+(cx-rx)+'" y1="0" x2="'+(cx+rx)+'" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset=".3" stop-color="#fff" stop-opacity=".15"/><stop offset=".7" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>';
+  var metalStrips='',inlays='';
+  if(sc.strips.length){
+    var tot=0;sc.strips.forEach(function(s){tot+=s.w;});var yy=(sc.width-tot)/2;
+    sc.strips.forEach(function(s,k){
+      var m=MAT[s.m], a=y0+yy/sc.width*H, b=y0+(yy+s.w)/sc.width*H; yy+=s.w;
+      if(m.metal){
+        grads+='<linearGradient id="'+id+'m'+k+'" gradientUnits="userSpaceOnUse" x1="'+(cx-rx)+'" y1="0" x2="'+(cx+rx)+'" y2="0">'+stops(f,m.c)+'</linearGradient>';
+        metalStrips+='<path d="'+band(a,b)+'" fill="url(#'+id+'m'+k+')"/>';
+      }else inlays+='<path d="'+band(a,b)+'" fill="'+m.fill+'"/><path d="'+band(a,b)+'" fill="url(#'+id+'sh)"/>';
+    });
+  }
+  var inner='M'+(cx-irx)+','+y0+' a'+irx+','+iry+' 0 1 0 '+(2*irx)+',0 a'+irx+','+iry+' 0 1 0 '+(-2*irx)+',0 Z';
+  var outer='M'+(cx-rx)+','+y0+' a'+rx+','+ry+' 0 1 0 '+(2*rx)+',0 a'+rx+','+ry+' 0 1 0 '+(-2*rx)+',0 Z';
+  var hole='M'+(cx-irx)+','+(y0+H)+' a'+irx+','+iry+' 0 1 0 '+(2*irx)+',0 a'+irx+','+iry+' 0 1 0 '+(-2*irx)+',0 Z';
+  return '<svg viewBox="0 0 300 200" role="img" aria-label="'+esc('Your ring: '+sc.base+', '+f+' finish')+'">'+
+    '<defs>'+grads+'<clipPath id="'+id+'c"><path d="'+band(y0,y0+H)+'"/></clipPath><clipPath id="'+id+'ic"><path d="'+inner+'"/></clipPath></defs>'+
+    '<ellipse cx="'+cx+'" cy="'+(y0+H+ry-4)+'" rx="'+(rx*.9)+'" ry="10" fill="#000" opacity=".12"/>'+
+    '<path d="'+inner+'" fill="url(#'+id+'in)"/>'+
+    '<path d="'+hole+'" fill="var(--soft)" clip-path="url(#'+id+'ic)"/>'+
+    '<path d="'+outer+' '+inner+'" fill="url(#'+id+'rim)" fill-rule="evenodd"/>'+
+    '<g style="isolation:isolate"><path d="'+band(y0,y0+H)+'" fill="url(#'+id+'g)"/>'+metalStrips+texture(f,id+'c',cx-rx,y0-ry,2*rx,H+2*ry)+inlays+'</g>'+
+  '</svg>';
+}
+var LOCK='<span class="lock" aria-hidden="true"><svg viewBox="0 0 12 12"><rect x="2" y="5.2" width="8" height="5.8" rx="1.3" fill="currentColor"/><path d="M3.8,5.4 V3.9 a2.2,2.2 0 0 1 4.4,0 V5.4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></span>';
+
+/* ---------- state ---------- */
+var NAMES=['Texture tiles, reasons below','Live ring + swatch row','Shine first, then texture','Compare and choose'];
+var CHANGED=[
+  {lead:'Each finish is a large tile that shows the real surface in your metal colour. What you cannot have moves to its own short list with the reason.',
+   items:['The finish you have is shown at the top: "Your finish: Polished, already chosen. Tap another to change."',
+   'Every tile has a short plain description ("Mirror shine", "Fine satin lines").',
+   'Blocked finishes are no longer greyed out in the grid: they sit below, each with why and a "Change the inlay" link.',
+   'A small note says the finish goes on the metal only; the inlay keeps its own look.']},
+  {lead:'A large drawing of your own ring sits at the top and changes the moment a finish is tapped.',
+   items:['Round swatches under the ring, like paint samples; the chosen one has a blue ring and tick.',
+   'Blocked finishes show a lock. Tapping one does not choose it: it opens a short "Why not?" card with the way to fix it.',
+   'The ring drawing shows the inlay and pinstripes too, so you see that only the metal changes.',
+   'On a PC the ring stays on the left while you choose on the right.']},
+  {lead:'Two easy questions: how much shine, then (only if needed) which texture. Nothing is pre-chosen here, so the customer makes a real choice.',
+   items:['Question 1 has 4 simple groups: Shiny, Soft glow, No shine, Textured. Each says how many choices it holds.',
+   'A group with one finish chooses it at once; a group with two asks question 2.',
+   'Groups or finishes that are not possible say why, right on the card.',
+   'Today Polished is pre-set. Here "Get my quote" stays grey until a finish is picked (needs your OK).']},
+  {lead:'A before / after slider on one band, and a clear list where every finish, possible or not, keeps its place.',
+   items:['Drag the white handle to compare your new finish with the previous one on the same band.',
+   'Each row shows a picture, a description and how well it hides everyday scratches.',
+   'Blocked rows stay in the list but say "Not possible:" and why, in plain words, plus how to fix it.',
+   '"Most chosen" and the scratch dots are examples: please confirm with real order numbers and your own experience.']}
+];
+function fresh(i){var s={finish:null,auto:false,prev:null,notice:'',why:null,fam:null,open:'q1',cut:50};if(i!==2){s.finish=standard();s.auto=true;}else if(allowed().length===1){s.finish=allowed()[0];s.auto=true;}return s;}
+var S=[0,1,2,3].map(fresh);
+var cur=0;
+var device=document.getElementById('device');
+
+function onScenario(){
+  S.forEach(function(s,i){
+    s.why=null;s.notice='';
+    if(s.finish&&!ok(s.finish)){
+      var old=s.finish, wasAuto=s.auto;s.prev=old;s.finish=standard();s.auto=true;
+      if(!wasAuto)s.notice='Your '+old+' finish is not possible with this design, so we switched it to '+s.finish+'.';
+    }else if(!s.finish&&allowed().length===1){s.finish=allowed()[0];s.auto=true;}
+    else if(s.auto&&i!==2){s.finish=standard();}
+    if(i===2&&s.finish){s.fam=FIN[s.finish].fam;}
+  });
+}
+
+/* ---------- shell ---------- */
+function shell(inner,opts){
+  opts=opts||{};
+  var tabs=(sc.strips.length?'<div class="done">Band Composer</div>':'')+'<div class="done">Sleeve</div><div class="on">Finish</div>';
+  return '<div class="b-top">'+
+      '<div class="brand"><b>JEWELRY BY JOHAN</b><span>Ring Builder</span></div>'+
+      '<div class="steps" aria-label="Steps">'+
+        '<div class="st done"><i></i><small>Step 1 ✓</small><span>Your band</span></div>'+
+        '<div class="st on"><i></i><small>Step 2</small><span>Make it yours</span></div>'+
+        '<div class="st"><i></i><small>Step 3</small><span>Get my quote</span></div>'+
+      '</div>'+
+      '<div class="subtabs">'+tabs+'</div>'+
+    '</div>'+
+    (opts.wrapClass?'<div class="'+opts.wrapClass+'">':'')+(opts.before||'')+
+    '<div class="b-body">'+inner+'</div>'+
+    (opts.wrapClass?'</div>':'')+
+    '<div data-slot="toast"></div>'+
+    '<div class="b-bar">'+bar()+'</div>';
+}
+function bar(){
+  var s=S[cur], one=allowed().length===1;
+  var todo=!s.finish?'<div class="todo">Still to choose: <b>finish</b></div>':
+    '<div class="todo ready">✓ '+(one?sc.base+' comes only '+s.finish+', so it is set for you':(s.auto?s.finish+' is set as standard. Happy with it? Go on.':'Finish chosen: '+s.finish))+'</div>';
+  return todo+'<div class="row"><button type="button" class="back">← Back</button><div class="mid">Make it yours</div>'+
+    '<button type="button" class="next" data-act="next" aria-disabled="'+(!s.finish)+'">Get my quote →</button></div>';
+}
+function inlayNote(){
+  var n=inlayNames().filter(function(m){return !MAT[m].metal;});
+  if(!n.length)return '';
+  var metals=[sc.base].concat(inlayNames().filter(function(m){return MAT[m].metal;}));
+  return '<p class="inlaynote"><i></i><span>The finish goes on the metal ('+metals.join(' and ')+'). Your '+n.join(', ')+' inlay keeps its own natural look.</span></p>';
+}
+function hammerNote(s){
+  if(s.finish!=='Hammer'||!sc.strips.length)return '';
+  var e=edgeMM();
+  return '<p class="'+(e>=HAMMER_MIN_EDGE?'okline':'notice')+'">Hammer needs at least '+HAMMER_MIN_EDGE+' mm of '+sc.base+' on both sides of the inlay. Yours: '+e+' mm'+(e>=HAMMER_MIN_EDGE?' ✓':'')+'.</p>';
+}
+function noticeHTML(s){return s.notice?'<p class="notice" role="status">'+esc(s.notice)+'</p>':'';}
+function onlyOne(){var a=allowed();return a.length===1?'<p class="okline">'+sc.base+' comes only '+a[0]+'. It is already set, so there is nothing to choose here.</p>':'';}
+function reasonHTML(f,cls){
+  var r=reasons(f);
+  return r.map(function(x,k){return '<span class="'+(cls||'why')+'" style="display:block">'+(k===0?'':'Also: ')+'<b>'+esc(x.t)+'.</b> '+esc(x.d)+'</span>';}).join('')+
+    (r[0]?'<button type="button" class="fixbtn" data-act="fix" data-v="'+esc(r[0].go)+'">'+esc(r[0].fix)+' →</button>':'');
+}
+
+/* ---------- Preview 1: tiles ---------- */
+function P1(s){
+  var a=allowed(), b=FINISHES.filter(function(f){return a.indexOf(f)<0;});
+  var picked=s.finish?'<div class="picked" data-q="pick"><span>'+swatch(s.finish,{w:76,h:56})+'</span><span><span class="k">Your finish</span><br><span class="n">'+s.finish+'</span><br>'+
+    '<span class="s">'+(a.length===1?'The only finish for '+sc.base+'.':(s.auto?'Already chosen as standard. Tap another below to change it.':'Your choice. Tap another to change it.'))+'</span></span></div>':'';
+  var tiles=a.map(function(f){
+    return '<button type="button" class="tile" data-act="pick" data-v="'+f+'" aria-pressed="'+(s.finish===f)+'">'+
+      '<span class="pic">'+swatch(f)+'</span><span class="txt"><span class="t">'+f+'</span><span class="radio"></span><span class="d">'+FIN[f].d+'</span></span></button>';
+  }).join('');
+  /* finishes the base metal itself cannot take are grouped in one row when there are 3 or more */
+  var byMetal=b.filter(function(f){return reasons(f)[0].k==='metal';});
+  var grouped=byMetal.length>=3?byMetal:[];
+  var rest=b.filter(function(f){return grouped.indexOf(f)<0;});
+  var blocked=b.length?'<section class="blocked"><div class="label">Not possible with this design ('+b.length+')</div>'+
+    (grouped.length?'<div class="brow grey"><span class="pic">'+swatch(grouped[0],{plain:true,w:64,h:44})+'</span><span><span class="t">'+LOCK+grouped.join(', ')+'</span>'+
+      '<span class="why"><b>Not offered on '+esc(sc.base)+'.</b> '+esc(sc.base)+' comes only '+allowed().join(' or ')+'. Other base metals offer more finishes.</span>'+
+      '<button type="button" class="fixbtn" data-act="fix" data-v="Base Metal">Change the base metal →</button></span></div>':'')+
+    rest.map(function(f){return '<div class="brow grey"><span class="pic">'+swatch(f,{plain:true,w:64,h:44})+'</span><span><span class="t">'+LOCK+f+'</span><span class="why">'+reasonHTML(f)+'</span></span></div>';}).join('')+'</section>':'';
+  var inner='<div class="p1" style="display:grid;gap:14px">'+
+    '<div class="ptitle"><h2>Metal Finish</h2><p>How should the metal surface look? Each picture shows the finish on your '+sc.base+'.</p></div>'+
+    noticeHTML(s)+picked+onlyOne()+inlayNote()+
+    (a.length>1?'<div class="tiles" data-q="tiles">'+tiles+'</div>':'')+hammerNote(s)+blocked+
+  '</div>';
+  return shell(inner);
+}
+
+/* ---------- Preview 2: live ring ---------- */
+function P2(s){
+  var f=s.finish||standard();
+  var live='<div class="live" aria-label="Your ring">'+
+    '<div class="fig">'+ringSVG(f)+'</div>'+
+    '<div class="live-cap"><b>'+f+'</b><span>'+sc.base+(inlayNames().length?' · '+inlayNames().join(' + '):'')+' · '+sc.profile+'</span></div>'+
+    '<p class="desc">'+FIN[f].long+'</p></div>';
+  var row=FINISHES.map(function(x){
+    var o=ok(x);
+    return '<button type="button" class="swb" data-act="'+(o?'pick':'why')+'" data-v="'+x+'" aria-pressed="'+(o&&s.finish===x)+'"'+(o?'':' aria-disabled="true"')+'>'+
+      '<span class="ring">'+swatch(x,{circle:true,plain:true,w:72,h:72})+(o?'':LOCK)+'</span>'+
+      '<span class="nm">'+x+'</span><span class="sub">'+(o?FIN[x].d:'Not possible')+'</span></button>';
+  }).join('');
+  var why='';
+  if(s.why){
+    why='<div class="whycard" role="status"><h3>Why not '+s.why+'?</h3><p>'+reasonHTML(s.why,'x-why')+'</p><button type="button" class="x" data-act="closewhy">Close</button></div>';
+  }
+  var anyBlocked=allowed().length<FINISHES.length;
+  var inner='<div class="ptitle"><h2>Metal Finish</h2><p>Tap a finish and see it on your ring above.</p></div>'+
+    noticeHTML(s)+onlyOne()+
+    '<section class="sec" data-q="tiles" style="display:grid;gap:10px"><div class="label">'+(s.auto?'Standard is Polished · tap to change':'Your pick: '+s.finish)+'</div>'+
+    '<div class="swrow">'+row+'</div>'+
+    (anyBlocked?'<div class="legend">'+LOCK+'<span>Not possible with your design. Tap it to see why.</span></div>':'')+'</section>'+
+    why+hammerNote(s)+inlayNote();
+  return shell(inner,{wrapClass:'p2wrap',before:live});
+}
+
+/* ---------- Preview 3: guided ---------- */
+function famMembers(id){return FINISHES.filter(function(f){return FIN[f].fam===id;});}
+function P3(s){
+  function q(id,n,title,sum,answered,body,locked,lockTxt){
+    var open=s.open===id&&!locked;
+    return '<section class="q'+(open?' open':'')+(answered&&!open?' answered':'')+(locked?' locked':'')+'" data-q="'+id+'">'+
+      '<button type="button" class="q-head" data-act="open" data-v="'+id+'" aria-expanded="'+open+'"'+(locked?' aria-disabled="true"':'')+'>'+
+        '<span class="q-n">'+(answered&&!open?'✓':n)+'</span>'+
+        '<span><span class="q-title">'+title+'</span><span class="q-sum">'+(locked?lockTxt:sum)+'</span></span>'+
+        '<span class="q-act">'+(open||locked?'':(answered?'Change':'Open'))+'</span>'+
+      '</button>'+(open?'<div class="q-body">'+body+'</div>':'')+'</section>';
+  }
+  var fams=FAMS.map(function(F){
+    var mem=famMembers(F.id), av=mem.filter(ok), first=av[0]||mem[0];
+    var c=av.length?(av.length===1?(mem.length===1?'1 finish':'1 of '+mem.length+' possible'):av.length+' finishes'):reasons(mem[0])[0].t;
+    return '<button type="button" class="fam" data-act="fam" data-v="'+F.id+'" aria-pressed="'+(s.fam===F.id)+'"'+(av.length?'':' aria-disabled="true"')+'>'+
+      '<span class="pic">'+swatch(first,{w:120,h:60})+'</span><span class="t">'+F.t+'</span><span class="d">'+F.d+'</span><span class="c">'+c+'</span></button>';
+  }).join('');
+  var famObj=s.fam?FAMS.filter(function(F){return F.id===s.fam;})[0]:null;
+  var mem=s.fam?famMembers(s.fam):[];
+  var b2=mem.map(function(f){
+    var o=ok(f);
+    return '<button type="button" class="mem" data-act="'+(o?'pick':'noop')+'" data-v="'+f+'" aria-pressed="'+(o&&s.finish===f)+'"'+(o?'':' aria-disabled="true"')+'>'+
+      '<span class="pic">'+swatch(f,{w:96,h:58})+'</span><span><span class="t">'+f+'</span><br><span class="d">'+(o?FIN[f].long:esc(reasons(f)[0].t+'. '+reasons(f)[0].d))+'</span></span>'+
+      (o?'<span class="radio"></span>':LOCK)+'</button>';
+  }).join('');
+  var needQ2=s.fam&&mem.length>1;
+  var sum1=famObj?famObj.t:'Not answered yet';
+  var inner='<div class="p3" style="display:grid;gap:10px">'+
+    '<div class="ptitle"><h2>Metal Finish</h2><p>Two quick questions about how the metal surface should look.</p></div>'+
+    noticeHTML(s)+onlyOne()+inlayNote()+
+    q('q1',1,'How much shine do you want?',sum1+(s.fam&&!needQ2&&s.finish?' · '+s.finish:''),!!s.fam&&(!!s.finish||needQ2),'<div class="fams">'+fams+'</div>')+
+    (s.fam&&!needQ2?'':
+    q('q2',2,'Which one?',s.finish&&needQ2?s.finish:'Not chosen yet',!!s.finish&&needQ2,'<div class="members">'+b2+'</div>'+hammerNote(s),!needQ2,'Answer question 1 first'))+
+    (s.finish&&!needQ2?hammerNote(s):'')+
+    (s.finish?'<div class="card" style="display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center"><span>'+swatch(s.finish,{w:110,h:66})+'</span><span><span class="label">Your finish</span><br><b style="font-size:18px">'+s.finish+'</b><br><span class="note">'+FIN[s.finish].long+'</span></span></div>':'')+
+  '</div>';
+  return shell(inner);
+}
+
+/* ---------- Preview 4: compare + list ---------- */
+function P4(s){
+  var f=s.finish||standard(), before=s.prev&&ok(s.prev)&&s.prev!==f?s.prev:(f==='Polished'?(allowed().filter(function(x){return x!=='Polished';})[0]||f):(ok('Polished')?'Polished':f));
+  var cmp='<div class="cmp" style="--cut:'+s.cut+'%" data-q="cmp">'+
+      '<div class="layer">'+swatch(before,{w:300,h:120})+'</div>'+
+      '<div class="layer top">'+swatch(f,{w:300,h:120})+'</div>'+
+      '<div class="div"></div><div class="knob" aria-hidden="true">⇆</div>'+
+      '<span class="tag l">'+(s.prev&&s.prev===before?'Before':'Compare')+': '+before+'</span><span class="tag r">Yours: '+f+'</span>'+
+      '<input type="range" min="5" max="95" value="'+s.cut+'" data-cut aria-label="Drag to compare '+before+' with '+f+'">'+
+    '</div>';
+  var rows=FINISHES.map(function(x){
+    var o=ok(x);
+    var meter='<span class="meter">Hides scratches <span class="dots">'+[1,2,3].map(function(n){return '<i class="'+(n<=FIN[x].hide?'on':'')+'"></i>';}).join('')+'</span></span>';
+    return '<div role="radio" tabindex="'+(o?0:-1)+'" class="frow" data-act="'+(o?'pick':'noop')+'" data-v="'+x+'" aria-checked="'+(o&&s.finish===x)+'"'+(o?'':' aria-disabled="true"')+'>'+
+      (o?'<span class="radio"></span>':LOCK)+'<span class="pic">'+swatch(x,{w:72,h:46})+'</span>'+
+      '<span><span class="t">'+x+(x==='Polished'&&o?' <span class="badge">Most chosen</span>':'')+(s.auto&&s.finish===x?' <span class="badge std">Standard</span>':'')+'</span>'+
+      (o?'<span class="d">'+FIN[x].long+'</span>'+meter:'<span class="why"><b>'+esc(reasons(x)[0].t)+'.</b> '+esc(reasons(x)[0].d)+'</span><button type="button" class="fixbtn" data-act="fix" data-v="'+esc(reasons(x)[0].go)+'">'+esc(reasons(x)[0].fix)+' →</button>')+
+      '</span></div>';
+  }).join('');
+  var inner='<div class="p4">'+
+    '<div class="ptitle full"><h2>Metal Finish</h2><p>'+(s.auto?'Your ring is set to <b>'+f+'</b>. Keep it, or pick another below.':'You picked <b>'+f+'</b>. Drag the handle to compare.')+'</p></div>'+
+    (s.notice?'<div class="full">'+noticeHTML(s)+'</div>':'')+
+    '<div class="stick" style="display:grid;gap:10px">'+cmp+'<p class="note">Drag the white handle across the band. Left: '+before+'. Right: your finish.</p>'+inlayNote()+hammerNote(s)+'</div>'+
+    '<section class="rows" role="radiogroup" aria-label="Metal finish" data-q="tiles">'+onlyOne()+rows+'</section>'+
+  '</div>';
+  return shell(inner);
+}
+
+var R=[P1,P2,P3,P4];
+var toastT=0;
+function render(focusKey){
+  uid=0;
+  var y=window.scrollY;
+  device.innerHTML=R[cur](S[cur]);
+  if(focusKey){var f=device.querySelector(focusKey);if(f)f.focus({preventScroll:true});}
+  window.scrollTo(0,y);
+}
+function toast(msg){
+  var t=device.querySelector('[data-slot="toast"]'); if(!t)return;
+  t.innerHTML='<div class="toast" role="status">'+esc(msg)+'</div>';
+  clearTimeout(toastT);toastT=setTimeout(function(){if(t.isConnected)t.innerHTML='';},2600);
+}
+function renderChanged(){
+  var c=CHANGED[cur];
+  document.getElementById('changed').innerHTML='<h2>What changed · Preview '+(cur+1)+': '+NAMES[cur]+'</h2><p class="diff">'+c.lead+'</p><ul>'+c.items.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>';
+}
+function select(n){
+  cur=n;
+  document.querySelectorAll('#switch button').forEach(function(b,k){b.setAttribute('aria-selected',String(k===n));b.tabIndex=k===n?0:-1;});
+  try{localStorage.setItem('finPreview',String(n));}catch(e){}
+  render();renderChanged();
+}
+function pick(s,f){
+  if(s.finish!==f){s.prev=s.finish;}
+  s.finish=f;s.auto=false;s.notice='';s.why=null;
+  if(cur===2)s.fam=FIN[f].fam;
+}
+
+/* ---------- events ---------- */
+device.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]'); if(!b||!device.contains(b))return;
+  var s=S[cur], a=b.getAttribute('data-act'), v=b.getAttribute('data-v');
+  if(a==='fix'){e.stopPropagation();toast('In the real builder this opens '+v+'.');return;}
+  var key='[data-act="'+a+'"][data-v="'+v+'"]';
+  if(a==='pick'){pick(s,v);if(cur===3)s.cut=50;render(key);}
+  else if(a==='why'){s.why=s.why===v?null:v;render(key);var w=device.querySelector('.whycard');if(w)w.scrollIntoView({block:'nearest'});}
+  else if(a==='closewhy'){s.why=null;render();}
+  else if(a==='noop'){/* blocked: reason already shown on the card */}
+  else if(a==='fam'){
+    if(b.getAttribute('aria-disabled')==='true')return;
+    var mem=famMembers(v), av=mem.filter(ok);
+    s.fam=v;s.notice='';
+    if(mem.length===1){pick(s,av[0]);s.open='q1';}
+    else{if(s.finish&&FIN[s.finish].fam!==v){s.finish=null;}s.open='q2';}
+    render(key);
+  }
+  else if(a==='open'){if(b.getAttribute('aria-disabled')==='true'){flash('q1');return;}s.open=s.open===v?'':v;render('[data-act="open"][data-v="'+v+'"]');}
+  else if(a==='next'){
+    if(b.getAttribute('aria-disabled')==='true'){if(cur===2){s.open=s.fam&&famMembers(s.fam).length>1?'q2':'q1';render();flash(s.open);}else flash('tiles');}
+    else{b.textContent='✓ Going to Get my quote…';setTimeout(function(){if(b.isConnected)b.textContent='Get my quote →';},1400);}
+  }
+});
+device.addEventListener('keydown',function(e){
+  var t=e.target; if(!t.classList||!t.classList.contains('frow'))return;
+  if(e.key===' '||e.key==='Enter'){e.preventDefault();t.click();}
+});
+function flash(id){
+  var el=device.querySelector('[data-q="'+id+'"]'); if(!el)return;
+  el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});
+  el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');
+}
+device.addEventListener('input',function(e){
+  var t=e.target; if(!t.matches('input[data-cut]'))return;
+  S[cur].cut=+t.value; var c=t.closest('.cmp'); if(c)c.style.setProperty('--cut',t.value+'%');
+});
+
+/* ---------- switcher, demo designs, view ---------- */
+var sw=document.getElementById('switch');
+sw.innerHTML=NAMES.map(function(n,k){return '<button type="button" role="tab" id="tab'+k+'" aria-selected="false"><b>Preview '+(k+1)+'</b><span>'+n+'</span></button>';}).join('');
+sw.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;select([].indexOf.call(sw.children,b));});
+sw.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='ArrowLeft'){var n=(cur+(e.key==='ArrowRight'?1:3))%4;select(n);sw.children[n].focus();}});
+var dr=document.getElementById('demoRow');
+function drawDemo(){dr.innerHTML=SCEN.map(function(x){return '<button type="button" data-s="'+x.id+'" aria-pressed="'+(x===sc)+'">'+esc(x.label)+'</button>';}).join('');}
+dr.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;sc=SCEN.filter(function(x){return x.id===b.getAttribute('data-s');})[0];onScenario();drawDemo();render();});
+drawDemo();
+var stage=document.getElementById('stage');
+function view(pc){stage.classList.toggle('pc',pc);document.getElementById('vt-phone').setAttribute('aria-pressed',String(!pc));document.getElementById('vt-pc').setAttribute('aria-pressed',String(pc));render();}
+document.getElementById('vt-phone').addEventListener('click',function(){view(false);});
+document.getElementById('vt-pc').addEventListener('click',function(){view(true);});
+document.getElementById('resetBtn').addEventListener('click',function(){S[cur]=fresh(cur);render();});
+
+var start=0;
+var hash=(location.hash||'').replace('#','');
+if(/^p[1-4]$/.test(hash))start=parseInt(hash.slice(1),10)-1;
+else{try{var st=parseInt(localStorage.getItem('finPreview'),10);if(st>=0&&st<4)start=st;}catch(e){}}
+select(start);
+window.__fp={S:S,select:select,view:view,scen:function(id){sc=SCEN.filter(function(x){return x.id===id;})[0];onScenario();drawDemo();render();}};
+})();
+</script>

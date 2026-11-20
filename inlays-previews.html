@@ -1,0 +1,970 @@
+<title>Add/Remove Inlays Previews</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap">
+<style>
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --soft:#edf0f6; --soft2:#e4e8f0;
+  --ink:#151823; --ink2:#3f4758; --muted:#566074;
+  --line:#d3d8e3; --line2:#bcc4d3;
+  --accent:#4a59dc; --accent2:#5f6eea; --on-accent:#ffffff; --sel:#edf0ff;
+  --ok:#2f7a4a; --ok-bg:#eef6f0; --warn:#8a5a00; --warn-bg:#fff6e5; --bad:#b3261e; --bad-bg:#fdecea;
+  --shadow:0 1px 2px rgba(21,24,35,.06),0 6px 20px rgba(21,24,35,.06);
+  --font:"DM Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --r-lg:18px; --r-md:14px; --r-sm:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10131a; --card:#171b24; --soft:#1d222d; --soft2:#272d39;
+  --ink:#f2f4f9; --ink2:#d2d7e2; --muted:#aeb6c6; --line:#333a48; --line2:#465064;
+  --accent:#96a2ff; --accent2:#b3bcff; --on-accent:#10131a; --sel:#272d45;
+  --ok:#8fd3a5; --ok-bg:#16261d; --warn:#f3c56b; --warn-bg:#2e2412; --bad:#ffb4ab; --bad-bg:#3a1714;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10131a; --card:#171b24; --soft:#1d222d; --soft2:#272d39;
+  --ink:#f2f4f9; --ink2:#d2d7e2; --muted:#aeb6c6; --line:#333a48; --line2:#465064;
+  --accent:#96a2ff; --accent2:#b3bcff; --on-accent:#10131a; --sel:#272d45;
+  --ok:#8fd3a5; --ok-bg:#16261d; --warn:#f3c56b; --warn-bg:#2e2412; --bad:#ffb4ab; --bad-bg:#3a1714;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.45;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.45}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+h1,h2,h3{text-wrap:balance;margin:0}
+.wrap{max-width:1160px;margin:0 auto;display:grid;gap:18px}
+
+/* ---------- page header + switcher (same family as the Width & Profile set) ---------- */
+.intro{display:grid;gap:6px;max-width:68ch}
+.intro .eyebrow{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.intro h1{font-size:26px;font-weight:700;letter-spacing:-.01em}
+.intro p{margin:0;color:var(--ink2)}
+.switch{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;background:var(--soft2);padding:5px;border-radius:var(--r-md)}
+@media (min-width:760px){.switch{grid-template-columns:repeat(4,1fr)}}
+.switch button{border:0;background:transparent;border-radius:var(--r-sm);padding:9px 10px;text-align:left;display:grid;gap:1px;min-height:52px}
+.switch button b{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.switch button span{font-weight:600;font-size:14px;line-height:1.25}
+.switch button[aria-selected="true"]{background:var(--card);box-shadow:var(--shadow)}
+.switch button[aria-selected="true"] b{color:var(--accent)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.viewtoggle{display:none;gap:4px;background:var(--soft2);padding:4px;border-radius:999px}
+@media (min-width:760px){.viewtoggle{display:inline-flex}}
+.viewtoggle button{border:0;background:transparent;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--muted)}
+.viewtoggle button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.linkbtn{border:0;background:none;color:var(--accent);font-weight:600;font-size:14px;padding:6px 2px;text-decoration:underline;text-underline-offset:3px}
+.demo{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--warn-bg);color:var(--warn);border-radius:var(--r-md);padding:8px 10px;font-size:13px;font-weight:600}
+.demo[hidden]{display:none}
+.demo .chip{font-size:13px;padding:7px 11px;color:var(--ink)}
+
+.stage{display:grid;gap:16px;justify-items:center}
+.device{width:100%;max-width:390px;background:var(--bg);border:1px solid var(--line2);border-radius:30px;overflow:clip;
+  box-shadow:0 20px 50px rgba(21,24,35,.12);container-type:inline-size;position:relative}
+.stage.pc .device{max-width:1100px;border-radius:16px}
+@media (max-width:520px){.device{border-radius:20px}}
+.changed{width:100%;max-width:640px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px 18px;display:grid;gap:8px}
+.changed h2{font-size:16px}
+.changed ul{margin:0;padding-left:20px;display:grid;gap:4px;color:var(--ink2)}
+.changed .diff{font-size:13px;color:var(--muted);margin:0}
+
+/* ---------- builder chrome ---------- */
+.b-top{background:var(--card);border-bottom:1px solid var(--line);padding:12px 14px 0;display:grid;gap:10px}
+.brand{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
+.brand b{color:var(--ink);font-size:14px;letter-spacing:.02em}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.steps .st{display:grid;gap:4px}
+.steps .st i{display:block;height:5px;border-radius:3px;background:var(--soft2)}
+.steps .st.on i{background:var(--accent)}
+.steps .st.done i{background:var(--ok)}
+.steps .st small{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.steps .st.on small{color:var(--accent)}
+.steps .st.done small{color:var(--ok)}
+.steps .st span{font-size:13px;font-weight:600;line-height:1.2}
+.steps .st:not(.on) span{color:var(--muted)}
+.subtabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:0 14px}
+.subtabs div{white-space:nowrap;font-size:13.5px;font-weight:600;padding:9px 4px 10px;margin-right:14px;color:var(--muted);border-bottom:3px solid transparent;display:flex;gap:6px;align-items:center}
+.subtabs .on{color:var(--ink);border-bottom-color:var(--accent)}
+.b-body{padding:16px 14px 18px;display:grid;gap:14px;min-width:0}
+.ptitle{display:grid;gap:4px}
+.ptitle h2{font-size:22px;font-weight:700;letter-spacing:-.01em}
+.ptitle p{margin:0;color:var(--ink2);font-size:14.5px}
+.crumb{font-size:12.5px;color:var(--muted);font-weight:600}
+
+.b-bar{position:sticky;bottom:0;z-index:5;background:var(--card);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));display:grid;gap:8px}
+.b-bar .todo{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.b-bar .todo b{color:var(--ink)}
+.b-bar .todo.ready{color:var(--ok)}
+.b-bar .todo .linkbtn{font-size:13px;padding:0;min-height:0}
+.b-bar .row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px}
+.b-bar .back{border:1px solid var(--line2);background:var(--card);border-radius:12px;padding:11px 14px;font-weight:600;min-height:44px}
+.b-bar .mid{text-align:center;font-size:12.5px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+.b-bar .next{border:0;background:var(--accent);color:var(--on-accent);border-radius:12px;padding:12px 16px;font-weight:700;white-space:nowrap;min-height:44px}
+.b-bar .next[aria-disabled="true"]{background:var(--soft2);color:var(--muted)}
+@container (min-width:720px){.b-bar{padding-inline:28px}.b-body{padding:24px 28px 28px}.b-top{padding-inline:28px}.subtabs{margin:0 -28px;padding:0 28px}}
+
+/* ---------- shared controls ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px;display:grid;gap:12px;min-width:0}
+.label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.help{margin:0;color:var(--ink2);font-size:14px}
+.note{font-size:13px;color:var(--muted);margin:0}
+.msg{font-size:13.5px;border-radius:var(--r-sm);padding:9px 11px;margin:0;display:flex;gap:8px;align-items:flex-start}
+.msg.bad{background:var(--bad-bg);color:var(--bad)}
+.msg.ok{background:var(--ok-bg);color:var(--ok)}
+.msg.info{background:var(--soft);color:var(--ink2)}
+.flash{animation:flash 1.2s ease}
+@keyframes flash{0%,100%{box-shadow:none}30%{box-shadow:0 0 0 4px var(--accent)}}
+@media (prefers-reduced-motion:reduce){.flash{animation:none;outline:3px solid var(--accent)}}
+.chip{border:1.5px solid var(--line2);background:var(--card);border-radius:999px;padding:9px 14px;font-weight:600;font-size:14px;white-space:nowrap;min-height:40px}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:var(--on-accent)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips.scroll{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:0 14px 2px}
+.btn{border:1.5px solid var(--line2);background:var(--card);border-radius:12px;padding:10px 14px;font-weight:600;font-size:14px;min-height:44px;display:inline-flex;gap:6px;align-items:center;justify-content:center}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
+.btn.big{min-height:52px;font-size:16px;width:100%}
+.btn.ghost{border-style:dashed;background:transparent}
+.btn.bad{color:var(--bad)}
+.btn svg{width:16px;height:16px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.range{display:flex;gap:10px;align-items:center}
+.range input[type=range]{flex:1;accent-color:var(--accent);min-width:0;height:44px}
+.num{display:inline-flex;align-items:center;gap:3px;border:1.5px solid var(--line2);border-radius:10px;padding:0 8px;background:var(--card);min-height:44px}
+.num input{width:44px;border:0;background:transparent;font-weight:700;font-size:16px;text-align:right;font-variant-numeric:tabular-nums;padding:0}
+.num input:focus{outline:none}
+.num:focus-within{border-color:var(--accent)}
+.num span{color:var(--muted);font-size:13px}
+.ticks{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;padding:0 2px;margin-top:-6px}
+.badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:var(--ok-bg);color:var(--ok);border-radius:999px;padding:2px 8px}
+.badge.auto{background:var(--soft2);color:var(--ink2)}
+
+/* the band picture: strips side by side, true to width */
+.bandwrap{display:grid;gap:4px;min-width:0}
+.band{display:flex;height:58px;border-radius:10px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25),0 2px 6px rgba(21,24,35,.12);position:relative}
+.band.big{height:86px;border-radius:12px}
+.band .seg{overflow:hidden;border:0;padding:0;margin:0;min-width:0;display:block;position:relative;box-shadow:inset 1px 0 0 rgba(0,0,0,.3)}
+.band .seg:first-child{box-shadow:none}
+.band .seg.q{display:grid;place-items:center;font-weight:800;font-size:20px;color:#4a59dc;background:repeating-linear-gradient(45deg,#eef0f8 0 6px,#dde1ec 6px 12px)}
+.band .seg.sel{outline:3px solid var(--accent);outline-offset:-3px;z-index:1}
+.band .seg.sel::after{content:"";position:absolute;left:50%;bottom:-1px;margin-left:-7px;border:7px solid transparent;border-bottom-color:var(--card)}
+.blabels{display:flex;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink2)}
+.blabels span{min-width:0;text-align:center;white-space:nowrap;overflow:visible}
+.ruler{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);font-weight:600}
+.ruler::before,.ruler::after{content:"";flex:1;height:0;border-top:1.5px solid var(--line2)}
+.ruler b{color:var(--ink)}
+.eq{display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-variant-numeric:tabular-nums;font-size:14px;font-weight:600}
+.eq .t{border-radius:6px;padding:1px 6px;background:var(--soft)}
+.eq .t i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2)}
+.eq .ok{color:var(--ok);font-weight:700}
+.eq .total{font-weight:800}
+
+/* strip rows */
+.rows{display:grid;gap:8px}
+.srow{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-md);padding:8px 10px;display:grid;grid-template-columns:26px 1fr auto;gap:6px 10px;align-items:center}
+.srow.sel{border-color:var(--accent);background:var(--sel)}
+.srow.edge,.srow.pin{background:var(--soft)}
+.srow .sw{width:26px;height:44px;border-radius:6px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.22)}
+.srow .sn{min-width:0;display:grid}
+.srow .sn b{font-size:14.5px;line-height:1.25;overflow-wrap:anywhere}
+.srow .sn small{font-size:12px;color:var(--muted);line-height:1.3}
+.srow .sa,.srow .ctl{grid-column:1/-1;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.srow .grow{flex:1}
+.srow .num{padding:0 6px}
+.srow .num input{width:32px}
+.srow .num span{font-size:12px}
+.srow .ctl{gap:4px}
+.srow .fixednote{font-size:12px;color:var(--muted);font-weight:600}
+.stp{display:inline-flex;align-items:center;gap:4px}
+.ib{width:44px;height:44px;border-radius:10px;border:1.5px solid var(--line2);background:var(--card);font-size:20px;font-weight:600;line-height:1;display:grid;place-items:center;padding:0}
+.ib.sm{font-size:16px}
+.rm{min-height:44px;border:1.5px solid var(--line2);border-radius:10px;background:transparent;color:var(--bad);font-weight:600;font-size:13.5px;padding:0 12px}
+.plainband{border:1.5px dashed var(--line2);border-radius:var(--r-md);padding:14px;color:var(--ink2);font-size:14px;text-align:center}
+
+/* popular design cards */
+.lay-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@container (min-width:720px){.lay-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.lay{border:1.5px solid var(--line2);background:var(--card);border-radius:var(--r-md);padding:8px;display:grid;gap:6px;text-align:left;min-height:96px;align-content:start}
+.lay[aria-pressed="true"]{border-color:var(--accent);background:var(--sel);box-shadow:inset 0 0 0 1px var(--accent)}
+.lay .mini{display:flex;height:40px;border-radius:8px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.2)}
+.lay .mini i{display:block;height:100%;box-shadow:inset 1px 0 0 rgba(0,0,0,.28)}
+.lay .mini i:first-child{box-shadow:none}
+.lay .mini i.q{background:repeating-linear-gradient(45deg,#eef0f8 0 5px,#dde1ec 5px 10px);display:grid;place-items:center;font-style:normal;font-weight:800;color:#4a59dc;font-size:14px}
+.lay .nm{font-size:13.5px;font-weight:700;line-height:1.25}
+.lay .sub{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.lay.own{border-style:dashed;place-content:center;text-align:center;justify-items:center}
+.lay.own .plus{width:40px;height:40px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-size:24px;font-weight:600}
+.more{width:100%;min-height:44px;border:1.5px dashed var(--line2);border-radius:12px;background:transparent;font-weight:600}
+details.fold{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:4px 14px 14px}
+details.fold > summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:48px;font-size:15.5px;font-weight:700}
+details.fold > summary::-webkit-details-marker{display:none}
+details.fold > summary::after{content:"+";font-size:22px;font-weight:400;color:var(--muted)}
+details.fold[open] > summary::after{content:"\2212"}
+details.fold > div{display:grid;gap:10px}
+
+/* how-it-works mini diagram */
+.how{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;background:var(--soft);border-radius:var(--r-md);padding:10px 12px;font-size:13.5px;color:var(--ink2)}
+.how svg{width:92px;height:auto;display:block}
+
+/* ---------- Preview 1: three clear steps ---------- */
+.q{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);overflow:clip}
+.q-head{width:100%;border:0;background:transparent;display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:14px;text-align:left;min-height:60px}
+.q-n{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:14px;background:var(--soft2);color:var(--ink2)}
+.q.open .q-n{background:var(--accent);color:var(--on-accent)}
+.q.answered .q-n{background:var(--ok);color:#fff}
+.q-title{font-weight:700;font-size:16px;line-height:1.25;display:block}
+.q-sum{font-size:13.5px;color:var(--muted);display:block;font-weight:500}
+.q.answered .q-sum{color:var(--ok)}
+.q-act{font-size:13px;font-weight:600;color:var(--accent)}
+.q.locked .q-title{color:var(--muted)}
+.q-body{padding:0 14px 16px;display:grid;gap:12px;min-width:0}
+.p1{display:grid;gap:10px}
+@container (min-width:720px){.p1{max-width:760px;margin:0 auto;width:100%}}
+
+/* ---------- Preview 2: tap the band ---------- */
+.p2{display:grid;gap:14px}
+.studio{position:sticky;top:0;z-index:4;background:var(--card);border-bottom:1px solid var(--line);padding:10px 14px 12px;display:grid;gap:8px}
+.studio .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.studio .top .t{font-weight:700;font-size:15px}
+.rwmini{display:inline-flex;align-items:center;gap:4px}
+.rwmini b{min-width:62px;text-align:center;font-variant-numeric:tabular-nums;font-size:16px}
+.gaps{position:relative;height:44px;margin-top:-2px}
+.gap{position:absolute;top:2px;width:40px;height:40px;margin-left:-20px;border-radius:50%;border:2px solid var(--accent);background:var(--card);color:var(--accent);font-size:22px;font-weight:700;line-height:1;display:grid;place-items:center;padding:0;box-shadow:var(--shadow)}
+.gap.solo{width:auto;margin-left:0;transform:translateX(-50%);border-radius:999px;padding:0 14px;font-size:14px;gap:4px;display:inline-flex;align-items:center}
+.editor{border:2px solid var(--accent);border-radius:var(--r-lg);background:var(--card);padding:14px;display:grid;gap:12px}
+.editor .eh{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center}
+.editor .eh .sw{width:34px;height:44px;border-radius:7px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.22)}
+.editor .eh b{font-size:17px;display:block;line-height:1.2}
+.editor .eh small{font-size:12.5px;color:var(--muted)}
+.bigstep{display:grid;grid-template-columns:52px 1fr 52px;gap:8px;align-items:center}
+.bigstep .ib{width:52px;height:52px;font-size:24px}
+.bigstep .num{justify-content:center;min-height:52px}
+.bigstep .num input{font-size:22px;width:70px}
+.editor .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tapme{border:1.5px dashed var(--line2);border-radius:var(--r-lg);padding:14px;text-align:center;color:var(--ink2);font-size:14px;display:grid;gap:4px}
+.hscroll{display:grid;grid-auto-flow:column;grid-auto-columns:150px;gap:8px;overflow-x:auto;scrollbar-width:thin;margin:0 -14px;padding:0 14px 6px;scroll-snap-type:x proximity}
+.hscroll .lay{scroll-snap-align:start}
+@container (min-width:720px){
+  .p2wrap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start}
+  .p2wrap .studio{top:16px;margin:24px 0 24px 28px;border:1px solid var(--line);border-radius:var(--r-lg);padding:16px}
+  .p2wrap .b-body{padding-left:24px}
+  .hscroll{grid-auto-flow:row;grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible;margin:0;padding:0}
+}
+
+/* ---------- Preview 3: width budget ---------- */
+.meter{position:sticky;top:0;z-index:4;background:var(--card);border-bottom:1px solid var(--line);padding:10px 14px 12px;display:grid;gap:8px}
+.meter .mh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.meter .mh b{font-size:15px}
+.meter .mh .ok{color:var(--ok);font-weight:700;font-size:13.5px}
+.legend{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.legend div{background:var(--soft);border-radius:10px;padding:6px 8px;display:grid;gap:0}
+.legend small{font-size:12px;color:var(--muted);font-weight:600}
+.legend b{font-size:16px;font-variant-numeric:tabular-nums}
+.legend .auto{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+@container (min-width:720px){
+  .p3wrap{display:grid;grid-template-columns:400px minmax(0,1fr);align-items:start}
+  .p3wrap .meter{top:16px;margin:24px 0 24px 28px;border:1px solid var(--line);border-radius:var(--r-lg);padding:16px}
+  .p3wrap .b-body{padding-left:24px}
+}
+
+/* ---------- Preview 4: design gallery ---------- */
+.p4{display:grid;gap:14px}
+.gal{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@container (min-width:720px){.gal{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.gal .lay{min-height:120px}
+.gal .lay .mini{height:54px}
+.step-h{display:flex;gap:10px;align-items:center}
+.step-h .n{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--on-accent);font-weight:700;font-size:13.5px;flex:0 0 auto}
+.step-h .n.ok{background:var(--ok);color:#fff}
+.step-h h3{font-size:17px}
+.space{border:2px dashed var(--accent);background:var(--sel);border-radius:var(--r-md);padding:12px;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;text-align:left;min-height:64px;width:100%}
+.space .qmark{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:22px;color:#4a59dc;background:repeating-linear-gradient(45deg,#eef0f8 0 6px,#dde1ec 6px 12px)}
+.space b{display:block;font-size:15px}
+.space small{color:var(--ink2);font-size:13px}
+.chan{display:grid;gap:8px;border:1px solid var(--line);border-radius:var(--r-md);padding:10px;background:var(--card)}
+.chan .ct{display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:var(--muted)}
+.fixedrow{display:flex;gap:10px;align-items:center;font-size:13.5px;color:var(--muted);padding:2px 4px}
+.fixedrow i{width:22px;height:22px;border-radius:5px;display:block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.22)}
+@container (min-width:720px){
+  .p4 .two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+}
+
+/* ---------- stand-in Add Inlay popup ---------- */
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:end center;background:rgba(15,18,28,.45);padding:12px}
+.modal[hidden]{display:none}
+.sheet{width:100%;max-width:390px;max-height:86vh;overflow:auto;background:var(--card);border-radius:20px;padding:14px;display:grid;gap:12px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.stage.pc ~ .modal .sheet,.pcmodal .sheet{max-width:560px}
+@media (min-width:760px){.modal{place-items:center}}
+.sheet .sh{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sheet .sh h3{font-size:18px}
+.standin{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--warn);background:var(--warn-bg);border-radius:8px;padding:6px 8px}
+.mats{display:grid;gap:6px}
+.mat{border:1.5px solid var(--line2);background:var(--card);border-radius:12px;padding:8px 10px;display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;text-align:left;min-height:52px}
+.mat i{width:30px;height:36px;border-radius:6px;display:block;box-shadow:inset 0 0 0 1px rgba(0,0,0,.22)}
+.mat small{color:var(--muted);font-size:12.5px;white-space:nowrap}
+.mat[aria-pressed="true"]{border-color:var(--accent);background:var(--sel);box-shadow:inset 0 0 0 1px var(--accent)}
+.mat:disabled{opacity:.45}
+.svgdefs{position:absolute;width:0;height:0;overflow:hidden}
+</style>
+
+<div class="wrap">
+  <header class="intro">
+    <div class="eyebrow">New Ring Builder · design mock-ups · 20 Nov 2026</div>
+    <h1>Add/Remove Inlays: four ways to build the band</h1>
+    <p>This page only shows after "Yes, add inlays". The band is made of strips side by side, and their widths must add up to the ring width. Every preview is clickable: add inlays, change widths, try a popular design. The <b>Sleeve →</b> button turns blue when the band is ready. Nothing here talks to the real builder or to prices.</p>
+  </header>
+
+  <div class="toolbar">
+    <div class="switch" role="tablist" aria-label="Choose a preview" id="switch" style="flex:1 1 100%"></div>
+  </div>
+  <div class="toolbar">
+    <div class="viewtoggle" role="group" aria-label="Frame size">
+      <button type="button" id="vt-phone" aria-pressed="true">Phone</button>
+      <button type="button" id="vt-pc" aria-pressed="false">PC</button>
+    </div>
+    <button type="button" class="linkbtn" id="resetBtn">Start this preview again</button>
+  </div>
+  <div class="demo" id="demo" hidden role="group" aria-label="Demo: base metal chosen in Step 1">
+    <span>Demo · base metal from Step 1:</span>
+    <button type="button" class="chip" data-metal="Titanium">Titanium</button>
+    <button type="button" class="chip" data-metal="Tungsten">Tungsten</button>
+    <button type="button" class="chip" data-metal="Black Ceramic">Black Ceramic</button>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="device" id="device"></div>
+    <section class="changed" id="changed" aria-live="polite"></section>
+  </div>
+</div>
+<div class="modal" id="modal" hidden></div>
+
+<script>
+(function(){
+"use strict";
+/* ================= data (names and minimum widths from the test pricing file) ================= */
+function speck(b,c){return 'radial-gradient(circle,'+c+' 0 .8px,transparent 1.4px) 0 0/5px 5px,radial-gradient(circle,'+c+' 0 .6px,transparent 1.2px) 2px 3px/7px 6px,'+b;}
+var MAT={
+  'Titanium':{g:'Metal',min:.5,bg:'linear-gradient(180deg,#e6e8ec 0%,#b4b8c0 40%,#d2d5db 60%,#8e939b 100%)'},
+  'Tungsten':{g:'Metal',min:.5,bg:'linear-gradient(180deg,#c4c6ca 0%,#85898f 40%,#a3a6ab 60%,#5f6369 100%)'},
+  'Black Ceramic':{g:'Metal',min:.5,bg:'linear-gradient(180deg,#55575d 0%,#1a1a1a 45%,#303136 60%,#0b0b0c 100%)'},
+  'Yellow 14K':{g:'Precious metal',min:.5,bg:'linear-gradient(180deg,#f6e4a6 0%,#ddb85c 45%,#e9cd7a 60%,#a47b2a 100%)'},
+  'Koa':{g:'Woods',min:1,bg:'repeating-linear-gradient(100deg,#8b5a2b 0 3px,#a8713c 3px 6px,#7a4c22 6px 8px)'},
+  'Bloodwood':{g:'Woods',min:1,bg:'repeating-linear-gradient(95deg,#8b0000 0 3px,#a3241a 3px 5px,#6e0b05 5px 8px)'},
+  'Oak (Whiskey Barrel)':{g:'Woods',min:1,bg:'repeating-linear-gradient(98deg,#654321 0 2px,#86603a 2px 6px,#5a3a1c 6px 8px)'},
+  'Gibeon Meteorite':{g:'Meteorite',min:2,max:10,bg:'repeating-linear-gradient(-30deg,rgba(225,229,236,.55) 0 1px,transparent 1px 6px),repeating-linear-gradient(60deg,#6c7077 0 3px,#55585e 3px 6px)'},
+  'Lapis Lazuli':{g:'Lapidary',min:2,bg:'radial-gradient(circle,#e8c766 0 1px,transparent 1.6px) 0 0/9px 9px,radial-gradient(circle,#9fc0ff 0 .7px,transparent 1.3px) 3px 4px/7px 7px,#26619c'},
+  'Turquoise':{g:'Lapidary',min:2,bg:'repeating-linear-gradient(130deg,transparent 0 7px,#2b5d58 7px 8px),#40e0d0'},
+  'Sapphire Crushed':{g:'Lapidary',min:1.5,bg:speck('#1d3f9a','#8fb0ff')},
+  'Aquamarine':{g:'Lapidary',min:1.5,bg:speck('#7fc8d8','#e6fbff')},
+  'Topaz Crushed':{g:'Lapidary',min:1.5,bg:speck('#3b8fd0','#d3ecff')},
+  'Supply Your Own Ash':{g:'Memorial',min:1.5,bg:speck('#808080','#dadada')},
+  'Supply Your Own Fur/Hair':{g:'Memorial',min:1.5,bg:'repeating-linear-gradient(80deg,#d2b48c 0 2px,#a88459 2px 3px,#e0c7a3 3px 5px)'},
+  'Supply Your Own Sand':{g:'Sand',min:1.5,bg:speck('#c2b280','#f4ead0')},
+  'Antler':{g:'Antler',min:1,bg:'repeating-linear-gradient(88deg,#f5deb3 0 4px,#d9bf8f 4px 5px,#fbecd0 5px 8px)'},
+  'Stardust - Black Gold':{g:'Stardust',min:1,bg:speck('#151515','#e2b74a')}
+};
+var GROUPS=['Woods','Meteorite','Lapidary','Memorial','Antler','Stardust','Sand','Precious metal'];
+var EDGE_MIN=.5, PIN=1, STEP=.25, RW={min:2,max:14,step:.5};
+/* builder_config.ready_layouts (designed for 8 mm) */
+var LAYOUTS=[
+ {n:'Meteorite centre',s:[['base',1.5],['Gibeon Meteorite',5],['base',1.5]]},
+ {n:'Crushed stone centre',s:[['base',2.5],['Sapphire Crushed',3],['base',2.5]]},
+ {n:'Memorial inlay - your own ashes',s:[['base',2.5],['Supply Your Own Ash',3],['base',2.5]]},
+ {n:'Whiskey barrel wood centre',s:[['base',1.5],['Oak (Whiskey Barrel)',5],['base',1.5]]},
+ {n:'Gold pinstripes + stone',s:[['base',1.5],['Yellow 14K',1,1],['Lapis Lazuli',3],['Yellow 14K',1,1],['base',1.5]]},
+ {n:'Wood + meteorite',s:[['base',1.5],['Oak (Whiskey Barrel)',2],['base',1,1],['Gibeon Meteorite',2],['base',1.5]]},
+ {n:'Antler centre',s:[['base',1.5],['Antler',5],['base',1.5]]},
+ {n:'Two memorial inlays',s:[['base',1.25],['Supply Your Own Ash',2],['base',1.5,1],['Supply Your Own Fur/Hair',2],['base',1.25]]},
+ {n:'Two stones',s:[['base',1.5],['Aquamarine',2],['base',1,1],['Topaz Crushed',2],['base',1.5]]},
+ {n:'Stardust centre',s:[['base',2.5],['Stardust - Black Gold',3],['base',2.5]]},
+ {n:'Your own sand',s:[['base',2],['Supply Your Own Sand',4],['base',2]]}
+];
+/* invented filter groups for Preview 4 */
+var CATS=[['All',null],['Meteorite',[0,5]],['Wood',[3,5]],['Memorial',[2,7,10]],['Stone',[1,4,8]],['Two inlays',[5,7,8]],['More',[6,9]]];
+/* builder_config.rules.precut_blanks */
+var BLANKS={
+ 'Tungsten':[
+  {st:1,w:8,p:'Flat',g:[['i',2],['b',2],['i',4]]},{st:2,w:8,p:'Flat',g:[['b',1],['i',6],['b',1]]},{st:3,w:8,p:'Flat',g:[['i',2],['b',1],['i',5]]},
+  {st:5,w:8,p:'Flat',g:[['b',1],['i',6],['b',1]],bev:1},{st:6,w:8,p:'Flat',g:[['i',8]]},{st:7,w:8,p:'Round',g:[['b',.5],['i',7],['b',.5]]},
+  {st:8,w:6,p:'Flat',g:[['b',1],['i',4],['b',1]]},{st:9,w:6,p:'Flat',g:[['b',1],['i',4],['b',1]],bev:1},{st:10,w:6,p:'Flat',g:[['i',2],['b',1],['i',3]]},
+  {st:11,w:8,p:'Flat',g:[['b',4],['i',2],['b',2]]},{st:12,w:8,p:'Flat',g:[['b',2],['i',4],['b',2]],bev:1},{st:13,w:8,p:'Flat',g:[['b',2],['i',4],['b',2]]},
+  {st:'P1',w:6,p:'Flat',plain:1,g:[['b',6]]},{st:'P3',w:8,p:'Flat',plain:1,g:[['b',8]]},{st:'P5',w:8,p:'Round',plain:1,g:[['b',8]]}],
+ 'Black Ceramic':[
+  {st:14,w:8,p:'Flat',g:[['b',1],['i',6],['b',1]],bev:1},{st:15,w:8,p:'Flat',g:[['i',2],['b',2],['i',4]]},
+  {st:16,w:8,p:'Flat',g:[['b',2],['i',4],['b',2]],bev:1},{st:'P6',w:8,p:'Flat',plain:1,g:[['b',8]]}]
+};
+
+var NAMES=['Three clear steps','Tap the band picture','Width budget on top','Design gallery first'];
+var CHANGED=[
+  {lead:'The page is split into three numbered steps that open one after another, like the Width & Profile preview.',
+   items:['Step 1 asks how to start: a popular design, an empty band to build yourself, or keep it plain.',
+   'Step 2 shows the band as a true-to-width picture with a sum under it, e.g. "1.5 + 5 + 1.5 = 8 mm ✓".',
+   'Every strip row says what it is ("Left edge", "Inlay 1", "Pinstripe") and its smallest width.',
+   'The edges always take up the rest, so "Remaining" can never go wrong; ring width moves to step 3.']},
+  {lead:'The band picture is the control: tap a strip to change it, tap a + between strips to add an inlay right there.',
+   items:['A big band picture stays at the top of the screen with the ring width and − / + next to it.',
+   'Tapping a strip opens one large editor: width with big − / + buttons, move, change material, remove.',
+   'The + buttons sit exactly where the new inlay will go, so nobody has to use « » afterwards.',
+   'Popular designs sit underneath as a sideways row of cards.']},
+  {lead:'Closest to today\'s page, but a "width budget" stays at the top and shows how the ring width is shared out.',
+   items:['Three boxes at the top: Edges, Inlays and Pinstripes, adding up to the ring width with a green tick.',
+   'The list is the same strips as today, in plain words, with − / + and Remove on every row.',
+   'New "Make edges equal" button, and a clear note that the edges get the rest automatically.',
+   'The popular designs fold-out stays under the list, as today, and opens by itself while the band is empty.']},
+  {lead:'Starts with pictures of finished bands; most customers pick one and only swap a material. Use the yellow demo bar above to see the Tungsten / Black Ceramic version.',
+   items:['Step 1 is a gallery with filters (Meteorite, Wood, Memorial, Stone…), drawn at the customer\'s own ring width.',
+   'Step 2 "Make it yours": each inlay has a "Swap material" button; widths, Add Inlay, Undo and Clear All stay.',
+   'Tungsten / Black Ceramic: the same gallery shows the precut blanks; every ? becomes a big "Tap to choose" button.',
+   'The filter groups are our own idea: please check they match how customers think about inlays.']}
+];
+
+/* ================= helpers ================= */
+function r3(x){return Math.round(x*1000)/1000;}
+function fl(x){return Math.floor(x/STEP+1e-9)*STEP;}
+function fmt(x){return String(r3(x));}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function bg(m){return m==='?'?'repeating-linear-gradient(45deg,#eef0f8 0 6px,#dde1ec 6px 12px)':(MAT[m]?MAT[m].bg:'#999');}
+function minM(m){return MAT[m]?MAT[m].min:STEP;}
+function maxM(m){return (MAT[m]&&MAT[m].max)||99;}
+function sum(a){return r3(a.reduce(function(t,x){return t+x.w;},0));}
+function cp(a){return a.map(function(x){return {m:x.m,w:x.w};});}
+function isPre(s){return !!BLANKS[s.base];}
+
+function fresh(){return {base:'Titanium',W:8,strips:[{m:'Titanium',w:8}],undo:[],sel:-1,msg:null,plainOK:false,more:false,open:'q1',start:null,cat:0,
+  blank:null,ch:null,pcat:0,foldOpen:null};}
+var S=[fresh(),fresh(),fresh(),fresh()];
+var cur=0, modal=null;
+
+function kind(s,i){var a=s.strips,x=a[i],n=a.length;if(x.m!==s.base)return 'inlay';if(n===1)return 'plain';return (i===0||i===n-1)?'edge':'pin';}
+function inlayIdx(s){var o=[];s.strips.forEach(function(x,i){if(x.m!==s.base)o.push(i);});return o;}
+function minAt(s,i){return kind(s,i)==='inlay'?minM(s.strips[i].m):EDGE_MIN;}
+function say(s,type,text){s.msg={t:type,x:text};}
+function snap(s){s.undo.push({strips:cp(s.strips),W:s.W,blank:s.blank,ch:s.ch?JSON.parse(JSON.stringify(s.ch)):null});if(s.undo.length>40)s.undo.shift();}
+function commit(s,a,W){snap(s);s.strips=a;if(W!=null)s.W=W;s.msg=null;s.plainOK=false;}
+function roleName(s,i){var k=kind(s,i);if(k==='edge')return i===0?'Left edge':'Right edge';if(k==='pin')return 'Pinstripe';if(k==='plain')return 'Whole band';return 'Inlay '+(inlayIdx(s).indexOf(i)+1);}
+function edgesEqual(a){return a.length>1&&Math.abs(a[0].w-a[a.length-1].w)<.001;}
+
+/* width comes from the edges: always from the wider one first, one step at a time */
+function takeEdges(a,need){
+  var L=a[0],R=a[a.length-1];
+  if(r3(L.w-EDGE_MIN+R.w-EDGE_MIN)<need-1e-9)return false;
+  var g=0;while(need-g>1e-9){var e=(R.w>L.w)?R:L;if(e.w-STEP<EDGE_MIN-1e-9)e=(e===L?R:L);var t=Math.min(STEP,r3(need-g));e.w=r3(e.w-t);g=r3(g+t);}
+  return true;
+}
+function giveEdges(a,amt){var L=a[0],R=a[a.length-1],g=0;while(amt-g>1e-9){var e=(L.w<R.w)?L:R;var t=Math.min(STEP,r3(amt-g));e.w=r3(e.w+t);g=r3(g+t);}}
+function edgeRoom(a){return a.length<2?0:r3(a[0].w-EDGE_MIN+a[a.length-1].w-EDGE_MIN);}
+function noRoom(s){return 'No room left: the '+s.base+' edges are at their narrowest ('+EDGE_MIN+' mm). Make the ring wider or another strip narrower.';}
+
+function addInlay(s,m,w,p){
+  w=r3(w);var a=cp(s.strips);
+  if(w<minM(m)-1e-9){say(s,'bad',m+' must be at least '+fmt(minM(m))+' mm wide.');return false;}
+  if(w>maxM(m)+1e-9){say(s,'bad',m+' can be '+maxM(m)+' mm wide at most.');return false;}
+  if(a.length===1){
+    var tot=r3(s.W-w);if(tot<2*EDGE_MIN-1e-9){say(s,'bad','Not enough room for '+fmt(w)+' mm of '+m+' in a '+fmt(s.W)+' mm ring. Make the ring wider first.');return false;}
+    var l=fl(tot/2);commit(s,[{m:s.base,w:l},{m:m,w:w},{m:s.base,w:r3(tot-l)}]);s.sel=1;return true;
+  }
+  if(p==null||p<1||p>a.length-1)p=a.length-1;
+  var left=a[p-1],right=a[p];
+  function pieces(pw){var o=[];if(left.m!==s.base)o.push({m:s.base,w:pw});o.push({m:m,w:w});if(right.m!==s.base)o.push({m:s.base,w:pw});return o;}
+  var pc=pieces(PIN);
+  if(!takeEdges(a,sum(pc))){a=cp(s.strips);pc=pieces(EDGE_MIN);if(!takeEdges(a,sum(pc))){say(s,'bad','Not enough room for '+fmt(w)+' mm of '+m+'. Make the ring wider or another strip narrower first.');return false;}}
+  var at=p+(left.m!==s.base?1:0);
+  a.splice.apply(a,[p,0].concat(pc));
+  commit(s,a);s.sel=at;
+  if(pc.length>1)say(s,'ok','Added. A '+s.base+' pinstripe was put between the inlays for you.');
+  return true;
+}
+function stepFor(s,i,dir){
+  var k=kind(s,i);
+  if(k==='inlay'||k==='pin'){if(edgesEqual(s.strips)){var w2=r3(s.strips[i].w+dir*.5);if(dir>0||w2>=minAt(s,i)-1e-9)return .5;}}
+  return STEP;
+}
+function setW(s,i,want){
+  var a=cp(s.strips),x=a[i],k=kind(s,i),now=x.w;want=r3(Math.round(want/STEP)*STEP);
+  if(k==='plain'){return setRing(s,want);}
+  var mn=minAt(s,i),mx=k==='inlay'?maxM(x.m):99;
+  if(want<mn-1e-9){say(s,'bad',(k==='inlay'?x.m:'The '+s.base+' '+roleName(s,i).toLowerCase())+' must be at least '+fmt(mn)+' mm wide.');return false;}
+  if(want>mx+1e-9){say(s,'bad',x.m+' can be '+mx+' mm wide at most.');return false;}
+  var d=r3(want-now);if(Math.abs(d)<1e-9)return false;
+  if(k==='edge'){
+    var o=i===0?a.length-1:0;
+    if(d<0){a[o].w=r3(a[o].w-d);x.w=want;}
+    else{
+      var need=d,g=Math.min(need,fl(a[o].w-EDGE_MIN));a[o].w=r3(a[o].w-g);need=r3(need-g);
+      var guard=0;while(need>1e-9&&guard++<200){var best=-1;for(var j=1;j<a.length-1;j++){if(a[j].m===s.base)continue;if(a[j].w-STEP>=minM(a[j].m)-1e-9&&(best<0||a[j].w>a[best].w))best=j;}if(best<0)break;a[best].w=r3(a[best].w-STEP);need=r3(need-STEP);}
+      if(need>1e-9){var got=r3(want-need);if(got<=now+1e-9){say(s,'bad','No room left: the other edge and every inlay are at their narrowest. Make the ring wider first.');return false;}x.w=got;commit(s,a);say(s,'info','Widest possible here: '+fmt(got)+' mm.');return true;}
+      x.w=want;
+    }
+  }else{
+    if(d<0){x.w=want;giveEdges(a,-d);}
+    else if(!takeEdges(a,d)){var room=fl(edgeRoom(a));if(room<STEP-1e-9){say(s,'bad',noRoom(s));return false;}a=cp(s.strips);takeEdges(a,room);a[i].w=r3(now+room);commit(s,a);say(s,'info','Widest possible here: '+fmt(a[i].w)+' mm.');return true;}
+    else x.w=want;
+  }
+  commit(s,a);return true;
+}
+function minRing(s){if(s.strips.length===1)return RW.min;var u=0;for(var i=1;i<s.strips.length-1;i++)u+=s.strips[i].w;return Math.max(RW.min,Math.ceil((u+2*EDGE_MIN)/RW.step-1e-9)*RW.step);}
+function setRing(s,W2){
+  W2=Math.round(W2/RW.step)*RW.step;var mn=minRing(s),note=null;
+  if(W2<mn){W2=mn;note='Narrowest possible for this band: '+fmt(mn)+' mm. Make an inlay narrower first.';}
+  if(W2>RW.max){W2=RW.max;note='The widest ring is '+RW.max+' mm.';}
+  if(Math.abs(W2-s.W)<1e-9){if(note)say(s,'info',note);return false;}
+  var a=cp(s.strips);
+  if(a.length===1)a[0].w=W2;else{var d=r3(W2-s.W);if(d>0)giveEdges(a,d);else takeEdges(a,-d);}
+  commit(s,a,W2);if(note)say(s,'info',note);return true;
+}
+function moveInlay(s,i,dir){
+  var idx=inlayIdx(s),k=idx.indexOf(i),j=idx[k+dir];if(j==null)return;
+  var a=cp(s.strips),t=a[i];a[i]=a[j];a[j]=t;commit(s,a);s.sel=j;
+}
+function removeInlay(s,i){
+  var a=cp(s.strips),freed=a[i].w,name=a[i].m;a.splice(i,1);
+  /* two base strips side by side become one (the pinstripe joins its neighbour) */
+  var j=i-1;
+  if(j>=0&&j+1<a.length&&a[j].m===s.base&&a[j+1].m===s.base){var drop=(j===0)?j+1:j;freed=r3(freed+a[drop].w);a.splice(drop,1);}
+  if(!a.some(function(x){return x.m!==s.base;}))a=[{m:s.base,w:s.W}];
+  else{var cw=r3(s.W-sum(a));giveEdges(a,cw);}
+  commit(s,a);s.sel=-1;say(s,'ok',name+' removed. Its width went back to the '+s.base+' edges.');
+}
+function swapMat(s,i,m){
+  var a=cp(s.strips),w=a[i].w;
+  if(w<minM(m)-1e-9){say(s,'bad',m+' needs at least '+fmt(minM(m))+' mm. Make this strip wider first.');return false;}
+  if(w>maxM(m)+1e-9){say(s,'bad',m+' can be '+maxM(m)+' mm wide at most. Make this strip narrower first.');return false;}
+  var old=a[i].m;a[i].m=m;commit(s,a);say(s,'ok','Swapped '+old+' for '+m+'.');return true;
+}
+function equalEdges(s){var a=cp(s.strips),t=r3(a[0].w+a[a.length-1].w),l=fl(t/2);a[0].w=l;a[a.length-1].w=r3(t-l);commit(s,a);say(s,'ok','Edges set to '+fmt(l)+(l===a[a.length-1].w?'':' and '+fmt(a[a.length-1].w))+' mm.');}
+function undo(s){var u=s.undo.pop();if(!u)return;s.strips=u.strips;s.W=u.W;s.blank=u.blank;s.ch=u.ch;s.msg=null;s.sel=-1;}
+function clearAll(s){commit(s,[{m:s.base,w:s.W}]);s.sel=-1;say(s,'info','All inlays removed. Your band is plain '+s.base+' again.');}
+
+/* popular design at the customer's ring width (same idea as the real page: inlays scale, edges take the rest, both edges equal) */
+function layoutAt(L,W,base){
+  var n=L.s.length,P=L.s.map(function(x){return {m:x[0]==='base'?base:x[0],ref:x[1],fixed:!!x[2]};});
+  if(P.some(function(p){return !MAT[p.m];}))return null;
+  var fixed=0,i;for(i=1;i<n-1;i++)if(P[i].fixed)fixed+=P[i].ref;
+  var f=(W-fixed)/(8-fixed);if(!(f>0))return null;
+  for(i=1;i<n-1;i++){var p=P[i];if(p.fixed){p.w=p.ref;continue;}var w=fl(p.ref*f);w=Math.min(w,fl(maxM(p.m)));var mn=p.m===base?EDGE_MIN:minM(p.m);if(w<mn)w=Math.ceil(mn/STEP-1e-9)*STEP;p.w=w;}
+  function tot(){var u=0;for(var k=1;k<n-1;k++)u+=P[k].w;return r3(W-u);}
+  var g=0;while(tot()<2*EDGE_MIN-1e-9&&g++<200){var b=-1;for(i=1;i<n-1;i++){if(P[i].fixed)continue;var mn2=P[i].m===base?EDGE_MIN:minM(P[i].m);if(P[i].w-STEP>=mn2-1e-9&&(b<0||P[i].w>P[b].w))b=i;}
+    if(b<0)return null;P[b].w=r3(P[b].w-STEP);var o=n-1-b;if(o!==b&&!P[o].fixed&&P[o].w>P[b].w)P[o].w=P[b].w;}
+  var t=tot();if(t<2*EDGE_MIN-1e-9)return null;
+  if(Math.round(t/STEP)%2&&n%2){var mid=P[(n-1)/2];if(!mid.fixed){if(mid.w-STEP>=minM(mid.m)-1e-9)mid.w=r3(mid.w-STEP);else if(mid.w+STEP<=maxM(mid.m)&&t-STEP>=2*EDGE_MIN)mid.w=r3(mid.w+STEP);}t=tot();}
+  var l=fl(t/2);P[0].w=l;P[n-1].w=r3(t-l);
+  if(P[n-1].w<EDGE_MIN-1e-9||l<EDGE_MIN-1e-9)return null;
+  return P.map(function(p){return {m:p.m,w:p.w};});
+}
+function same(a,b){if(!a||!b||a.length!==b.length)return false;for(var i=0;i<a.length;i++)if(a[i].m!==b[i].m||Math.abs(a[i].w-b[i].w)>1e-6)return false;return true;}
+function designs(s){var o=[];LAYOUTS.forEach(function(L,i){var st=layoutAt(L,s.W,s.base);if(st)o.push({i:i,n:L.n,st:st,cur:same(st,s.strips)});});return o;}
+function applyDesign(s,i){var st=layoutAt(LAYOUTS[i],s.W,s.base);if(!st)return;commit(s,st);s.sel=-1;say(s,'ok',LAYOUTS[i].n+' added, sized for your '+fmt(s.W)+' mm ring. Change anything you like.');}
+
+/* ================= precut blanks (Tungsten / Black Ceramic) ================= */
+function blankName(s,b){return b.plain?'Plain band · '+b.w+'mm '+b.p:b.g.map(function(x){return x[1]+'mm '+(x[0]==='b'?s.base:'Inlay');}).join(' · ');}
+function blankSub(b){return b.plain?'No inlays':'= '+b.w+'mm '+b.p+(b.bev?', beveled corners':'');}
+function chooseBlank(s,k){var b=BLANKS[s.base][k];snap(s);s.blank=k;s.W=b.w;s.ch=b.g.map(function(x){return x[0]==='b'?null:{w:x[1],items:[{m:'?',w:x[1]}]};});s.msg=null;
+  if(!b.plain)say(s,'info','Blank chosen. Now tap each ? to choose its inlay.');}
+function preStrips(s){var b=BLANKS[s.base][s.blank],o=[];b.g.forEach(function(x,gi){if(x[0]==='b')o.push({m:s.base,w:x[1],fixed:1});else s.ch[gi].items.forEach(function(it,ii){o.push({m:it.m,w:it.w,g:gi,k:ii});});});return o;}
+function tidy(c){var o=[];c.items.forEach(function(it){if(it.w<1e-9)return;var l=o[o.length-1];if(l&&l.m==='?'&&it.m==='?')l.w=r3(l.w+it.w);else o.push({m:it.m,w:it.w});});c.items=o;}
+function chFill(s,g,k,m){
+  var c=s.ch[g],it=c.items[k];
+  if(minM(m)>it.w+1e-9){say(s,'bad',m+' needs at least '+fmt(minM(m))+' mm, and this space is '+fmt(it.w)+' mm. Pick another inlay, or make the inlay next to it narrower.');return false;}
+  snap(s);var w=Math.min(it.w,maxM(m)),rest=r3(it.w-w);c.items.splice(k,1,{m:m,w:w},{m:'?',w:rest});tidy(c);s.msg=null;
+  if(rest>0)say(s,'info','This space is wider than '+m+' can be, so '+fmt(rest)+' mm is still free.');return true;
+}
+function chSet(s,g,k,want){
+  var c=s.ch[g],it=c.items[k],m=it.m;want=r3(Math.round(want/STEP)*STEP);
+  var others=0;c.items.forEach(function(x,j){if(j!==k&&x.m!=='?')others+=x.w;});var room=r3(c.w-others),mx=Math.min(room,maxM(m));
+  if(want<minM(m)-1e-9){say(s,'bad',m+' must be at least '+fmt(minM(m))+' mm wide.');return false;}
+  if(want>mx+1e-9){say(s,'bad',room<=maxM(m)?'This space is '+fmt(c.w)+' mm. '+m+' can be '+fmt(mx)+' mm here at most.':m+' can be '+maxM(m)+' mm wide at most.');return false;}
+  snap(s);var items=c.items.filter(function(x,j){return x.m!=='?'||j===k;});var me=items.indexOf(it);it.w=want;
+  var free=r3(c.w-others-want);items.splice(me+1,0,{m:'?',w:free});c.items=items;tidy(c);s.msg=null;
+  if(free>0)say(s,'info',fmt(free)+' mm free in this space: tap the ? to add another inlay, or leave it and the inlay next to it fills it.');return true;
+}
+function chRemove(s,g,k){snap(s);var c=s.ch[g],nm=c.items[k].m;c.items[k].m='?';tidy(c);say(s,'ok',nm+' removed: that space shows a ? again.');}
+function chMove(s,g,k,d){var c=s.ch[g],j=k+d;if(j<0||j>=c.items.length)return;snap(s);var t=c.items[k];c.items[k]=c.items[j];c.items[j]=t;}
+
+/* ================= what is still missing ================= */
+function missing(s){
+  if(isPre(s)){
+    if(s.blank==null)return {key:'blank',txt:'pick a ring blank'};
+    var n=0;s.ch.forEach(function(c){if(c&&!c.items.some(function(x){return x.m!=='?';}))n++;});
+    if(n)return {key:'q',txt:'choose the inlay for '+(n===1?'the space':n+' spaces')+' marked ?'};
+    return null;
+  }
+  if(!inlayIdx(s).length&&!s.plainOK)return {key:'add',txt:'add at least one inlay'};
+  return null;
+}
+
+/* ================= drawing pieces ================= */
+function band(s,opts){
+  opts=opts||{};var a=isPre(s)&&s.blank!=null?preStrips(s):s.strips,W=isPre(s)&&s.blank!=null?BLANKS[s.base][s.blank].w:s.W;
+  var segs=a.map(function(x,i){
+    var isQ=x.m==='?',lab=esc(x.m)+', '+fmt(x.w)+' mm';
+    var attrs=opts.tap?(isPre(s)?(x.fixed?'':' data-act="'+(isQ?'chq':'chsel')+'" data-g="'+x.g+'" data-k="'+x.k+'"'):' data-act="sel" data-i="'+i+'"'):'';
+    var tag=attrs?'button type="button"':'span';
+    return '<'+tag+' class="seg'+(isQ?' q':'')+(opts.sel===i?' sel':'')+'" style="flex:'+x.w+' 1 0;'+(isQ?'':'background:'+bg(x.m))+'" aria-label="'+lab+'"'+attrs+'>'+(isQ?'?':'')+'</'+tag.split(' ')[0]+'>';
+  }).join('');
+  var labels='<div class="blabels" aria-hidden="true">'+a.map(function(x){return '<span style="flex:'+x.w+' 1 0">'+fmt(x.w)+'</span>';}).join('')+'</div>';
+  var gaps='';
+  if(opts.gaps&&!isPre(s)){
+    if(a.length===1)gaps='<div class="gaps"><button type="button" class="gap solo" style="left:50%" data-act="add" data-p="1">+ Add an inlay here</button></div>';
+    else{var c=0,n=a.length;gaps='<div class="gaps">';
+      function gp(pct,p){return '<button type="button" class="gap" style="left:'+Math.min(94,Math.max(6,pct)).toFixed(2)+'%" data-act="add" data-p="'+p+'" aria-label="Add an inlay at this spot">+</button>';}
+      for(var i=0;i<n;i++){
+        if(i===1)gaps+=gp(c/W*100,1);
+        if(i===n-1&&n>2)gaps+=gp(c/W*100,n-1);
+        if(kind(s,i)==='pin')gaps+=gp((c+a[i].w/2)/W*100,i+1);
+        c+=a[i].w;}
+      gaps+='</div>';}
+  }
+  return '<div class="bandwrap"><div class="band'+(opts.big?' big':'')+'">'+segs+'</div>'+labels+gaps+
+    (opts.ruler===false?'':'<div class="ruler"><span>Ring width</span><b>'+fmt(W)+' mm</b></div>')+'</div>';
+}
+function equation(s){
+  var a=isPre(s)&&s.blank!=null?preStrips(s):s.strips,W=isPre(s)&&s.blank!=null?BLANKS[s.base][s.blank].w:s.W;
+  var parts=a.map(function(x){return '<span class="t"><i style="background:'+bg(x.m)+'"></i>'+fmt(x.w)+'</span>';});
+  var ok=Math.abs(sum(a)-W)<1e-6;
+  return '<div class="eq" aria-label="Strip widths add up to the ring width">'+parts.join('<span>+</span>')+'<span>=</span><span class="total">'+fmt(W)+' mm</span>'+(ok?'<span class="ok">✓ adds up</span>':'')+'</div>';
+}
+function mini(st,W){return '<span class="mini" aria-hidden="true">'+st.map(function(x){return x.m==='?'?'<i class="q" style="flex:'+x.w+' 1 0">?</i>':'<i style="flex:'+x.w+' 1 0;background:'+bg(x.m)+'"></i>';}).join('')+'</span>';}
+function msgHTML(s){if(!s.msg)return '';var ic=s.msg.t==='bad'?'!':s.msg.t==='ok'?'✓':'i';return '<p class="msg '+s.msg.t+'" role="status"><b>'+ic+'</b><span>'+esc(s.msg.x)+'</span></p>';}
+var UNDO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
+function tools(s,addLabel){
+  var plain=s.strips.length===1;
+  return '<div class="tools" data-q="add">'+
+    '<button type="button" class="btn primary" data-act="add">'+(addLabel||'+ Add Inlay')+'</button>'+
+    (plain?'':'<button type="button" class="btn" data-act="clear">Clear All</button>')+
+    (s.undo.length?'<button type="button" class="btn" data-act="undo">'+UNDO+' Undo</button>':'')+'</div>';
+}
+function stepper(s,i,w,cls){
+  return '<span class="stp '+(cls||'')+'"><button type="button" class="ib" data-act="dec" data-i="'+i+'" aria-label="Narrower">−</button>'+
+    '<label class="num"><input data-sw="'+i+'" inputmode="decimal" value="'+fmt(w)+'" aria-label="Width of '+esc(s.strips[i].m)+' in mm"><span>mm</span></label>'+
+    '<button type="button" class="ib" data-act="inc" data-i="'+i+'" aria-label="Wider">+</button></span>';
+}
+function rows(s,opts){
+  opts=opts||{};var a=s.strips;
+  if(a.length===1)return '<div class="plainband">Your band is plain '+esc(s.base)+', '+fmt(s.W)+' mm wide.<br>Add an inlay and it is split into strips for you.</div>';
+  var idx=inlayIdx(s);
+  return '<div class="rows">'+a.map(function(x,i){
+    var k=kind(s,i),p=idx.indexOf(i),mn=minAt(s,i);
+    var sub=roleName(s,i)+' · min '+fmt(mn)+' mm'+(k==='edge'?' · gets the rest':'')+(x.m==='Gibeon Meteorite'?' · max 10 mm':'');
+    return '<div class="srow '+k+(s.sel===i?' sel':'')+'" data-row="'+i+'">'+
+      '<span class="sw" style="background:'+bg(x.m)+'"></span>'+
+      '<span class="sn"><b>'+esc(x.m)+'</b><small>'+sub+'</small></span>'+
+      (k==='inlay'?'<button type="button" class="rm" data-act="rm" data-i="'+i+'">Remove</button>':'<span></span>')+
+      '<span class="ctl">'+
+      (k==='inlay'?'<button type="button" class="ib sm" data-act="mv" data-i="'+i+'" data-v="-1"'+(p===0?' disabled':'')+' aria-label="Move left">«</button>'+
+        '<button type="button" class="ib sm" data-act="mv" data-i="'+i+'" data-v="1"'+(p===idx.length-1?' disabled':'')+' aria-label="Move right">»</button>':'<span class="fixednote">'+(k==='edge'?'Edge':'Between inlays')+'</span>')+
+      '<span class="grow"></span>'+stepper(s,i,x.w)+'</span>'+
+      (k==='inlay'&&opts.swap?'<span class="ctl"><button type="button" class="btn" style="flex:1" data-act="swap" data-i="'+i+'">Swap material</button></span>':'')+
+    '</div>';
+  }).join('')+'</div>';
+}
+function ringWidthCtl(s,id){
+  if(isPre(s))return '';
+  return '<div class="range"><input type="range" data-rw id="rw'+id+'" min="'+RW.min+'" max="'+RW.max+'" step="'+RW.step+'" value="'+s.W+'" aria-label="Ring width in mm">'+
+    '<label class="num"><input data-rwn inputmode="decimal" value="'+fmt(s.W)+'" aria-label="Ring width, exact"><span>mm</span></label></div>'+
+    '<div class="ticks"><span>2 mm</span><span>14 mm</span></div>';
+}
+function designGrid(s,opts){
+  opts=opts||{};var list=designs(s);
+  if(opts.filter){var c=CATS[s.cat][1];if(c)list=list.filter(function(d){return c.indexOf(d.i)>=0;});}
+  var first=opts.all?99:6,show=s.more||list.length<=first?list:list.slice(0,first);
+  var h=show.map(function(d){return '<button type="button" class="lay" data-act="design" data-v="'+d.i+'" aria-pressed="'+d.cur+'">'+mini(d.st)+'<span class="nm">'+esc(d.n)+'</span>'+(opts.sub?'<span class="sub">'+d.st.map(function(x){return fmt(x.w);}).join(' · ')+' mm</span>':'')+'</button>';}).join('');
+  return {cards:h,more:(show.length<list.length)?'<button type="button" class="more" data-act="more">More designs ('+(list.length-show.length)+')</button>':'',n:list.length};
+}
+function howSVG(){
+  return '<svg viewBox="0 0 92 40" aria-hidden="true"><rect x="1" y="4" width="14" height="24" rx="2" fill="#c8ccd3" stroke="#8e939b"/><rect x="15" y="4" width="62" height="24" fill="#6c7077"/><path d="M15 4 L77 28 M30 4 L77 22 M15 14 L60 28" stroke="#c9ced6" stroke-width=".8"/><rect x="77" y="4" width="14" height="24" rx="2" fill="#c8ccd3" stroke="#8e939b"/>'+
+    '<path d="M1 35 H91" stroke="#566074" stroke-width="1"/><path d="M1 32 V38 M91 32 V38" stroke="#566074"/></svg>';
+}
+
+/* ================= shell ================= */
+function shell(s,inner,opts){
+  opts=opts||{};var m=missing(s),pre=isPre(s);
+  var crumb=pre?(s.blank!=null?s.base+' · '+BLANKS[s.base][s.blank].w+' mm '+BLANKS[s.base][s.blank].p+' blank':s.base+' · precut blank'):s.base+' · '+fmt(s.W)+' mm Flat · with inlays';
+  var todo;
+  if(m)todo='<div class="todo">Still to do: <b>'+m.txt+'</b>'+(m.key==='add'?' · or <button type="button" class="linkbtn" data-act="plain">keep the band plain</button>':'')+'</div>';
+  else if(pre){var b=BLANKS[s.base][s.blank];todo='<div class="todo ready">✓ '+(b.plain?'Plain '+s.base+' band, '+b.w+' mm':'Every ? has an inlay')+'</div>';}
+  else if(!inlayIdx(s).length)todo='<div class="todo ready">✓ Plain '+esc(s.base)+' band, '+fmt(s.W)+' mm · no inlays</div>';
+  else todo='<div class="todo ready">✓ Band adds up to '+fmt(s.W)+' mm · '+inlayIdx(s).length+' inlay'+(inlayIdx(s).length>1?'s':'')+'</div>';
+  return '<div class="b-top">'+
+      '<div class="brand"><b>JEWELRY BY JOHAN</b><span>Ring Builder</span></div>'+
+      '<div class="steps" aria-label="Steps">'+
+        '<div class="st done"><i></i><small>Step 1 ✓</small><span>Your band</span></div>'+
+        '<div class="st on"><i></i><small>Step 2</small><span>Make it yours</span></div>'+
+        '<div class="st"><i></i><small>Step 3</small><span>Get my quote</span></div>'+
+      '</div>'+
+      '<div class="subtabs"><div class="on">Add/Remove Inlays</div><div>Sleeve</div><div>Finish</div></div>'+
+    '</div>'+
+    (opts.wrapClass?'<div class="'+opts.wrapClass+'">':'')+(opts.before||'')+
+    '<div class="b-body"><div class="crumb">'+esc(crumb)+'</div>'+inner+'</div>'+
+    (opts.wrapClass?'</div>':'')+
+    '<div class="b-bar">'+todo+'<div class="row"><button type="button" class="back">← Back</button><div class="mid">Make it yours</div>'+
+      '<button type="button" class="next" data-act="next" aria-disabled="'+(!!m)+'">Sleeve →</button></div></div>';
+}
+
+/* ================= Preview 1: three clear steps ================= */
+function P1(s){
+  function q(id,n,title,sum,answered,body,locked,lockTxt){
+    var open=s.open===id&&!locked;
+    return '<section class="q'+(open?' open':'')+(answered&&!open?' answered':'')+(locked?' locked':'')+'" data-q="'+id+'">'+
+      '<button type="button" class="q-head" data-act="open" data-v="'+id+'" aria-expanded="'+open+'"'+(locked?' aria-disabled="true"':'')+'>'+
+      '<span class="q-n">'+(answered&&!open?'✓':n)+'</span><span><span class="q-title">'+title+'</span><span class="q-sum">'+(locked?lockTxt:sum)+'</span></span>'+
+      '<span class="q-act">'+(open||locked?'':(answered?'Change':'Open'))+'</span></button>'+(open?'<div class="q-body">'+body+'</div>':'')+'</section>';
+  }
+  var g=designGrid(s);
+  var b1='<p class="help">Tap a popular design (you can change everything after), or start with an empty band.</p>'+
+    '<div class="lay-grid"><button type="button" class="lay own" data-act="start" data-v="own" aria-pressed="'+(s.start==='own')+'"><span class="plus">+</span><span class="nm">Build my own</span><span class="sub">Add inlays one by one</span></button>'+g.cards+'</div>'+g.more+
+    '<button type="button" class="linkbtn" data-act="plain">No inlay after all: keep the band plain</button>';
+  var d=LAYOUTS.filter(function(L,i){return same(layoutAt(L,s.W,s.base),s.strips);})[0];
+  var sum1=s.start==='own'?'Building my own':d?d.n:(s.start==='design'?'Design, changed by you':(s.plainOK?'Plain band':'Not chosen yet'));
+  var b2='<div class="how">'+howSVG()+'<span>Strips sit side by side. The '+esc(s.base)+' edges always take up the rest, so the band always fills <b>'+fmt(s.W)+' mm</b>.</span></div>'+
+    band(s,{tap:false})+(s.strips.length>1?equation(s):'')+msgHTML(s)+rows(s)+tools(s)+
+    (s.strips.length>1?'<p class="note">Type a width or press − / +. A wider inlay takes its width from the edges. « » swap an inlay with the next one.</p>':'');
+  var nIn=inlayIdx(s).length;
+  var sum2=nIn?nIn+' inlay'+(nIn>1?'s':'')+' · '+s.strips.map(function(x){return fmt(x.w);}).join(' + ')+' mm':'No inlays yet';
+  var b3='<p class="help">Already set in Step 1. Changing it here only makes the '+esc(s.base)+' edges wider or narrower.</p>'+msgHTML(s)+ringWidthCtl(s,0);
+  var inner='<div class="ptitle"><h2>Build Your Band</h2><p>Three short steps. Your inlays go between '+esc(s.base)+' edges.</p></div>'+
+    '<div class="p1">'+
+    q('q1',1,'How do you want to start?',sum1,!!s.start||s.plainOK,b1)+
+    q('q2',2,'Your strips',sum2,nIn>0,b2,!s.start,'Choose a start first')+
+    q('q3',3,'Ring width','<span>'+fmt(s.W)+' mm</span>',true,b3)+
+    '</div>';
+  return shell(s,inner);
+}
+
+/* ================= Preview 2: tap the band picture ================= */
+function P2(s){
+  var plain=s.strips.length===1;
+  var studio='<div class="studio" aria-label="Your band">'+
+    '<div class="top"><span class="t">Your band</span><span class="rwmini"><button type="button" class="ib" data-act="rw" data-v="-1" aria-label="Narrower ring">−</button><b>'+fmt(s.W)+' mm</b><button type="button" class="ib" data-act="rw" data-v="1" aria-label="Wider ring">+</button></span></div>'+
+    band(s,{big:true,tap:true,gaps:true,sel:s.sel,ruler:false})+
+    (plain?'':equation(s))+'</div>';
+  var ed;
+  if(s.sel>=0&&s.strips[s.sel]&&!plain){
+    var i=s.sel,x=s.strips[i],k=kind(s,i),idx=inlayIdx(s),p=idx.indexOf(i);
+    ed='<div class="editor" data-q="ed"><div class="eh"><span class="sw" style="background:'+bg(x.m)+'"></span><span><b>'+esc(x.m)+'</b><small>'+roleName(s,i)+' · min '+fmt(minAt(s,i))+' mm'+(k==='edge'?' · gets the rest':'')+'</small></span></div>'+
+      '<div class="bigstep"><button type="button" class="ib" data-act="dec" data-i="'+i+'" aria-label="Narrower">−</button><label class="num"><input data-sw="'+i+'" inputmode="decimal" value="'+fmt(x.w)+'" aria-label="Width in mm"><span>mm</span></label><button type="button" class="ib" data-act="inc" data-i="'+i+'" aria-label="Wider">+</button></div>'+
+      '<p class="note">'+(k==='inlay'||k==='pin'?'Wider takes the width from the '+esc(s.base)+' edges.':'A wider edge takes from the other edge first, then from the inlays.')+'</p>'+
+      (k==='inlay'?'<div class="acts"><button type="button" class="btn" data-act="mv" data-i="'+i+'" data-v="-1"'+(p===0?' disabled':'')+'>« Move left</button><button type="button" class="btn" data-act="mv" data-i="'+i+'" data-v="1"'+(p===idx.length-1?' disabled':'')+'>Move right »</button>'+
+        '<button type="button" class="btn" data-act="swap" data-i="'+i+'">Change material</button><button type="button" class="btn bad" data-act="rm" data-i="'+i+'">Remove</button></div>':
+       k==='edge'?'<div class="acts"><button type="button" class="btn" data-act="eqedges">Make edges equal</button><button type="button" class="btn" data-act="sel" data-i="-1">Done</button></div>':'<div class="acts"><button type="button" class="btn" data-act="sel" data-i="-1">Done</button></div>')+
+    '</div>';
+  }else ed='<div class="tapme" data-q="ed"><b>'+(plain?'Tap “+ Add an inlay here” on the band':'Tap any strip in the picture to change it')+'</b><span>'+(plain?'Or pick a popular design below.':'Tap a blue + to add another inlay exactly there.')+'</span></div>';
+  var g=designGrid(s,{all:true,sub:true});
+  var inner='<div class="ptitle"><h2>Build Your Band</h2><p>Tap the band to change it. The strips always fill the ring width.</p></div>'+
+    msgHTML(s)+ed+
+    '<div class="tools"'+(plain?' data-q="add"':'')+'>'+(plain?'':'<button type="button" class="btn" data-act="clear">Clear All</button>')+(s.undo.length?'<button type="button" class="btn" data-act="undo">'+UNDO+' Undo</button>':'')+'</div>'+
+    '<section style="display:grid;gap:8px"><div class="label">Start from a popular design</div><p class="note">Tap one, then change anything you like.</p><div class="hscroll">'+g.cards+'</div></section>';
+  return shell(s,inner,{wrapClass:'p2wrap',before:studio});
+}
+
+/* ================= Preview 3: width budget on top ================= */
+function P3(s){
+  var a=s.strips,plain=a.length===1,E=0,I=0,P=0;
+  a.forEach(function(x,i){var k=kind(s,i);if(k==='edge')E+=x.w;else if(k==='pin')P+=x.w;else if(k==='inlay')I+=x.w;});
+  var meter='<div class="meter" aria-label="Width budget">'+
+    '<div class="mh"><b>Ring width '+fmt(s.W)+' mm</b><span class="ok">'+(plain?'Plain band':'✓ All '+fmt(s.W)+' mm used')+'</span></div>'+
+    band(s,{ruler:false})+
+    '<div class="legend"><div><small>Edges</small><b>'+(plain?fmt(s.W):fmt(E))+' mm</b><span class="auto">auto · the rest</span></div><div><small>Inlays</small><b>'+fmt(I)+' mm</b><span class="auto">'+inlayIdx(s).length+' chosen</span></div><div><small>Pinstripes</small><b>'+fmt(P)+' mm</b><span class="auto">auto</span></div></div>'+
+    ringWidthCtl(s,2)+'</div>';
+  var g=designGrid(s);
+  var open=s.foldOpen==null?plain:s.foldOpen;
+  var inner='<div class="ptitle"><h2>Build Your Band</h2><p>Add inlays one at a time. '+esc(s.base)+' edges and pinstripes are added for you, and the edges always take up the rest of the width.</p></div>'+
+    tools(s)+msgHTML(s)+rows(s)+
+    (plain?'':'<div class="tools"><button type="button" class="btn ghost" data-act="eqedges">Make edges equal</button></div><p class="note">To change a width, type it in the box or press − / +. A wider inlay takes its width from the '+esc(s.base)+' edges; a wider edge takes it from the other edge. « » move an inlay.</p>')+
+    '<details class="fold" id="fold3"'+(open?' open':'')+'><summary>'+(plain?'Start from a popular design':'Popular designs')+'</summary><div><p class="note">Tap one, then change anything you like.</p><div class="lay-grid">'+g.cards+'</div>'+g.more+
+    (plain?'<p class="note">Or build your own above - or keep the band plain and continue.</p>':'')+'</div></details>';
+  return shell(s,inner,{wrapClass:'p3wrap',before:meter});
+}
+
+/* ================= Preview 4: design gallery first (+ precut blanks) ================= */
+function P4(s){
+  if(isPre(s))return P4pre(s);
+  var plain=s.strips.length===1,g=designGrid(s,{filter:true,all:true,sub:true});
+  var chips='<div class="chips scroll" role="group" aria-label="Filter designs">'+CATS.map(function(c,i){return '<button type="button" class="chip" data-act="cat" data-v="'+i+'" aria-pressed="'+(s.cat===i)+'">'+c[0]+'</button>';}).join('')+'</div>';
+  var picked=!plain;
+  var step1='<section style="display:grid;gap:10px" data-q="add"><div class="step-h"><span class="n'+(picked?' ok':'')+'">'+(picked?'✓':'1')+'</span><h3>Pick a design to start from</h3></div>'+
+    (picked&&!s.galOpen?'':'<p class="note">Drawn at your ring width, '+fmt(s.W)+' mm. Tap one, then change anything you like.</p>'+chips)+
+    (picked&&!s.galOpen?curDesign(s)+'<button type="button" class="more" data-act="gal">Show all designs again</button>':'<div class="gal"><button type="button" class="lay own" data-act="add"><span class="plus">+</span><span class="nm">Start empty</span><span class="sub">Add my own inlays</span></button>'+g.cards+'</div>')+
+    (plain?'<button type="button" class="linkbtn" data-act="plain">Or keep the band plain and continue</button>':'')+'</section>';
+  var step2='<section class="card" data-q="mine"><div class="step-h"><span class="n">2</span><h3>Make it yours</h3></div>'+
+    (plain?'<p class="note">Pick a design above or tap “Start empty”. Your band shows up here.</p>':
+      band(s)+equation(s)+msgHTML(s)+rows(s,{swap:true})+tools(s,'+ Add another inlay')+
+      '<details class="fold" style="padding-inline:12px"><summary>Ring width · '+fmt(s.W)+' mm</summary><div><p class="note">Only the '+esc(s.base)+' edges change.</p>'+ringWidthCtl(s,3)+'</div></details>')+'</section>';
+  var inner='<div class="ptitle"><h2>Build Your Band</h2><p>Start from a finished band and swap in your favourite materials.</p></div>'+
+    (plain?msgHTML(s):'')+'<div class="p4"><div class="two">'+step1+step2+'</div></div>';
+  return shell(s,inner);
+}
+function curDesign(s){var d=designs(s).filter(function(x){return x.cur;})[0];return d?'<div class="lay" aria-pressed="true" style="max-width:260px">'+mini(d.st)+'<span class="nm">Started from: '+esc(d.n)+'</span></div>':'<p class="note">Your own design. Change it on the right / below.</p>';}
+function P4pre(s){
+  var list=BLANKS[s.base],kinds=[['All',null]];
+  list.forEach(function(b){var k=b.plain?'Plain':b.w+' mm '+b.p;if(!kinds.some(function(x){return x[0]===k;}))kinds.push([k,k]);});
+  if(s.pcat>=kinds.length)s.pcat=0;
+  var chips='<div class="chips scroll" role="group" aria-label="Filter blanks">'+kinds.map(function(c,i){return '<button type="button" class="chip" data-act="pcat" data-v="'+i+'" aria-pressed="'+(s.pcat===i)+'">'+c[0]+'</button>';}).join('')+'</div>';
+  var f=kinds[s.pcat][1];
+  var cards=list.map(function(b,k){var key=b.plain?'Plain':b.w+' mm '+b.p;if(f&&f!==key)return '';
+    var st=b.g.map(function(x){return {m:x[0]==='b'?s.base:'?',w:x[1]};});
+    return '<button type="button" class="lay" data-act="blank" data-v="'+k+'" aria-pressed="'+(s.blank===k)+'">'+mini(st)+'<span class="nm">'+esc(blankName(s,b))+'</span><span class="sub">'+esc(blankSub(b))+'</span></button>';}).join('');
+  var picked=s.blank!=null;
+  var step1='<section style="display:grid;gap:10px" data-q="blank"><div class="step-h"><span class="n'+(picked?' ok':'')+'">'+(picked?'✓':'1')+'</span><h3>Choose your ring blank</h3></div>'+
+    (picked&&!s.galOpen?'<p class="note">'+esc(blankName(s,list[s.blank]))+' '+esc(blankSub(list[s.blank]))+'</p><button type="button" class="more" data-act="gal">Show all blanks again</button>':'<p class="note">'+esc(s.base)+' rings are made from precut blanks. Pick one, then tap each ? to choose its inlay.</p>'+chips+'<div class="gal">'+cards+'</div>')+'</section>';
+  var step2;
+  if(!picked)step2='<section class="card"><div class="step-h"><span class="n">2</span><h3>Fill each ?</h3></div><p class="note">Pick a blank first. Its spaces for inlays show up here.</p></section>';
+  else{
+    var b=list[s.blank],body='';
+    if(b.plain)body='<div class="plainband">A plain '+esc(s.base)+' band, '+b.w+' mm '+b.p+'. Nothing to fill.</div>';
+    else{var sn=0;b.g.forEach(function(x,gi){
+      if(x[0]==='b'){body+='<div class="fixedrow"><i style="background:'+bg(s.base)+'"></i>'+x[1]+' mm '+esc(s.base)+' · comes with the blank</div>';return;}
+      sn++;var c=s.ch[gi],filled=c.items.some(function(t){return t.m!=='?';});
+      if(!filled){body+='<button type="button" class="space" data-act="chq" data-g="'+gi+'" data-k="0" data-q="q"><span class="qmark">?</span><span><b>Space '+sn+' · '+fmt(c.w)+' mm</b><small>Tap to choose the inlay</small></span></button>';return;}
+      body+='<div class="chan"><div class="ct"><span>Space '+sn+'</span><span>'+fmt(c.w)+' mm</span></div>'+c.items.map(function(t,k){
+        if(t.m==='?')return '<button type="button" class="space" data-act="chq" data-g="'+gi+'" data-k="'+k+'"><span class="qmark">?</span><span><b>'+fmt(t.w)+' mm free</b><small>Tap to add another inlay, or leave it: the inlay next to it fills it.</small></span></button>';
+        return '<div class="srow"><span class="sw" style="background:'+bg(t.m)+'"></span><span class="sn"><b>'+esc(t.m)+'</b><small>min '+fmt(minM(t.m))+' mm · this space '+fmt(c.w)+' mm</small></span>'+
+          '<button type="button" class="rm" data-act="chrm" data-g="'+gi+'" data-k="'+k+'">Remove</button>'+
+          '<span class="ctl">'+(c.items.length>1?'<button type="button" class="ib sm" data-act="chmv" data-g="'+gi+'" data-k="'+k+'" data-v="-1"'+(k===0?' disabled':'')+' aria-label="Move left">«</button><button type="button" class="ib sm" data-act="chmv" data-g="'+gi+'" data-k="'+k+'" data-v="1"'+(k===c.items.length-1?' disabled':'')+' aria-label="Move right">»</button>':'')+
+          '<span class="grow"></span><span class="stp"><button type="button" class="ib" data-act="chdec" data-g="'+gi+'" data-k="'+k+'" aria-label="Narrower">−</button><label class="num"><input data-chw data-g="'+gi+'" data-k="'+k+'" inputmode="decimal" value="'+fmt(t.w)+'" aria-label="Width in mm"><span>mm</span></label><button type="button" class="ib" data-act="chinc" data-g="'+gi+'" data-k="'+k+'" aria-label="Wider">+</button></span></span>'+
+          '<span class="ctl"><button type="button" class="btn" style="flex:1" data-act="chswap" data-g="'+gi+'" data-k="'+k+'">Swap material</button></span></div>';
+      }).join('')+'</div>';
+    });}
+    step2='<section class="card" data-q="mine"><div class="step-h"><span class="n">2</span><h3>Fill each ?</h3></div>'+band(s,{tap:true})+equation(s)+msgHTML(s)+body+
+      '<div class="tools">'+(s.undo.length?'<button type="button" class="btn" data-act="undo">'+UNDO+' Undo</button>':'')+'<button type="button" class="btn" data-act="unblank">Change blank</button></div>'+
+      '<p class="note">Ring width and profile come with the blank ('+b.w+' mm '+b.p+').</p></section>';
+  }
+  var inner='<div class="ptitle"><h2>Build Your Band</h2><p>Pick a precut blank, then choose the inlay for each space.</p></div>'+(picked?'':msgHTML(s))+'<div class="p4"><div class="two">'+step1+step2+'</div></div>';
+  return shell(s,inner);
+}
+
+/* ================= stand-in Add Inlay popup ================= */
+function openModal(o){modal=o;modal.group=modal.group||(o.cur&&MAT[o.cur]?MAT[o.cur].g:'Woods');modal.pick=o.cur||null;
+  if(o.mode==='add'){var s=S[cur];var room=s.strips.length===1?r3(s.W-2*EDGE_MIN):r3(edgeRoom(s.strips)-EDGE_MIN);modal.room=Math.max(0,room);modal.w=null;}
+  drawModal();}
+function drawModal(){
+  var el=document.getElementById('modal');if(!modal){el.hidden=true;el.innerHTML='';return;}
+  var s=S[cur],o=modal;
+  var title=o.mode==='add'?'Add an inlay':o.mode==='fill'?'Choose the inlay for this '+fmt(o.space)+' mm space':'Swap material ('+fmt(o.space)+' mm strip)';
+  var mats=Object.keys(MAT).filter(function(m){return MAT[m].g===o.group&&m!==s.base;});
+  var w=o.w;if(o.mode==='add'&&o.pick&&w==null){w=Math.max(minM(o.pick),Math.min(3,fl(o.room)));}
+  var h='<div class="sheet" role="dialog" aria-modal="true" aria-label="'+esc(title)+'">'+
+    '<div class="sh"><h3>'+esc(title)+'</h3><button type="button" class="ib" data-m="close" aria-label="Close">×</button></div>'+
+    '<div class="standin">Stand-in only · the real Add Inlay popup is designed separately</div>'+
+    '<div class="chips scroll" style="margin:0 -14px;padding:0 14px">'+GROUPS.map(function(g){return '<button type="button" class="chip" data-m="group" data-v="'+esc(g)+'" aria-pressed="'+(o.group===g)+'">'+esc(g)+'</button>';}).join('')+'</div>'+
+    '<div class="mats">'+mats.map(function(m){var tooBig=o.mode!=='add'&&minM(m)>o.space+1e-9;
+      return '<button type="button" class="mat" data-m="pick" data-v="'+esc(m)+'" aria-pressed="'+(o.pick===m)+'"'+(tooBig?' disabled':'')+'><i style="background:'+bg(m)+'"></i><span>'+esc(m)+'</span><small>min '+fmt(minM(m))+' mm'+(tooBig?' · too wide':'')+'</small></button>';}).join('')+'</div>';
+  if(o.mode==='add'){
+    h+='<p class="note">Room you can use: '+fmt(o.room)+' mm (the '+esc(s.base)+' edges get narrower to make space).</p>';
+    if(o.pick&&minM(o.pick)>o.room+1e-9){h+='<p class="msg bad"><b>!</b><span>'+esc(o.pick)+' needs at least '+fmt(minM(o.pick))+' mm. Close this, then make the ring wider or another strip narrower.</span></p><button type="button" class="btn big" data-m="close">Close</button></div>';o.wNow=null;document.getElementById('modal').innerHTML=h;document.getElementById('modal').hidden=false;return;}
+    if(o.pick)h+='<div class="label">Width of '+esc(o.pick)+'</div><div class="bigstep"><button type="button" class="ib" data-m="w" data-v="-1" aria-label="Narrower">−</button><label class="num"><input id="mw" inputmode="decimal" value="'+fmt(w)+'" aria-label="Inlay width in mm"><span>mm</span></label><button type="button" class="ib" data-m="w" data-v="1" aria-label="Wider">+</button></div>';
+    h+='<button type="button" class="btn primary big" data-m="ok"'+(o.pick?'':' disabled')+'>'+(o.pick?'Add '+esc(o.pick)+' · '+fmt(w)+' mm':'Pick a material')+'</button>';
+  }else h+='<button type="button" class="btn primary big" data-m="ok"'+(o.pick?'':' disabled')+'>'+(o.pick?'Use '+esc(o.pick):'Pick a material')+'</button>';
+  h+='</div>';
+  o.wNow=w;el.innerHTML=h;el.hidden=false;
+  document.getElementById('modal').classList.toggle('pcmodal',stage.classList.contains('pc'));
+}
+document.getElementById('modal').addEventListener('click',function(e){
+  if(e.target.id==='modal'){modal=null;drawModal();return;}
+  var b=e.target.closest('[data-m]');if(!b)return;var a=b.getAttribute('data-m'),v=b.getAttribute('data-v'),o=modal,s=S[cur];
+  if(a==='close'){modal=null;drawModal();return;}
+  if(a==='group'){o.group=v;drawModal();return;}
+  if(a==='pick'){o.pick=v;o.w=null;drawModal();return;}
+  if(a==='w'){var w=r3((o.wNow||1)+parseFloat(v)*STEP);w=Math.max(minM(o.pick),w);o.w=w;drawModal();return;}
+  if(a==='ok'&&o.pick){
+    var ok=true,w2=o.wNow;var inp=document.getElementById('mw');if(inp){var t=parseFloat(inp.value);if(!isNaN(t))w2=t;}
+    if(o.mode==='add')ok=addInlay(s,o.pick,w2,o.p);
+    else if(o.mode==='swap')ok=swapMat(s,o.i,o.pick);
+    else if(o.mode==='fill')ok=chFill(s,o.g,o.k,o.pick);
+    else if(o.mode==='chswap'){var c=s.ch[o.g],it=c.items[o.k];if(minM(o.pick)>it.w+1e-9||maxM(o.pick)<it.w-1e-9){say(s,'bad',o.pick+' does not fit a '+fmt(it.w)+' mm strip.');}else{snap(s);it.m=o.pick;say(s,'ok','Swapped to '+o.pick+'.');}}
+    if(cur===0&&ok&&o.mode==='add'){s.start=s.start||'own';s.open='q2';}
+    modal=null;drawModal();render();
+  }
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&modal){modal=null;drawModal();}});
+
+/* ================= render + events ================= */
+var R=[P1,P2,P3,P4];
+var device=document.getElementById('device'),stage=document.getElementById('stage');
+function render(focusKey){
+  var s=S[cur];device.innerHTML=R[cur](s);
+  var f3=device.querySelector('#fold3');if(f3)f3.addEventListener('toggle',function(){s.foldOpen=f3.open;});
+  if(focusKey){var f=device.querySelector(focusKey);if(f)f.focus({preventScroll:true});}
+  var dm=document.getElementById('demo');dm.hidden=cur!==3;
+  dm.querySelectorAll('[data-metal]').forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-metal')===s.base));});
+}
+function renderChanged(){var c=CHANGED[cur];document.getElementById('changed').innerHTML='<h2>What changed · Preview '+(cur+1)+': '+NAMES[cur]+'</h2><p class="diff">'+c.lead+'</p><ul>'+c.items.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ul>';}
+function select(n){cur=n;document.querySelectorAll('#switch button').forEach(function(b,k){b.setAttribute('aria-selected',String(k===n));b.tabIndex=k===n?0:-1;});
+  try{localStorage.setItem('inlPreview',String(n));}catch(e){}modal=null;drawModal();render();renderChanged();}
+function flashMissing(s){
+  var m=missing(s);if(!m)return;
+  if(cur===0&&m.key==='add'){s.open=s.start?'q2':'q1';render();}
+  var el=device.querySelector('[data-q="'+m.key+'"]')||device.querySelector('[data-q="q1"]');
+  if(el){el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');}
+}
+device.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]');if(!b||!device.contains(b)||b.disabled)return;
+  var s=S[cur],a=b.getAttribute('data-act'),v=b.getAttribute('data-v'),i=parseInt(b.getAttribute('data-i'),10),g=parseInt(b.getAttribute('data-g'),10),k=parseInt(b.getAttribute('data-k'),10);
+  var key='[data-act="'+a+'"]'+(b.hasAttribute('data-i')?'[data-i="'+i+'"]':'')+(v!=null?'[data-v="'+v+'"]':'');
+  switch(a){
+    case 'open':if(b.getAttribute('aria-disabled')==='true'){flashMissing(s);return;}s.open=v;break;
+    case 'start':s.start='own';s.plainOK=false;s.open='q2';openModal({mode:'add'});break;
+    case 'design':applyDesign(s,parseInt(v,10));s.galOpen=false;if(cur===0){s.start='design';s.open='q2';}break;
+    case 'more':s.more=true;break;
+    case 'add':if(isPre(s))return;openModal({mode:'add',p:b.hasAttribute('data-p')?parseInt(b.getAttribute('data-p'),10):null});if(cur===0)s.start=s.start||'own';return;
+    case 'clear':clearAll(s);break;
+    case 'undo':undo(s);break;
+    case 'plain':if(s.strips.length>1)clearAll(s);s.plainOK=true;s.msg={t:'ok',x:'Fine: your band stays plain '+s.base+'. You can still add an inlay any time.'};if(cur===0){s.start=null;s.open='q1';}break;
+    case 'inc':case 'dec':var dir=a==='inc'?1:-1;setW(s,i,s.strips[i].w+dir*stepFor(s,i,dir));break;
+    case 'mv':moveInlay(s,i,parseInt(v,10));key='[data-act="mv"][data-i="'+s.sel+'"][data-v="'+v+'"]';break;
+    case 'rm':removeInlay(s,i);break;
+    case 'sel':s.sel=(s.sel===i||i<0)?-1:i;s.msg=null;break;
+    case 'swap':openModal({mode:'swap',i:i,space:s.strips[i].w,cur:s.strips[i].m});return;
+    case 'eqedges':equalEdges(s);break;
+    case 'rw':setRing(s,s.W+parseInt(v,10)*RW.step);break;
+    case 'gal':s.galOpen=true;break;
+    case 'cat':s.cat=parseInt(v,10);break;
+    case 'pcat':s.pcat=parseInt(v,10);break;
+    case 'blank':chooseBlank(s,parseInt(v,10));s.galOpen=false;break;
+    case 'unblank':snap(s);s.blank=null;s.ch=null;s.msg=null;break;
+    case 'chq':openModal({mode:'fill',g:g,k:k,space:s.ch[g].items[k].w});return;
+    case 'chsel':var el=device.querySelectorAll('[data-act="chrm"][data-g="'+g+'"][data-k="'+k+'"]')[0];if(el){el.closest('.srow').scrollIntoView({block:'center'});el.closest('.srow').classList.add('flash');}return;
+    case 'chinc':case 'chdec':var it=s.ch[g].items[k];chSet(s,g,k,it.w+(a==='chinc'?STEP:-STEP));break;
+    case 'chrm':chRemove(s,g,k);break;
+    case 'chmv':chMove(s,g,k,parseInt(v,10));break;
+    case 'chswap':openModal({mode:'chswap',g:g,k:k,space:s.ch[g].items[k].w,cur:s.ch[g].items[k].m});return;
+    case 'next':
+      if(b.getAttribute('aria-disabled')==='true'){flashMissing(s);return;}
+      b.textContent='✓ Going to Sleeve…';setTimeout(function(){if(b.isConnected)b.textContent='Sleeve →';},1400);return;
+    default:return;
+  }
+  render(key);
+});
+device.addEventListener('input',function(e){
+  var t=e.target,s=S[cur];
+  if(t.matches('input[type=range][data-rw]')){var n=t.parentNode.querySelector('[data-rwn]');if(n)n.value=t.value;}
+});
+device.addEventListener('change',function(e){
+  var t=e.target,s=S[cur],v=parseFloat(String(t.value).replace(',','.'));
+  if(t.matches('[data-rw],[data-rwn]')){if(!isNaN(v))setRing(s,v);render();return;}
+  if(t.matches('[data-sw]')){var i=parseInt(t.getAttribute('data-sw'),10);if(!isNaN(v))setW(s,i,v);render();return;}
+  if(t.matches('[data-chw]')){if(!isNaN(v))chSet(s,parseInt(t.getAttribute('data-g'),10),parseInt(t.getAttribute('data-k'),10),v);render();return;}
+});
+device.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.matches('input[data-sw],input[data-rwn],input[data-chw]')){e.preventDefault();e.target.blur();}});
+
+/* demo base metal (Preview 4 only) */
+document.getElementById('demo').addEventListener('click',function(e){
+  var b=e.target.closest('[data-metal]');if(!b)return;var m=b.getAttribute('data-metal'),s=fresh();s.base=m;s.strips=[{m:m,w:8}];S[3]=s;render();
+});
+
+/* switcher + view */
+var sw=document.getElementById('switch');
+sw.innerHTML=NAMES.map(function(n,k){return '<button type="button" role="tab" id="tab'+k+'" aria-selected="false"><b>Preview '+(k+1)+'</b><span>'+n+'</span></button>';}).join('');
+sw.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;select([].indexOf.call(sw.children,b));});
+sw.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key==='ArrowLeft'){var n=(cur+(e.key==='ArrowRight'?1:3))%4;select(n);sw.children[n].focus();}});
+function view(pc){stage.classList.toggle('pc',pc);document.getElementById('vt-phone').setAttribute('aria-pressed',String(!pc));document.getElementById('vt-pc').setAttribute('aria-pressed',String(pc));render();}
+document.getElementById('vt-phone').addEventListener('click',function(){view(false);});
+document.getElementById('vt-pc').addEventListener('click',function(){view(true);});
+document.getElementById('resetBtn').addEventListener('click',function(){var base=S[cur].base;S[cur]=fresh();if(cur===3&&BLANKS[base]){S[3].base=base;S[3].strips=[{m:base,w:8}];}modal=null;drawModal();render();});
+
+var start=0,hash=(location.hash||'').replace('#','');
+if(/^p[1-4]$/.test(hash))start=parseInt(hash.slice(1),10)-1;
+else{try{var st=parseInt(localStorage.getItem('inlPreview'),10);if(st>=0&&st<4)start=st;}catch(e){}}
+select(start);
+window.__inl={S:S,select:select,view:view,api:{addInlay:addInlay,setW:setW,setRing:setRing,layoutAt:layoutAt,LAYOUTS:LAYOUTS,removeInlay:removeInlay,chooseBlank:chooseBlank,chFill:chFill,chSet:chSet,missing:missing,sum:sum}};
+})();
+</script>
