@@ -1400,6 +1400,8 @@ body.nb-pre #acc-body-compose .width-control,body.nb-pre .composer-actions .btn-
 #nbSbDlg .nb-sb-field{display:flex;flex-direction:column;gap:6px;margin:0 0 14px;min-width:0}
 #nbSbDlg .nb-sb-field[hidden],#nbSbDlg .nb-sb-eng[hidden],#nbSbDlg .nb-sb-groups[hidden],#nbSbDlg .nb-sb-wait[hidden],#nbSbDlg .nb-sb-msg[hidden]{display:none}
 #nbSbDlg .nb-sb-pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+#nbSbDlg .nb-sb-pair.one{grid-template-columns:minmax(0,1fr)}
+#nbSbDlg .nb-sb-loading .nb-sb-sw::after,#nbSbDlg .nb-sb-loading .nb-sb-chev{border:2px solid var(--sb-off-bg);border-top-color:var(--sb-accent);border-radius:50%;width:12px;height:12px;margin-top:-8px;transform:none;animation:nbSbSpin .8s linear infinite}
 #nbSbDlg .nb-sb-label{font-size:14px;font-weight:600;color:var(--sb-text)}
 #nbSbDlg .nb-sb-select,#nbSbDlg .nb-sb-input{
   width:100%;min-width:0;min-height:44px;padding:8px 12px;border-radius:10px;border:1px solid var(--sb-border);
@@ -8917,7 +8919,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   function blankF(){ return { profile:'', metal:'', style:'', weight:'', size:'', group:null, width:'', finish:'', inside:{ text:'', font:'', fill:'' }, outside:{ text:'', font:'', fill:'' } }; }
 
   function askChoices(changed,upTo){
-    var f=SB.f, d={}, ci=ORDER.indexOf(changed);
+    var f=SB.f, d={}, ci=ORDER.indexOf(changed); if(upTo==null) SB.clearedAt=null;
     ['profile','metal','style','weight'].forEach(function(k){ if(f[k]&&(upTo==null||ORDER.indexOf(k)<=upTo)) d[k]=f[k]; });
     var seq=++SB.seq; lock(changed);
     call('/solid-band/choices',d).then(function(json){
@@ -8957,10 +8959,12 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       else if(i>ci){ var pv=SB.prevLower&&SB.prevLower[k]; if(!f[k]&&pv&&offered(k,pv)) f[k]=pv; if(!offered(k,f[k])) f[k]=single||(offered(k,o[k])&&!f[k]?o[k]:''); }
     });
     SB.prevLower=null; scheduleRefresh(o);
-    var sz=w?w.size:f.size; if(w&&SB.fromShare&&sz&&!offered('size',sz)) lost('size'); f.size=offered('size',sz)?String(sz):''; if(f.size!=='U') f.group=null; else if(w) f.group=w.group;
+    var sz=w?w.size:f.size; if(w&&SB.fromShare&&sz&&!offered('size',sz)) lost('size');
+    if(!w&&sz&&!offered('size',sz)&&(changed==='style'||changed==='weight')) SB.clearedAt=SB.clearedAt||'size';
+    f.size=offered('size',sz)?String(sz):''; if(f.size!=='U') f.group=null; else if(w) f.group=w.group;
     SB.good=copyF(f);
     if(f.size&&f.profile&&f.metal&&f.style&&f.weight){ askOptions(changed); return; }
-    SB.op=null; SB.want=null; unlock(); render(); restored();
+    SB.op=null; SB.want=null; unlock(); render(); restored(); cleared();
   }
   function askOptions(changed){
     var f=SB.f, wd=SB.want&&SB.want.width?SB.want.width:f.width, d=optDesign(f,wd);
@@ -8968,15 +8972,17 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     (takePre(d)||call('/solid-band/options',d)).then(function(json){
       if(seq!==SB.seq||!SB.open) return;
       if(!json.ok||json.outcome!=='options'||!validOptions(json.options)){ refused(json,changed); return; }
-      takeOptions(json.options);
+      takeOptions(json.options,changed);
     });
   }
-  function takeOptions(o){
+  function takeOptions(o,changed){
     var f=SB.f, w=SB.want||{}, first=!SB.op;
     SB.op=o;
     var wd=w.width!=null&&w.width!==''?w.width:f.width;
     if(SB.want&&SB.fromShare){ if(wd&&!offered('width',wd)) lost('width'); if(w.finish&&!offered('finish',w.finish)) lost('finish'); }
-    f.width=offered('width',wd)?String(wd):(offered('width',o.selected_width)?String(o.selected_width):'');
+    var mine=!first&&!SB.want&&changed==='weight';
+    if(mine&&f.width&&!offered('width',f.width)) SB.clearedAt=SB.clearedAt||'width';
+    f.width=offered('width',wd)?String(wd):(mine&&f.width?'':(offered('width',o.selected_width)?String(o.selected_width):''));
     var fin=w.finish||f.finish;
     f.finish=offered('finish',fin)?fin:((first||w.finish!=null)&&listOf('finish').length?listOf('finish')[0].value:'');
     ['inside','outside'].forEach(function(k){
@@ -8986,8 +8992,9 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       var font=fontOk(k,src.font)?src.font:l.fonts.filter(function(x){ return !goneHas(k+'_font',x.value); }).map(function(x){ return x.value; })[0]||'';
       f[k]={ text:clean(src.text||'',k,font), font:font, fill:fillOk(k,src.fill)?src.fill:'' };
     });
-    SB.want=null; SB.good=copyF(f); unlock(); render(); restored();
+    SB.want=null; SB.good=copyF(f); unlock(); render(); restored(); cleared();
   }
+  function cleared(){ var at=SB.clearedAt; SB.clearedAt=null; if(at&&SB.open) showMsg(at,true); }
   function lost(path){ if(!SB.unrestored) SB.unrestored=path; }
   function restored(){ var p=SB.unrestored; SB.unrestored=null; SB.fromShare=false; if(p) showMsg(p,true); }
   function lookupDesign(){
@@ -9074,16 +9081,16 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     head.appendChild(h); head.appendChild(x); box.appendChild(head);
     var body=el('div','nb-sb-body'); box.appendChild(body);
     if(txt('intro')) body.appendChild(el('p','nb-sb-intro',txt('intro')));
-    V.profile=field(body,'profile',txt('profile_label'),'select');
     V.metal=field(body,'metal',txt('metal_label'),'select');
-    V.style=field(body,'style',txt('style_label'),'select');
-    V.weight=field(body,'weight',txt('weight_label'),'select');
+    V.profile=field(body,'profile',txt('profile_label'),'select');
     var more=el('div','nb-sb-more'); more.setAttribute('role','status'); more.setAttribute('aria-live','polite'); more.hidden=true;
     var msp=el('span','nb-sb-spin'); msp.setAttribute('aria-hidden','true'); more.appendChild(msp); more.appendChild(el('span','nb-sb-moret')); body.appendChild(more);
-    var pair=el('div','nb-sb-pair'); body.appendChild(pair);
-    V.size=field(pair,'size',txt('size_label'),'select');
-    V.width=field(pair,'width',txt('width_label'),'select');
+    V.size=field(body,'size',txt('size_label'),'select');
     var gw=el('div','nb-sb-groups'); gw.setAttribute('role','group'); gw.hidden=true; body.appendChild(gw); V.groups=gw;
+    V.style=field(body,'style',txt('style_label'),'select');
+    var pair=el('div','nb-sb-pair'); body.appendChild(pair); V.pair=pair;
+    V.width=field(pair,'width',txt('width_label'),'select');
+    V.weight=field(pair,'weight',txt('weight_label'),'select');
     V.finish=finishField(body);
     ['inside','outside'].forEach(function(k){
       var sec=el('div','nb-sb-eng nb-sb-eng-'+k); sec.hidden=true; body.appendChild(sec);
@@ -9153,6 +9160,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
     fillSel(V.style.sel,'style',f.style,isL('style')||!SB.ch);
     fillSel(V.weight.sel,'weight',f.weight,isL('weight')||!SB.ch);
     V.weight.wrap.hidden=!(SB.ch&&(listOf('weight').length>1||SB.msgAt==='weight'));
+    if(V.pair&&V.pair.classList.contains('one')!==V.weight.wrap.hidden) V.pair.classList.toggle('one',V.weight.wrap.hidden);
     fillSel(V.size.sel,'size',f.size,isL('size')||!SB.ch||!upOk);
     fillSel(V.width.sel,'width',f.width,isL('width')||!SB.op||!f.size);
     fillFinish(f.finish,isL('finish')||!SB.op||!f.size);
@@ -9184,6 +9192,8 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
         });
       }
     });
+    ['profile','metal','style','weight','size','width'].forEach(function(k){ var w=V[k]&&V[k].wrap, l=!!(SB.busy&&isL(k)); if(w&&w.classList.contains('nb-sb-loading')!==l){ w.classList.toggle('nb-sb-loading',l); if(l) w.setAttribute('aria-busy','true'); else w.removeAttribute('aria-busy'); } });
+    if(V.finish){ var fl=!!(SB.busy&&isL('finish')); if(V.finish.wrap.classList.contains('nb-sb-loading')!==fl){ V.finish.wrap.classList.toggle('nb-sb-loading',fl); if(fl) V.finish.wrap.setAttribute('aria-busy','true'); else V.finish.wrap.removeAttribute('aria-busy'); } }
     paintWait(); paintMore();
     dlg.classList.toggle('nb-sb-busy',SB.busy);
     var ok=q('.nb-sb-primary'); if(ok) ok.disabled=!ready();
