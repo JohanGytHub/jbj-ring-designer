@@ -133,6 +133,7 @@
             var r=SB.result, body=JSON.parse(init.body);
             body.solidBand=true; body.solidBandLookupId=r.lookupId; body.solidBandDesign=r.design;
             if(isQuote&&r.srvMiss) body.solidBandMiss=r.srvMiss;
+            if(isQuote) body.solidBandShown={ title:r.title, details:r.details };
             if(isQuote&&typeof body.shareUrl==='string') body.shareUrl=shareLink(body.shareUrl);
             init=Object.assign({},init,{ body:JSON.stringify(body) });
             sent=true;

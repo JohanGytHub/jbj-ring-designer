@@ -7066,7 +7066,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
       var names=groupNames(vis), g=groupOf(vis[a]), gi=Math.max(0,names.indexOf(g));
       var inGroup=vis.filter(function(t){ return groupOf(t)===g; }), pos=inGroup.indexOf(vis[a])+1;
       var here0=label(vis[a]);
-      name.textContent=(screenNamed(g)&&here0)?here0:g;
+      name.textContent=here0||g;
       var here=label(vis[a]), says='Step '+(gi+1)+' of '+names.length+': '+g+(here&&here!==g?', '+here:'');
       mid.setAttribute('aria-label',says+'. Show all steps');
       stepInfo(says);
@@ -8747,7 +8747,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
 })();
 (function(){
   'use strict';
-  var FILE='data/solid-band.js', VER='0f4a05ea31ed';
+  var FILE='data/solid-band.js', VER='a97a9b6150bc';
   var PROFILES=['Flat','Round','Bevel'];
   var L={ requested:0, loading:false, loaded:false, failed:false, held:null, order:[], long:false, heldAt:null, releasedAt:null }, holdTimer=null, longTimer=null, retryTimer=null, booted=false, tries=0, line=null;
   var SHOW_MS=1000, failTimer=null, cur=0, round=0;
