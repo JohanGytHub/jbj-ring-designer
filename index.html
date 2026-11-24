@@ -9552,7 +9552,7 @@ const NB_LATE_PICTURES = [{"name":"PROFILE_IMAGES","src":"data/profile-images.js
   }
   function wrapNewDesign(){
     var n=window.__V2_NEW_DESIGN__; if(!n||typeof n.go!=='function'||n.go.__nbBack) return;
-    var g=n.go, w=function(){ clearTimeout(H.saveT); forget(); return g.apply(this,arguments); }; w.__nbBack=true; n.go=w;
+    var g=n.go, w=function(){ H.ready=false; clearTimeout(H.saveT); clearTimeout(H.timer); clearTimeout(laterT); forget(); return g.apply(this,arguments); }; w.__nbBack=true; n.go=w;
   }
   function madeToOrder(){
     var s=st(), b=builder(), c=b&&b.solid_band, L=window.__V2_SB_LATE__;
